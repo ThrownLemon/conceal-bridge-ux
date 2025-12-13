@@ -22,7 +22,7 @@ Each provider entry contains:
 The backend loads provider configs and instantiates the contract at runtime in [`SwapContract`](conceal-wswap/units/contract.js:14).
 
 ### Frontend types expect chain config (contract address + optional ABI)
-The Angular UX models the EVM side as `wccx` and expects a contract address (and optionally an ABI) in [`BridgeChainConfig`](concael-bridge-ux/src/app/core/bridge-types.ts:8), using viem types [`Abi`](concael-bridge-ux/src/app/core/bridge-types.ts:1) and [`Address`](concael-bridge-ux/src/app/core/bridge-types.ts:1).
+The Angular UX models the EVM side as `wccx` and expects a contract address (and optionally an ABI) in [`BridgeChainConfig`](conceal-bridge-ux/src/app/core/bridge-types.ts:8), using viem types [`Abi`](conceal-bridge-ux/src/app/core/bridge-types.ts:1) and [`Address`](conceal-bridge-ux/src/app/core/bridge-types.ts:1).
 
 Important: the UX should treat addresses / chain IDs / confirmations as **runtime config**, not hardcoded constants.
 
@@ -31,13 +31,13 @@ Important: the UX should treat addresses / chain IDs / confirmations as **runtim
 ## Contract addresses for each network
 
 ### EVM networks used by the UX
-The UX currently defines supported EVM network keys as [`EVM_NETWORK_KEYS`](concael-bridge-ux/src/app/core/bridge-types.ts:3) (currently `eth`, `bsc`, `plg`).
+The UX currently defines supported EVM network keys as [`EVM_NETWORK_KEYS`](conceal-bridge-ux/src/app/core/bridge-types.ts:3) (currently `eth`, `bsc`, `plg`).
 
 These keys must remain consistent with the backend provider IDs used by [`getProviderConfig()`](conceal-wswap/units/contract.js:88) and config entries in [`config.json.sample`](conceal-wswap/config.json.sample:25).
 
 ### Where the address is used
 - Backend: contract instances are created with [`ethers.Contract()`](conceal-wswap/units/contract.js:59) using the configured address.
-- Frontend: config shape uses [`BridgeChainConfig.wccx.contractAddress`](concael-bridge-ux/src/app/core/bridge-types.ts:14).
+- Frontend: config shape uses [`BridgeChainConfig.wccx.contractAddress`](conceal-bridge-ux/src/app/core/bridge-types.ts:14).
 
 Agent rule:
 - Do **not** embed contract addresses in UI code, docs, or tests. Always consume config from the backend/runtime config layer.
@@ -63,7 +63,7 @@ It includes the standard ERC-20 functions and events:
 - [`Transfer`](conceal-wswap/contracts/contract_bsc.abi:172)
 
 ### Frontend ABI typing (viem)
-The UX uses viem ABI types via [`Abi`](concael-bridge-ux/src/app/core/bridge-types.ts:1). If the backend provides ABI at runtime, keep it minimal (ERC-20 subset) unless the UX truly needs extra methods.
+The UX uses viem ABI types via [`Abi`](conceal-bridge-ux/src/app/core/bridge-types.ts:1). If the backend provides ABI at runtime, keep it minimal (ERC-20 subset) unless the UX truly needs extra methods.
 
 Agent rules:
 - Prefer **minimal ABI surface**.
@@ -170,7 +170,7 @@ When adjusting gas/fee logic:
 ## Common pitfalls (agent checklist)
 
 ### Address + network mismatches
-- Ensure provider IDs match between UX network keys ([`EVM_NETWORK_KEYS`](concael-bridge-ux/src/app/core/bridge-types.ts:3)) and backend provider IDs ([`getProviderConfig()`](conceal-wswap/units/contract.js:88)).
+- Ensure provider IDs match between UX network keys ([`EVM_NETWORK_KEYS`](conceal-bridge-ux/src/app/core/bridge-types.ts:3)) and backend provider IDs ([`getProviderConfig()`](conceal-wswap/units/contract.js:88)).
 - Ensure `chainId` is correct; ethers v6 is strict about networks (see network initialization in [`SwapContract`](conceal-wswap/units/contract.js:42)).
 
 ### Units and decimals
@@ -202,15 +202,15 @@ Agent rule:
 1) Backend: add a provider entry in the deployed config (model it after [`config.json.sample`](conceal-wswap/config.json.sample:25))
 2) Backend: add an ABI file (ERC-20 subset) similar to [`contract_bsc.abi`](conceal-wswap/contracts/contract_bsc.abi:1)
 3) Backend: ensure the provider can be loaded by [`SwapContract`](conceal-wswap/units/contract.js:14) (RPC reachable, ABI path valid)
-4) Frontend: decide whether the new chain should be part of [`EVM_NETWORK_KEYS`](concael-bridge-ux/src/app/core/bridge-types.ts:3)
+4) Frontend: decide whether the new chain should be part of [`EVM_NETWORK_KEYS`](conceal-bridge-ux/src/app/core/bridge-types.ts:3)
 5) End-to-end: verify tx validation works via [`getTxInfo()`](conceal-wswap/units/contract.js:204) and calldata parsing via [`decodeTransferData()`](conceal-wswap/units/contract.js:227)
 
 ---
 
 ## Related docs/specs in this repo
 
-- Backend API behavior (init/exec/poll endpoints): [`backend_api.md`](concael-bridge-ux/ai_docs/backend_api.md:1)
-- Error handling patterns for web3 + backend responses: [`error_handling.md`](concael-bridge-ux/ai_docs/error_handling.md:1)
-- Wallet integration patterns (MetaMask/etc.): [`wallets.md`](concael-bridge-ux/ai_docs/wallets.md:1)
-- Security posture and constraints: [`security.md`](concael-bridge-ux/ai_docs/security.md:1)
-- Future: explorer/history feature spec: [`bridge_explorer_and_history.md`](concael-bridge-ux/ai_spec/bridge_explorer_and_history.md:1)
+- Backend API behavior (init/exec/poll endpoints): [`backend_api.md`](conceal-bridge-ux/ai_docs/backend_api.md:1)
+- Error handling patterns for web3 + backend responses: [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:1)
+- Wallet integration patterns (MetaMask/etc.): [`wallets.md`](conceal-bridge-ux/ai_docs/wallets.md:1)
+- Security posture and constraints: [`security.md`](conceal-bridge-ux/ai_docs/security.md:1)
+- Future: explorer/history feature spec: [`bridge_explorer_and_history.md`](conceal-bridge-ux/ai_spec/bridge_explorer_and_history.md:1)

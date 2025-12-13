@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "concael-bridge-ux": {
+    "conceal-bridge-ux": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -16,6 +16,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": "dist/conceal-bridge-ux",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
@@ -63,16 +64,20 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "concael-bridge-ux:build:production"
+              "buildTarget": "conceal-bridge-ux:build:production"
             },
             "development": {
-              "buildTarget": "concael-bridge-ux:build:development"
+              "buildTarget": "conceal-bridge-ux:build:development"
             }
           },
           "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular/build:unit-test"
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {}
         }
       }
     }

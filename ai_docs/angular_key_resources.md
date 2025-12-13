@@ -135,7 +135,7 @@ Angular — Deliver web apps with confidence 🚀
 
 ## Related docs/specs in this repo
 
-- Repo-specific Angular rules and conventions: [`angular_best_practices.md`](concael-bridge-ux/ai_docs/angular_best_practices.md:1)
-- Project structure/build/deploy notes for this workspace: [`angular_build_guide.md`](concael-bridge-ux/ai_docs/angular_build_guide.md:1)
-- UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](concael-bridge-ux/ai_docs/style_guide.md:1)
-- Testing conventions for this repo (Angular TestBed + Web3 mocking): [`testing.md`](concael-bridge-ux/ai_docs/testing.md:1)
+- Repo-specific Angular rules and conventions: [`angular_best_practices.md`](conceal-bridge-ux/ai_docs/angular_best_practices.md:1)
+- Project structure/build/deploy notes for this workspace: [`angular_build_guide.md`](conceal-bridge-ux/ai_docs/angular_build_guide.md:1)
+- UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](conceal-bridge-ux/ai_docs/style_guide.md:1)
+- Testing conventions for this repo (Angular TestBed + Web3 mocking): [`testing.md`](conceal-bridge-ux/ai_docs/testing.md:1)

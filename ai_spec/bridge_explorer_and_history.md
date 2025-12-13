@@ -1,12 +1,12 @@
-# Spec: Bridge Explorer / Swap History (Future Feature) — Concael Bridge UX
+# Spec: Bridge Explorer / Swap History (Future Feature) — conceal Bridge UX
 
 ## Context / Current State
 
 - The current UX is designed around a single “in-progress session”:
-  - The swap page tracks `paymentId`, tx hashes, and completion state in-memory signals in [`SwapPage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:400).
+  - The swap page tracks `paymentId`, tx hashes, and completion state in-memory signals in [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:400).
 - There is no persistent history or account dashboard in the UI.
 - A “bridge explorer” / history view is explicitly listed as a non-goal in the example spec:
-  - see “A full ‘bridge explorer’…” in [`example.md`](concael-bridge-ux/ai_spec/example.md:17).
+  - see “A full ‘bridge explorer’…” in [`example.md`](conceal-bridge-ux/ai_spec/example.md:17).
 
 ## Goal
 
@@ -54,7 +54,7 @@ Choose one approach:
   - direction, network
   - timestamps
   - tx hashes (if available)
-- UI revalidates status by calling existing status endpoints via [`BridgeApiService.checkSwapState()`](concael-bridge-ux/src/app/core/bridge-api.service.ts:92).
+- UI revalidates status by calling existing status endpoints via [`BridgeApiService.checkSwapState()`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:92).
 
 ## Security / Privacy Requirements
 
@@ -67,7 +67,7 @@ Choose one approach:
   - provide a “Clear history” action
 
 Align with guidance in:
-- [`security.md`](concael-bridge-ux/ai_docs/security.md:1)
+- [`security.md`](conceal-bridge-ux/ai_docs/security.md:1)
 
 ## Error Handling
 
@@ -75,7 +75,7 @@ Align with guidance in:
   - blocking error for page load failures
   - status messages for transient failures
 Align with:
-- [`error_handling.md`](concael-bridge-ux/ai_docs/error_handling.md:30)
+- [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:30)
 
 ## Testing Plan
 
@@ -87,12 +87,12 @@ Align with:
   - search by payment ID
 
 See E2E approach:
-- [`e2e_testing.md`](concael-bridge-ux/ai_spec/e2e_testing.md:1)
+- [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1)
 
 ## Implementation Steps (Work Breakdown)
 
 1. Define data strategy (backend vs local).
-2. Add route in [`app.routes.ts`](concael-bridge-ux/src/app/app.routes.ts:3).
+2. Add route in [`app.routes.ts`](conceal-bridge-ux/src/app/app.routes.ts:3).
 3. Implement `HistoryPage` UI and interactions.
 4. Add service for persistence (if client-local).
 5. Add tests (unit + E2E later).

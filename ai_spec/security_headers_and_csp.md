@@ -1,23 +1,23 @@
-# Spec: Security Headers & Content Security Policy (CSP) — Concael Bridge UX
+# Spec: Security Headers & Content Security Policy (CSP) — conceal Bridge UX
 
 ## Context / Current State
 
-- This is a static Angular SPA (standalone bootstrapped via [`bootstrapApplication()`](concael-bridge-ux/src/main.ts:1)).
-- The app calls a backend API via a configurable base URL in [`APP_CONFIG.apiBaseUrl`](concael-bridge-ux/src/app/core/app-config.ts:8), consumed by [`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:20).
-- The app integrates with EVM wallets (injected providers + WalletConnect) via [`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:33).
-- The UI loads local static assets from [`public/`](concael-bridge-ux/public:1) (images for networks/wallets referenced by [`WalletButtonComponent`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:256)).
-- The home page indicates it loads chain metadata from a public API (see note in [`HomePage`](concael-bridge-ux/src/app/pages/home/home.page.ts:141)), so there may be external `connect-src` and/or external `img-src` requirements.
+- This is a static Angular SPA (standalone bootstrapped via [`bootstrapApplication()`](conceal-bridge-ux/src/main.ts:1)).
+- The app calls a backend API via a configurable base URL in [`APP_CONFIG.apiBaseUrl`](conceal-bridge-ux/src/app/core/app-config.ts:8), consumed by [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:20).
+- The app integrates with EVM wallets (injected providers + WalletConnect) via [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:33).
+- The UI loads local static assets from [`public/`](conceal-bridge-ux/public:1) (images for networks/wallets referenced by [`WalletButtonComponent`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:256)).
+- The home page indicates it loads chain metadata from a public API (see note in [`HomePage`](conceal-bridge-ux/src/app/pages/home/home.page.ts:141)), so there may be external `connect-src` and/or external `img-src` requirements.
 
 ## Goal
 
-Define a **safe default set of security headers** (especially CSP) for deployment of `concael-bridge-ux` that:
+Define a **safe default set of security headers** (especially CSP) for deployment of `conceal-bridge-ux` that:
 
 - reduces XSS and injection risk
 - allows necessary connections for:
   - the bridge backend
   - WalletConnect (if enabled)
   - any chain metadata API the app uses
-- remains compatible with Angular production builds (hashed asset filenames via `outputHashing` in [`angular.json`](concael-bridge-ux/angular.json:48))
+- remains compatible with Angular production builds (hashed asset filenames via `outputHashing` in [`angular.json`](conceal-bridge-ux/angular.json:48))
 
 ## Non-Goals
 
@@ -29,9 +29,9 @@ Define a **safe default set of security headers** (especially CSP) for deploymen
 
 1. Provide recommended headers for static hosting (Nginx, S3/CloudFront, Netlify, etc.).
 2. Provide a baseline CSP with clear extension points for:
-   - backend API host(s) from [`APP_CONFIG`](concael-bridge-ux/src/app/core/app-config.ts:3)
-   - chain metadata host(s) (as used by [`EvmChainMetadataService`](concael-bridge-ux/src/app/core/evm-chain-metadata.service.ts:1))
-   - WalletConnect endpoints when [`walletConnectProjectId`](concael-bridge-ux/src/app/core/app-config.ts:14) is enabled
+   - backend API host(s) from [`APP_CONFIG`](conceal-bridge-ux/src/app/core/app-config.ts:3)
+   - chain metadata host(s) (as used by [`EvmChainMetadataService`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:1))
+   - WalletConnect endpoints when [`walletConnectProjectId`](conceal-bridge-ux/src/app/core/app-config.ts:14) is enabled
 3. Document how to validate CSP correctness (report-only rollout).
 
 ## Recommended Security Headers
@@ -68,10 +68,10 @@ Notes:
 
 Once you identify exact hosts, tighten:
 
-- `img-src`: allow only required external image hosts (ideally none; prefer local assets in [`public/`](concael-bridge-ux/public:1))
+- `img-src`: allow only required external image hosts (ideally none; prefer local assets in [`public/`](conceal-bridge-ux/public:1))
 - `connect-src`: allow only:
-  - bridge backend base domain(s) used by [`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:20)
-  - chain metadata API domain(s) used by [`EvmChainMetadataService`](concael-bridge-ux/src/app/core/evm-chain-metadata.service.ts:1)
+  - bridge backend base domain(s) used by [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:20)
+  - chain metadata API domain(s) used by [`EvmChainMetadataService`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:1)
   - WalletConnect endpoints (if WalletConnect is enabled)
 
 Example tightened form (placeholders for actual domains):
@@ -96,7 +96,7 @@ Content-Security-Policy:
 
 #### WalletConnect CSP considerations
 
-If using WalletConnect provider initialization in [`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:298), the app may need `connect-src` permissions to WalletConnect infrastructure.
+If using WalletConnect provider initialization in [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:298), the app may need `connect-src` permissions to WalletConnect infrastructure.
 
 Because WalletConnect endpoints can evolve, prefer:
 - allowlist the minimum set from WalletConnect docs
@@ -151,15 +151,15 @@ Validate with WalletConnect flows before enforcing broadly.
 
 1. Deploy with `Content-Security-Policy-Report-Only` first.
 2. Use your browser devtools network panel while exercising:
-   - home page load + chain metadata load (see note in [`HomePage`](concael-bridge-ux/src/app/pages/home/home.page.ts:141))
-   - swap flows calling backend via [`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:13)
-   - WalletConnect connect flow via [`WalletButtonComponent`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:286)
+   - home page load + chain metadata load (see note in [`HomePage`](conceal-bridge-ux/src/app/pages/home/home.page.ts:141))
+   - swap flows calling backend via [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13)
+   - WalletConnect connect flow via [`WalletButtonComponent`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:286)
 3. Capture all blocked/attempted `connect-src`, `img-src`, and `frame-src`.
 4. Tighten `connect-src` and `img-src` to explicit hosts only.
 
 ## Runtime Config Interaction
 
-If you adopt runtime config per [`runtime_config.md`](concael-bridge-ux/ai_spec/runtime_config.md:1), ensure CSP allows:
+If you adopt runtime config per [`runtime_config.md`](conceal-bridge-ux/ai_spec/runtime_config.md:1), ensure CSP allows:
 - fetching `/config.json` from self:
   - keep `connect-src 'self'`
 - any configured backend host(s) still fit within the allowlist
@@ -180,7 +180,7 @@ If you adopt runtime config per [`runtime_config.md`](concael-bridge-ux/ai_spec/
   - Confirm swap flow works end-to-end with test backend.
   - Confirm WalletConnect works when enabled.
 - Automated:
-  - E2E suite (see [`e2e_testing.md`](concael-bridge-ux/ai_spec/e2e_testing.md:1)) should run with headers enabled in a staging environment if feasible.
+  - E2E suite (see [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1)) should run with headers enabled in a staging environment if feasible.
 
 ## Implementation Steps (Work Breakdown)
 
@@ -188,4 +188,4 @@ If you adopt runtime config per [`runtime_config.md`](concael-bridge-ux/ai_spec/
 2. Exercise main flows; collect reported violations.
 3. Create allowlist; switch to enforced `Content-Security-Policy`.
 4. Add remaining security headers.
-5. Document final header values in the deployment spec [`deployment_static_hosting.md`](concael-bridge-ux/ai_spec/deployment_static_hosting.md:1).
+5. Document final header values in the deployment spec [`deployment_static_hosting.md`](conceal-bridge-ux/ai_spec/deployment_static_hosting.md:1).

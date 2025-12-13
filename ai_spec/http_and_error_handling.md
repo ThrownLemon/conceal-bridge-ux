@@ -1,12 +1,12 @@
-# Spec: HTTP Conventions & Error Handling — Concael Bridge UX
+# Spec: HTTP Conventions & Error Handling — conceal Bridge UX
 
 ## Context / Current State
 
-- HTTP is provided globally via [`provideHttpClient()`](concael-bridge-ux/src/app/app.config.ts:2).
-- There are no HTTP interceptors configured today (same file: [`app.config.ts`](concael-bridge-ux/src/app/app.config.ts:7)).
-- Backend calls are centralized in [`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:13), which builds URLs using `APP_CONFIG.apiBaseUrl` (see [`#url()`](concael-bridge-ux/src/app/core/bridge-api.service.ts:20)).
-- Components handle errors with local `catchError` + UI signals (example in [`SwapPage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:489)).
-- Swap flows include backend polling loops using RxJS `timer` and `switchMap` (see [`startPolling()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:845)).
+- HTTP is provided globally via [`provideHttpClient()`](conceal-bridge-ux/src/app/app.config.ts:2).
+- There are no HTTP interceptors configured today (same file: [`app.config.ts`](conceal-bridge-ux/src/app/app.config.ts:7)).
+- Backend calls are centralized in [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13), which builds URLs using `APP_CONFIG.apiBaseUrl` (see [`#url()`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:20)).
+- Components handle errors with local `catchError` + UI signals (example in [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:489)).
+- Swap flows include backend polling loops using RxJS `timer` and `switchMap` (see [`startPolling()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:845)).
 
 ## Goal
 
@@ -33,9 +33,9 @@ Define a consistent, best-practice HTTP/error-handling approach for this Angular
    - only for idempotent requests (GET and safe polling calls)
    - do not blindly retry swap-init endpoints
 4. **Consistent UI messaging**:
-   - follow the existing `pageError` / `statusMessage` pattern in [`SwapPage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:445)
+   - follow the existing `pageError` / `statusMessage` pattern in [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:445)
 5. **Cancelable polling**:
-   - ensure polling stops on navigation and on completion (already does `takeUntilDestroyed()` in [`startPolling()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:855))
+   - ensure polling stops on navigation and on completion (already does `takeUntilDestroyed()` in [`startPolling()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:855))
 
 ## Proposed Solution
 
@@ -47,7 +47,7 @@ Add one interceptor for:
 - centralized error mapping
 - optional timeout enforcement
 
-In Angular 21 standalone, register interceptors using `provideHttpClient(withInterceptors([...]))` in [`app.config.ts`](concael-bridge-ux/src/app/app.config.ts:7).
+In Angular 21 standalone, register interceptors using `provideHttpClient(withInterceptors([...]))` in [`app.config.ts`](conceal-bridge-ux/src/app/app.config.ts:7).
 
 ### B) Add a small “ApiError” mapping utility
 
@@ -58,7 +58,7 @@ Create a helper that converts an error into:
 - `status` (optional)
 
 Proposed location:
-- [`concael-bridge-ux/src/app/core/api-error.ts`](concael-bridge-ux/src/app/core/api-error.ts:1)
+- [`conceal-bridge-ux/src/app/core/api-error.ts`](conceal-bridge-ux/src/app/core/api-error.ts:1)
 
 ### C) Apply strict retry rules
 
@@ -66,7 +66,7 @@ Rules:
 - `GET` requests: retry on network/5xx with exponential backoff (small max attempts)
 - `POST` requests:
   - **do not retry** swap-init endpoints (they may not be idempotent)
-  - allow retry only for safe “status polling” POST endpoints if backend guarantees idempotency (e.g. [`checkSwapState()`](concael-bridge-ux/src/app/core/bridge-api.service.ts:92) posts a `paymentId` for status; this is likely safe)
+  - allow retry only for safe “status polling” POST endpoints if backend guarantees idempotency (e.g. [`checkSwapState()`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:92) posts a `paymentId` for status; this is likely safe)
 
 ### D) Establish timeouts
 
@@ -120,8 +120,8 @@ Keep using signals in pages and set messages consistently:
 
 ## Implementation Steps (Work Breakdown)
 
-1. Add [`api-error.ts`](concael-bridge-ux/src/app/core/api-error.ts:1) (type + mapper).
-2. Add interceptor file (e.g. [`api-http.interceptor.ts`](concael-bridge-ux/src/app/core/api-http.interceptor.ts:1)).
-3. Register interceptor(s) in [`app.config.ts`](concael-bridge-ux/src/app/app.config.ts:7) via `withInterceptors`.
-4. Update [`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:13) and pages as needed to adopt consistent mapping/messages.
+1. Add [`api-error.ts`](conceal-bridge-ux/src/app/core/api-error.ts:1) (type + mapper).
+2. Add interceptor file (e.g. [`api-http.interceptor.ts`](conceal-bridge-ux/src/app/core/api-http.interceptor.ts:1)).
+3. Register interceptor(s) in [`app.config.ts`](conceal-bridge-ux/src/app/app.config.ts:7) via `withInterceptors`.
+4. Update [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13) and pages as needed to adopt consistent mapping/messages.
 5. Add tests for mapping and timeout/retry behavior.

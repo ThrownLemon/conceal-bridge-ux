@@ -88,7 +88,7 @@ AI agent rules:
 The backend uses provider IDs from config, e.g. `eth`, `bsc`, `plg`, `ccx`, and a configured default provider.
 
 - Provider selection is done by [`getProviderConfig()`](conceal-wswap/units/contract.js:88)
-- The newer Angular UX models network keys as [`EVM_NETWORK_KEYS`](concael-bridge-ux/src/app/core/bridge-types.ts:3)
+- The newer Angular UX models network keys as [`EVM_NETWORK_KEYS`](conceal-bridge-ux/src/app/core/bridge-types.ts:3)
 
 AI agent rules:
 - Keep provider IDs consistent across backend config, backend code, and frontend network keys.
@@ -380,6 +380,6 @@ AI agent rule:
 
 ## 9) Related docs/specs in this repo
 
-- Smart contract behavior (ERC-20 wCCX) and backend verification patterns: [`smart_conctracts.md`](concael-bridge-ux/ai_docs/smart_conctracts.md:1)
-- Frontend runtime types for swap responses (new UX): [`BridgeInitSwapResponse`](concael-bridge-ux/src/app/core/bridge-types.ts:39), [`BridgeSwapStateResponse`](concael-bridge-ux/src/app/core/bridge-types.ts:45)
-- Error handling expectations for the UX: [`error_handling.md`](concael-bridge-ux/ai_docs/error_handling.md:1)
+- Smart contract behavior (ERC-20 wCCX) and backend verification patterns: [`smart_conctracts.md`](conceal-bridge-ux/ai_docs/smart_conctracts.md:1)
+- Frontend runtime types for swap responses (new UX): [`BridgeInitSwapResponse`](conceal-bridge-ux/src/app/core/bridge-types.ts:39), [`BridgeSwapStateResponse`](conceal-bridge-ux/src/app/core/bridge-types.ts:45)
+- Error handling expectations for the UX: [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:1)

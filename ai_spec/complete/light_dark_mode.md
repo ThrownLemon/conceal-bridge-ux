@@ -1,4 +1,4 @@
-# Spec: Light/Dark Mode — Concael Bridge UX
+# Spec: Light/Dark Mode — conceal Bridge UX
 
 > [!NOTE]
 > **Status: Implemented**

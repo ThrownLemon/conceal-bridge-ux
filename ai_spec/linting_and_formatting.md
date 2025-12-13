@@ -1,11 +1,11 @@
-# Spec: Linting & Formatting (Angular 21) — Concael Bridge UX
+# Spec: Linting & Formatting (Angular 21) — conceal Bridge UX
 
 ## Context / Current State
 
-- The project has **no lint script** today (see [`scripts`](concael-bridge-ux/package.json:4)).
-- Formatting is partially defined via a `prettier` config embedded in [`package.json`](concael-bridge-ux/package.json:11).
-- Codebase is strict TypeScript + strict templates (see [`compilerOptions.strict`](concael-bridge-ux/tsconfig.json:6) and [`angularCompilerOptions.strictTemplates`](concael-bridge-ux/tsconfig.json:22)).
-- Angular project is standalone, configured via [`angular.json`](concael-bridge-ux/angular.json:1) and bootstrapped with [`bootstrapApplication()`](concael-bridge-ux/src/main.ts:1).
+- The project has **no lint script** today (see [`scripts`](conceal-bridge-ux/package.json:4)).
+- Formatting is partially defined via a `prettier` config embedded in [`package.json`](conceal-bridge-ux/package.json:11).
+- Codebase is strict TypeScript + strict templates (see [`compilerOptions.strict`](conceal-bridge-ux/tsconfig.json:6) and [`angularCompilerOptions.strictTemplates`](conceal-bridge-ux/tsconfig.json:22)).
+- Angular project is standalone, configured via [`angular.json`](conceal-bridge-ux/angular.json:1) and bootstrapped with [`bootstrapApplication()`](conceal-bridge-ux/src/main.ts:1).
 
 ## Goal
 
@@ -62,7 +62,7 @@ Optional (recommended if you want a `lint` target in Angular CLI):
 
 Prefer the modern “flat config” file:
 
-- [`concael-bridge-ux/eslint.config.js`](concael-bridge-ux/eslint.config.js:1)
+- [`conceal-bridge-ux/eslint.config.js`](conceal-bridge-ux/eslint.config.js:1)
 
 Config must:
 - lint `*.ts` using TypeScript parser and `@typescript-eslint`
@@ -71,7 +71,7 @@ Config must:
 
 ### 3) Scripts to add
 
-In [`scripts`](concael-bridge-ux/package.json:4), add:
+In [`scripts`](conceal-bridge-ux/package.json:4), add:
 
 - `lint`: run eslint over the project
 - `lint:fix`: run eslint with `--fix`
@@ -85,55 +85,55 @@ Example (spec-level, not final):
 
 ### 4) (Optional) Add Angular “lint” target
 
-Add a `lint` target under the Angular project in [`angular.json`](concael-bridge-ux/angular.json:15) if you want `ng lint` parity:
+Add a `lint` target under the Angular project in [`angular.json`](conceal-bridge-ux/angular.json:15) if you want `ng lint` parity:
 
 - Add `architect.lint` using `@angular-eslint/builder:lint` pointing to `src/**/*.ts` and `src/**/*.html`.
 
 This enables:
-- [`ng lint`](concael-bridge-ux/package.json:5) (via `ng` binary) to behave as expected.
+- [`ng lint`](conceal-bridge-ux/package.json:5) (via `ng` binary) to behave as expected.
 
 ### 5) Rule set (recommended baseline)
 
 TypeScript rules:
 - no unused vars
-- no floating promises (careful: the project uses `async` flows in [`SwapPage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:598))
+- no floating promises (careful: the project uses `async` flows in [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:598))
 - consistent type imports where useful
 
 Angular rules:
-- consistent component selectors (prefix `app` is set in [`angular.json`](concael-bridge-ux/angular.json:14))
+- consistent component selectors (prefix `app` is set in [`angular.json`](conceal-bridge-ux/angular.json:14))
 - template accessibility linting where feasible
 - discourage `any`
 
 Project-specific rules:
-- allow `void` for intentionally ignored promises (pattern used in [`void this.wallet.hydrate()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:478))
+- allow `void` for intentionally ignored promises (pattern used in [`void this.wallet.hydrate()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:478))
 
 Prettier integration:
 - disable ESLint formatting rules with `eslint-config-prettier`
-- keep formatting controlled by the Prettier config in [`package.json`](concael-bridge-ux/package.json:11)
+- keep formatting controlled by the Prettier config in [`package.json`](conceal-bridge-ux/package.json:11)
 
 ## Acceptance Criteria
 
 1. `npm run lint` exists and runs successfully on the repo.
 2. `npm run lint:fix` exists and can fix safe issues.
 3. `npm run format` / `npm run format:check` exist if adopted.
-4. CI (see future spec [`ci_cd_pipeline.md`](concael-bridge-ux/ai_spec/ci_cd_pipeline.md:1)) runs lint as a required step.
+4. CI (see future spec [`ci_cd_pipeline.md`](conceal-bridge-ux/ai_spec/ci_cd_pipeline.md:1)) runs lint as a required step.
 
 ## Testing Plan
 
 - Run lint locally against:
-  - TS files under [`src/app/`](concael-bridge-ux/src/app:1)
-  - HTML templates (inline templates inside TS and any standalone `.html` files such as [`src/app/app.html`](concael-bridge-ux/src/app/app.html:1))
+  - TS files under [`src/app/`](conceal-bridge-ux/src/app:1)
+  - HTML templates (inline templates inside TS and any standalone `.html` files such as [`src/app/app.html`](conceal-bridge-ux/src/app/app.html:1))
 - Verify no conflicts with Prettier output.
 
 ## Risks / Considerations
 
 - Angular 21 + TS 5.9 means dependency versions must be compatible; keep the stack aligned to avoid parser/plugin mismatches.
-- If the project adopts Vitest patterns more deeply, ensure test files remain lintable (Vitest types are set in [`tsconfig.spec.json`](concael-bridge-ux/tsconfig.spec.json:7)).
+- If the project adopts Vitest patterns more deeply, ensure test files remain lintable (Vitest types are set in [`tsconfig.spec.json`](conceal-bridge-ux/tsconfig.spec.json:7)).
 
 ## Implementation Steps (Work Breakdown)
 
-1. Add ESLint and plugins to dev dependencies in [`package.json`](concael-bridge-ux/package.json:38).
-2. Create [`eslint.config.js`](concael-bridge-ux/eslint.config.js:1).
-3. Add scripts in [`package.json`](concael-bridge-ux/package.json:4).
-4. (Optional) Add `architect.lint` to [`angular.json`](concael-bridge-ux/angular.json:15).
+1. Add ESLint and plugins to dev dependencies in [`package.json`](conceal-bridge-ux/package.json:38).
+2. Create [`eslint.config.js`](conceal-bridge-ux/eslint.config.js:1).
+3. Add scripts in [`package.json`](conceal-bridge-ux/package.json:4).
+4. (Optional) Add `architect.lint` to [`angular.json`](conceal-bridge-ux/angular.json:15).
 5. Run `npm run lint` and fix initial findings.

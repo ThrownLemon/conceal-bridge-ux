@@ -1,7 +1,7 @@
 # Conceal Bridge UX — Spec-Based Design Plan
 
 **Status**: Draft  
-**Project**: `concael-bridge-ux` (Angular)  
+**Project**: `conceal-bridge-ux` (Angular)  
 **Last updated**: 2025-12-13  
 
 ## Goals & non-goals

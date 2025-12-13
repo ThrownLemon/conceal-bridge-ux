@@ -184,8 +184,8 @@ This document targets **Angular v21** and is intended to guide both humans and A
 
 ## Related docs/specs in this repo
 
-- Project-specific build + architecture notes: [`angular_build_guide.md`](concael-bridge-ux/ai_docs/angular_build_guide.md:1)
-- UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](concael-bridge-ux/ai_docs/style_guide.md:1)
-- Testing conventions (Angular TestBed + Web3 mocking): [`testing.md`](concael-bridge-ux/ai_docs/testing.md:1)
-- Error handling conventions used across the app: [`error_handling.md`](concael-bridge-ux/ai_docs/error_handling.md:1)
-- Security constraints relevant to Angular/browser code: [`security.md`](concael-bridge-ux/ai_docs/security.md:1)
+- Project-specific build + architecture notes: [`angular_build_guide.md`](conceal-bridge-ux/ai_docs/angular_build_guide.md:1)
+- UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](conceal-bridge-ux/ai_docs/style_guide.md:1)
+- Testing conventions (Angular TestBed + Web3 mocking): [`testing.md`](conceal-bridge-ux/ai_docs/testing.md:1)
+- Error handling conventions used across the app: [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:1)
+- Security constraints relevant to Angular/browser code: [`security.md`](conceal-bridge-ux/ai_docs/security.md:1)

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Project Name:** Concael Bridge UX (workspace project: [`concael-bridge-ux`](concael-bridge-ux/package.json:1))
+**Project Name:** conceal Bridge UX (workspace project: [`conceal-bridge-ux`](conceal-bridge-ux/package.json:1))
 
 **Purpose:** A web UI for bridging (swapping) between **Conceal (CCX)** and **wrapped CCX (wCCX)** on EVM networks (**Ethereum**, **BNB Smart Chain**, **Polygon**). The UI:
 - connects to an EVM wallet (injected providers),
@@ -11,17 +11,17 @@
 - polls backend state until the swap completes.
 
 **Angular Version:** Angular **21.0.x** (CLI **21.0.x**)  
-- Dependencies pinned in [`concael-bridge-ux/package.json`](concael-bridge-ux/package.json:1)
-- CLI version referenced in [`concael-bridge-ux/README.md`](concael-bridge-ux/README.md:1)
+- Dependencies pinned in [`conceal-bridge-ux/package.json`](conceal-bridge-ux/package.json:1)
+- CLI version referenced in [`conceal-bridge-ux/README.md`](conceal-bridge-ux/README.md:1)
 
 **Target Platform:** Web SPA (responsive), static build output suitable for typical static hosting.
 
 **Key Features:**
-- Standalone app bootstrapped via [`bootstrapApplication()`](concael-bridge-ux/src/main.ts:1)
-- Route-level lazy loading with [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:3)
-- Wallet UX: MetaMask / Trust / Binance Wallet via [`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:33)
-- Swap UX for CCX→wCCX and wCCX→CCX via [`SwapPage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:400)
-- Tailwind CSS UI (utility-first) via [`src/styles.css`](concael-bridge-ux/src/styles.css:1) and PostCSS plugin config in [`.postcssrc.json`](concael-bridge-ux/.postcssrc.json:1)
+- Standalone app bootstrapped via [`bootstrapApplication()`](conceal-bridge-ux/src/main.ts:1)
+- Route-level lazy loading with [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:3)
+- Wallet UX: MetaMask / Trust / Binance Wallet via [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:33)
+- Swap UX for CCX→wCCX and wCCX→CCX via [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:400)
+- Tailwind CSS UI (utility-first) via [`src/styles.css`](conceal-bridge-ux/src/styles.css:1) and PostCSS plugin config in [`.postcssrc.json`](conceal-bridge-ux/.postcssrc.json:1)
 
 ---
 
@@ -32,7 +32,7 @@
 This project uses the newer Angular “public assets” approach (no `src/assets/`).
 
 ```
-concael-bridge-ux/
+conceal-bridge-ux/
 ├── angular.json
 ├── package.json
 ├── public/                   # Static assets served/copied to build output
@@ -49,18 +49,18 @@ concael-bridge-ux/
 ```
 
 **Key locations:**
-- Entry point: [`concael-bridge-ux/src/main.ts`](concael-bridge-ux/src/main.ts:1)
-- App root component: [`concael-bridge-ux/src/app/app.ts`](concael-bridge-ux/src/app/app.ts:1)
-- App providers: [`concael-bridge-ux/src/app/app.config.ts`](concael-bridge-ux/src/app/app.config.ts:1)
-- Routes: [`concael-bridge-ux/src/app/app.routes.ts`](concael-bridge-ux/src/app/app.routes.ts:1)
-- Backend config token: [`concael-bridge-ux/src/app/core/app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:1)
+- Entry point: [`conceal-bridge-ux/src/main.ts`](conceal-bridge-ux/src/main.ts:1)
+- App root component: [`conceal-bridge-ux/src/app/app.ts`](conceal-bridge-ux/src/app/app.ts:1)
+- App providers: [`conceal-bridge-ux/src/app/app.config.ts`](conceal-bridge-ux/src/app/app.config.ts:1)
+- Routes: [`conceal-bridge-ux/src/app/app.routes.ts`](conceal-bridge-ux/src/app/app.routes.ts:1)
+- Backend config token: [`conceal-bridge-ux/src/app/core/app-config.ts`](conceal-bridge-ux/src/app/core/app-config.ts:1)
 
 ### Naming Conventions (Observed)
 
-- **Pages:** `kebab-case.page.ts` (examples: [`home.page.ts`](concael-bridge-ux/src/app/pages/home/home.page.ts:1), [`swap.page.ts`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:1))
-- **Components:** `kebab-case.component.ts` (example: [`wallet-button.component.ts`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:1))
-- **Services:** `kebab-case.service.ts` (examples: [`bridge-api.service.ts`](concael-bridge-ux/src/app/core/bridge-api.service.ts:1), [`evm-wallet.service.ts`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:1))
-- **Types:** simple `*.ts` files (example: [`bridge-types.ts`](concael-bridge-ux/src/app/core/bridge-types.ts:1))
+- **Pages:** `kebab-case.page.ts` (examples: [`home.page.ts`](conceal-bridge-ux/src/app/pages/home/home.page.ts:1), [`swap.page.ts`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:1))
+- **Components:** `kebab-case.component.ts` (example: [`wallet-button.component.ts`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:1))
+- **Services:** `kebab-case.service.ts` (examples: [`bridge-api.service.ts`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:1), [`evm-wallet.service.ts`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:1))
+- **Types:** simple `*.ts` files (example: [`bridge-types.ts`](conceal-bridge-ux/src/app/core/bridge-types.ts:1))
 
 ---
 
@@ -69,38 +69,38 @@ concael-bridge-ux/
 ### Component Architecture
 
 - [x] Using **Standalone Components**
-  - Root bootstraps via [`bootstrapApplication()`](concael-bridge-ux/src/main.ts:1)
-  - Pages/components declare `imports` directly (example: [`App`](concael-bridge-ux/src/app/app.ts:5))
+  - Root bootstraps via [`bootstrapApplication()`](conceal-bridge-ux/src/main.ts:1)
+  - Pages/components declare `imports` directly (example: [`App`](conceal-bridge-ux/src/app/app.ts:5))
 
 ### State Management
 
 - [x] **Signals** + computed signals (Angular 16+ reactive primitives)
-  - Example usage: [`signal()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:1), [`computed()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:419)
+  - Example usage: [`signal()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:1), [`computed()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:419)
 - [x] **Services with RxJS** for API and side-effects
-  - Example: [`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:13)
+  - Example: [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13)
 
 **State Management Pattern (Project-specific):**
 - UI state lives locally in components as `signal()`s (e.g., busy flags, step state, error/status messages).
 - Derived state uses `computed()`.
-- Router params + form streams are converted using [`toSignal()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:409) to integrate RxJS with signals.
+- Router params + form streams are converted using [`toSignal()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:409) to integrate RxJS with signals.
 - Services encapsulate integration with:
-  - backend HTTP API ([`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:13))
-  - EVM wallet/provider ([`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:33))
+  - backend HTTP API ([`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13))
+  - EVM wallet/provider ([`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:33))
 
 ### Routing Strategy
 
-- **Route configuration location:** [`concael-bridge-ux/src/app/app.routes.ts`](concael-bridge-ux/src/app/app.routes.ts:1)
+- **Route configuration location:** [`conceal-bridge-ux/src/app/app.routes.ts`](conceal-bridge-ux/src/app/app.routes.ts:1)
 - **Lazy loading:** Yes (route-level lazy load components via `loadComponent`)
-  - Home page: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:6)
-  - Swap page: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:16)
-  - Not found: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:28)
+  - Home page: [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:6)
+  - Swap page: [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:16)
+  - Not found: [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:28)
 - **Route guards used:** None found in this project.
 
 ### Change Detection Strategy
 
 - **Default strategy:** `OnPush` (used across pages/components)
-  - Root uses [`ChangeDetectionStrategy.OnPush`](concael-bridge-ux/src/app/app.ts:7)
-  - Pages use [`ChangeDetectionStrategy.OnPush`](concael-bridge-ux/src/app/pages/home/home.page.ts:24)
+  - Root uses [`ChangeDetectionStrategy.OnPush`](conceal-bridge-ux/src/app/app.ts:7)
+  - Pages use [`ChangeDetectionStrategy.OnPush`](conceal-bridge-ux/src/app/pages/home/home.page.ts:24)
 - **When to use OnPush (project guideline):**
   - Always, unless a component relies on mutable objects / non-signal state that cannot be easily represented with inputs/signals/observables.
 
@@ -110,29 +110,29 @@ concael-bridge-ux/
 
 ### TypeScript Configuration
 
-From [`concael-bridge-ux/tsconfig.json`](concael-bridge-ux/tsconfig.json:1):
+From [`conceal-bridge-ux/tsconfig.json`](conceal-bridge-ux/tsconfig.json:1):
 
 - **Strict Mode:** Enabled (`"strict": true`)
 - **Strict Templates:** Enabled (`"strictTemplates": true`)
 - **No Implicit Any:** Enabled via `"strict": true`
 
 Notable compiler options:
-- `"target": "ES2022"` ([`tsconfig.json`](concael-bridge-ux/tsconfig.json:15))
-- `"module": "preserve"` ([`tsconfig.json`](concael-bridge-ux/tsconfig.json:16))
-- `"isolatedModules": true` ([`tsconfig.json`](concael-bridge-ux/tsconfig.json:12))
+- `"target": "ES2022"` ([`tsconfig.json`](conceal-bridge-ux/tsconfig.json:15))
+- `"module": "preserve"` ([`tsconfig.json`](conceal-bridge-ux/tsconfig.json:16))
+- `"isolatedModules": true` ([`tsconfig.json`](conceal-bridge-ux/tsconfig.json:12))
 
 ### RxJS Patterns
 
 **Subscription Management:**
 - Prefer `takeUntilDestroyed()` to auto-cleanup subscriptions in components:
-  - Example: [`takeUntilDestroyed()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:6) used when subscribing to network changes.
+  - Example: [`takeUntilDestroyed()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:6) used when subscribing to network changes.
 - Prefer `toSignal()` for router params / form streams:
-  - Example: [`toSignal()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:409)
+  - Example: [`toSignal()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:409)
 - For one-shot calls in async flows, use `firstValueFrom()`:
-  - Example: [`firstValueFrom()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:8)
+  - Example: [`firstValueFrom()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:8)
 
 **Preferred Operators (observed):**
-- `switchMap`, `catchError`, `filter`, `map`, `take`, `timer` (see imports in [`SwapPage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:5))
+- `switchMap`, `catchError`, `filter`, `map`, `take`, `timer` (see imports in [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:5))
 
 **Avoid (project anti-patterns):**
 - Leaking subscriptions (use `takeUntilDestroyed()` when manually subscribing)
@@ -142,17 +142,17 @@ Notable compiler options:
 
 - [x] **Reactive Forms** (preferred)
 - [x] **Typed Forms** via `NonNullableFormBuilder` (Angular 14+)
-  - Example: [`NonNullableFormBuilder`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:3)
+  - Example: [`NonNullableFormBuilder`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:3)
 
 ### Error Handling
 
 - **Global Error Handler:** No custom handler found. App enables browser global error listeners via:
-  - [`provideBrowserGlobalErrorListeners()`](concael-bridge-ux/src/app/app.config.ts:1)
+  - [`provideBrowserGlobalErrorListeners()`](conceal-bridge-ux/src/app/app.config.ts:1)
 - **HTTP Interceptor:** None found; HttpClient is provided directly via:
-  - [`provideHttpClient()`](concael-bridge-ux/src/app/app.config.ts:2)
+  - [`provideHttpClient()`](conceal-bridge-ux/src/app/app.config.ts:2)
 - **User-Facing Error Messages (strategy):**
   - Components store `pageError` / `statusMessage` in signals and render conditionally:
-    - Example: [`pageError`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:445), [`statusMessage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:446)
+    - Example: [`pageError`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:445), [`statusMessage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:446)
   - Backend call errors commonly handled with `catchError` → set error message → return fallback observable.
 
 ### Accessibility Requirements (Current State)
@@ -160,14 +160,14 @@ Notable compiler options:
 This project uses semantic HTML and includes some ARIA attributes (menus/modals), but there is no explicit WCAG policy in-repo.
 
 - **WCAG Level:** Not specified (treat as “aim for AA”).
-- **ARIA Labels:** Used where appropriate (example modal uses `role="dialog"` and `aria-modal="true"` in [`WalletButtonComponent`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:163)).
+- **ARIA Labels:** Used where appropriate (example modal uses `role="dialog"` and `aria-modal="true"` in [`WalletButtonComponent`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:163)).
 - **Keyboard Navigation:** Not explicitly documented; components should continue improving focus management for menus/modals.
 
 ---
 
 ## Dependencies & Third-Party Libraries
 
-### Core Dependencies (from [`package.json`](concael-bridge-ux/package.json:25))
+### Core Dependencies (from [`package.json`](conceal-bridge-ux/package.json:25))
 
 ```json
 {
@@ -182,26 +182,26 @@ This project uses semantic HTML and includes some ARIA attributes (menus/modals)
 
 ### UI Libraries
 
-- [x] **Tailwind CSS** - `^4.1.18` ([`package.json`](concael-bridge-ux/package.json:38))
-  - Integrated via PostCSS plugin in [`.postcssrc.json`](concael-bridge-ux/.postcssrc.json:1)
-  - Imported in global stylesheet [`src/styles.css`](concael-bridge-ux/src/styles.css:3)
+- [x] **Tailwind CSS** - `^4.1.18` ([`package.json`](conceal-bridge-ux/package.json:38))
+  - Integrated via PostCSS plugin in [`.postcssrc.json`](conceal-bridge-ux/.postcssrc.json:1)
+  - Imported in global stylesheet [`src/styles.css`](conceal-bridge-ux/src/styles.css:3)
 
 ### Web3 / Wallet Libraries
 
-- **viem** - `^2.41.2` ([`package.json`](concael-bridge-ux/package.json:25))
+- **viem** - `^2.41.2` ([`package.json`](conceal-bridge-ux/package.json:25))
   - Used for EVM wallet client + chain switching + tx receipts:
-    - See [`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:3)
-  - Provider initialization in [`#resolveProvider()`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:298)
+    - See [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:3)
+  - Provider initialization in [`#resolveProvider()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:298)
 
 ### Other
 
 - **QR Code generation**
   - `qrcode` `^1.5.4` (CommonJS; explicitly allowed by Angular build)
-  - See `allowedCommonJsDependencies` in [`angular.json`](concael-bridge-ux/angular.json:27)
+  - See `allowedCommonJsDependencies` in [`angular.json`](conceal-bridge-ux/angular.json:27)
 
 ### Internal/Custom Packages
 
-None detected (no internal npm packages referenced in [`package.json`](concael-bridge-ux/package.json:1)).
+None detected (no internal npm packages referenced in [`package.json`](conceal-bridge-ux/package.json:1)).
 
 ---
 
@@ -212,11 +212,11 @@ None detected (no internal npm packages referenced in [`package.json`](concael-b
 This project uses the standard Angular `src/environments/` pattern with build-time file replacements.
 
 - **Files:**
-  - [`src/environments/environment.ts`](concael-bridge-ux/src/environments/environment.ts:1): **Production** configuration (default).
-  - [`src/environments/environment.development.ts`](concael-bridge-ux/src/environments/environment.development.ts:1): **Development/Testing** configuration.
+  - [`src/environments/environment.ts`](conceal-bridge-ux/src/environments/environment.ts:1): **Production** configuration (default).
+  - [`src/environments/environment.development.ts`](conceal-bridge-ux/src/environments/environment.development.ts:1): **Development/Testing** configuration.
 
 - **Usage:**
-  - `APP_CONFIG` in [`app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:1) imports `environment` to provide values at runtime.
+  - `APP_CONFIG` in [`app-config.ts`](conceal-bridge-ux/src/app/core/app-config.ts:1) imports `environment` to provide values at runtime.
 
 - **Configuration Strategy:**
   - `ng build` (Production): Uses `environment.ts` (default).
@@ -225,7 +225,7 @@ This project uses the standard Angular `src/environments/` pattern with build-ti
 
 ### Build Configurations
 
-From [`concael-bridge-ux/angular.json`](concael-bridge-ux/angular.json:16):
+From [`conceal-bridge-ux/angular.json`](conceal-bridge-ux/angular.json:16):
 
 - **Development:** `development` configuration (source maps enabled, optimization off)
 - **Production:** `production` configuration (output hashing, budgets) and is the **default** build configuration
@@ -236,7 +236,7 @@ From [`concael-bridge-ux/angular.json`](concael-bridge-ux/angular.json:16):
 
 ### Build Commands (as configured)
 
-Scripts in [`package.json`](concael-bridge-ux/package.json:4):
+Scripts in [`package.json`](conceal-bridge-ux/package.json:4):
 
 - `npm run start` → runs Angular dev server
 - `npm run build` → production build by default (because defaultConfiguration is production)
@@ -261,10 +261,10 @@ ng build --configuration production
 
 ### Build Output
 
-- **Output directory:** `dist/concael-bridge-ux` (Angular default for the project name)
+- **Output directory:** `dist/conceal-bridge-ux` (Angular default for the project name)
 - **Production optimizations:** Enabled by default (production configuration)
 - **Source maps:** Enabled in `development` configuration
-  - See `sourceMap: true` in [`angular.json`](concael-bridge-ux/angular.json:50)
+  - See `sourceMap: true` in [`angular.json`](conceal-bridge-ux/angular.json:50)
 
 ### Deployment Target
 
@@ -281,13 +281,13 @@ Not specified in this repo (no GitHub Actions/GitLab/Jenkins config found under 
 ### Unit Testing
 
 - **Framework:** Vitest (types configured)
-  - [`vitest/globals`](concael-bridge-ux/tsconfig.spec.json:7)
+  - [`vitest/globals`](conceal-bridge-ux/tsconfig.spec.json:7)
 - **Run command:** `ng test` (also via `npm run test`)
-  - Scripts in [`package.json`](concael-bridge-ux/package.json:4)
+  - Scripts in [`package.json`](conceal-bridge-ux/package.json:4)
 
 ### E2E Testing
 
-Not configured (Angular CLI doesn’t include an e2e framework by default; see note in [`README.md`](concael-bridge-ux/README.md:53)).
+Not configured (Angular CLI doesn’t include an e2e framework by default; see note in [`README.md`](conceal-bridge-ux/README.md:53)).
 
 ---
 
@@ -295,7 +295,7 @@ Not configured (Angular CLI doesn’t include an e2e framework by default; see n
 
 ### Development
 
-Use the scripts defined in [`concael-bridge-ux/package.json`](concael-bridge-ux/package.json:4):
+Use the scripts defined in [`conceal-bridge-ux/package.json`](conceal-bridge-ux/package.json:4):
 
 ```bash
 npm install
@@ -304,7 +304,7 @@ npm run start
 
 ### Quality Assurance
 
-There is no `lint` script configured in [`package.json`](concael-bridge-ux/package.json:4). If linting is desired, add ESLint config + `ng lint` (or `eslint`) script.
+There is no `lint` script configured in [`package.json`](conceal-bridge-ux/package.json:4). If linting is desired, add ESLint config + `ng lint` (or `eslint`) script.
 
 ### Build
 
@@ -328,19 +328,19 @@ This repo does not include branch/commit conventions in this project folder. If 
 
 ### API Configuration
 
-- **Base URL:** `APP_CONFIG.apiBaseUrl` from [`app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:3)
-- **URL composition:** `base/network/path` via [`#url()`](concael-bridge-ux/src/app/core/bridge-api.service.ts:20)
+- **Base URL:** `APP_CONFIG.apiBaseUrl` from [`app-config.ts`](conceal-bridge-ux/src/app/core/app-config.ts:3)
+- **URL composition:** `base/network/path` via [`#url()`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:20)
 - **Authentication:** None implemented in this UI (no auth headers/interceptors found).
 
 ### HTTP Client
 
-- Provided globally via [`provideHttpClient()`](concael-bridge-ux/src/app/app.config.ts:2)
-- Service wrapper: [`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:13)
+- Provided globally via [`provideHttpClient()`](conceal-bridge-ux/src/app/app.config.ts:2)
+- Service wrapper: [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13)
 
 ### API Error Handling (Observed)
 
 - Uses `catchError(() => of(fallback))` for polling/balance endpoints:
-  - Example: [`catchError(() => of({ result: false, balance: 0 }))`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:511)
+  - Example: [`catchError(() => of({ result: false, balance: 0 }))`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:511)
 
 ---
 
@@ -354,16 +354,16 @@ This repo does not include branch/commit conventions in this project folder. If 
 ### Styling Technology
 
 - [x] **CSS** (global stylesheet is `.css`)
-  - [`src/styles.css`](concael-bridge-ux/src/styles.css:1)
+  - [`src/styles.css`](conceal-bridge-ux/src/styles.css:1)
 
 ### Global Styles
 
-- Location: [`concael-bridge-ux/src/styles.css`](concael-bridge-ux/src/styles.css:1)
-- Tailwind import: [`@import "tailwindcss";`](concael-bridge-ux/src/styles.css:3)
+- Location: [`conceal-bridge-ux/src/styles.css`](conceal-bridge-ux/src/styles.css:1)
+- Tailwind import: [`@import "tailwindcss";`](conceal-bridge-ux/src/styles.css:3)
 
 ### Theme / Dark Mode
 
-- App sets `color-scheme: dark` at [`:root`](concael-bridge-ux/src/styles.css:5)
+- App sets `color-scheme: dark` at [`:root`](conceal-bridge-ux/src/styles.css:5)
 - Most UI uses Tailwind colors for dark styling.
 
 ---
@@ -373,23 +373,23 @@ This repo does not include branch/commit conventions in this project folder. If 
 ### Lazy Loading
 
 Route-level component lazy loading is used for all main pages:
-- Home: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:6)
-- Swap: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:16)
-- Not found: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:28)
+- Home: [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:6)
+- Swap: [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:16)
+- Not found: [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:28)
 
 ### Change Detection Optimization
 
 - Components use `OnPush` by default:
-  - Example: [`ChangeDetectionStrategy.OnPush`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:61)
+  - Example: [`ChangeDetectionStrategy.OnPush`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:61)
 - Signals are used heavily; avoid calling functions repeatedly in templates unless memoized via `computed()`.
 
 ### Bundle Optimization
 
 Production build has budgets configured:
 - Initial bundle warning at 500kB and error at 1MB:
-  - [`budgets`](concael-bridge-ux/angular.json:36)
+  - [`budgets`](conceal-bridge-ux/angular.json:36)
 - Component style budgets:
-  - [`anyComponentStyle`](concael-bridge-ux/angular.json:42)
+  - [`anyComponentStyle`](conceal-bridge-ux/angular.json:42)
 
 ---
 
@@ -399,23 +399,23 @@ Production build has budgets configured:
 
 3. **CommonJS dependency warnings**
    - **Cause:** `qrcode` is CommonJS.
-   - **Solution:** It is already allowed via `allowedCommonJsDependencies` in [`angular.json`](concael-bridge-ux/angular.json:27).
+   - **Solution:** It is already allowed via `allowedCommonJsDependencies` in [`angular.json`](conceal-bridge-ux/angular.json:27).
 
 ---
 
 ## Additional Resources
 
-- Project readme: [`concael-bridge-ux/README.md`](concael-bridge-ux/README.md:1)
-- Product/architecture docs live in [`concael-bridge-ux/ai_docs/`](concael-bridge-ux/ai_docs/angular_build_guide.md:1)
+- Project readme: [`conceal-bridge-ux/README.md`](conceal-bridge-ux/README.md:1)
+- Product/architecture docs live in [`conceal-bridge-ux/ai_docs/`](conceal-bridge-ux/ai_docs/angular_build_guide.md:1)
 
 ---
 
 ## Related docs/specs in this repo
 
-- Angular coding conventions for this repo: [`angular_best_practices.md`](concael-bridge-ux/ai_docs/angular_best_practices.md:1)
-- External Angular reference links: [`angular_key_resources.md`](concael-bridge-ux/ai_docs/angular_key_resources.md:1)
-- UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](concael-bridge-ux/ai_docs/style_guide.md:1)
-- Wallet integration and supported connectors: [`wallets.md`](concael-bridge-ux/ai_docs/wallets.md:1)
-- Backend API contract (endpoints + response shapes): [`backend_api.md`](concael-bridge-ux/ai_docs/backend_api.md:1)
-- Error handling conventions across the app: [`error_handling.md`](concael-bridge-ux/ai_docs/error_handling.md:1)
-- Testing strategy (unit/E2E plan + web3 mocking): [`testing.md`](concael-bridge-ux/ai_docs/testing.md:1)
+- Angular coding conventions for this repo: [`angular_best_practices.md`](conceal-bridge-ux/ai_docs/angular_best_practices.md:1)
+- External Angular reference links: [`angular_key_resources.md`](conceal-bridge-ux/ai_docs/angular_key_resources.md:1)
+- UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](conceal-bridge-ux/ai_docs/style_guide.md:1)
+- Wallet integration and supported connectors: [`wallets.md`](conceal-bridge-ux/ai_docs/wallets.md:1)
+- Backend API contract (endpoints + response shapes): [`backend_api.md`](conceal-bridge-ux/ai_docs/backend_api.md:1)
+- Error handling conventions across the app: [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:1)
+- Testing strategy (unit/E2E plan + web3 mocking): [`testing.md`](conceal-bridge-ux/ai_docs/testing.md:1)

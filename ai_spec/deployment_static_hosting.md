@@ -1,12 +1,12 @@
-# Spec: Deployment to Static Hosting — Concael Bridge UX (Angular 21)
+# Spec: Deployment to Static Hosting — conceal Bridge UX (Angular 21)
 
 ## Context / Current State
 
-- The project builds an Angular SPA using [`@angular/build:application`](concael-bridge-ux/angular.json:17).
-- Production build is the default configuration (`defaultConfiguration: "production"` in [`angular.json`](concael-bridge-ux/angular.json:56)).
-- Production build enables `outputHashing: "all"` (see [`angular.json`](concael-bridge-ux/angular.json:48)), which is good for long-term caching.
-- Static assets are served from [`public/`](concael-bridge-ux/public:1) and included as build assets via [`assets.input = "public"`](concael-bridge-ux/angular.json:24).
-- No deployment target is currently specified (noted in [`angular_build_guide.md`](concael-bridge-ux/ai_docs/angular_build_guide.md:273)).
+- The project builds an Angular SPA using [`@angular/build:application`](conceal-bridge-ux/angular.json:17).
+- Production build is the default configuration (`defaultConfiguration: "production"` in [`angular.json`](conceal-bridge-ux/angular.json:56)).
+- Production build enables `outputHashing: "all"` (see [`angular.json`](conceal-bridge-ux/angular.json:48)), which is good for long-term caching.
+- Static assets are served from [`public/`](conceal-bridge-ux/public:1) and included as build assets via [`assets.input = "public"`](conceal-bridge-ux/angular.json:24).
+- No deployment target is currently specified (noted in [`angular_build_guide.md`](conceal-bridge-ux/ai_docs/angular_build_guide.md:273)).
 
 ## Goal
 
@@ -26,35 +26,35 @@ Define best-practice deployment requirements for hosting the built SPA on a stat
 ## Requirements
 
 1. Host must serve the SPA correctly for client-side routing:
-   - routes in [`app.routes.ts`](concael-bridge-ux/src/app/app.routes.ts:3) must work on full page refresh
+   - routes in [`app.routes.ts`](conceal-bridge-ux/src/app/app.routes.ts:3) must work on full page refresh
 2. Cache strategy must:
    - aggressively cache hashed static assets
    - avoid caching `index.html` too aggressively
 3. Deployment must be compatible with:
-   - build-time env files (see [`environment_configuration.md`](concael-bridge-ux/ai_spec/environment_configuration.md:1))
-   - optional runtime config file (see [`runtime_config.md`](concael-bridge-ux/ai_spec/runtime_config.md:1))
-4. Security headers must be applied at the edge (see [`security_headers_and_csp.md`](concael-bridge-ux/ai_spec/security_headers_and_csp.md:1))
+   - build-time env files (see [`environment_configuration.md`](conceal-bridge-ux/ai_spec/environment_configuration.md:1))
+   - optional runtime config file (see [`runtime_config.md`](conceal-bridge-ux/ai_spec/runtime_config.md:1))
+4. Security headers must be applied at the edge (see [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1))
 
 ## Build Output
 
-After `npm run build` (script in [`package.json`](concael-bridge-ux/package.json:7)):
+After `npm run build` (script in [`package.json`](conceal-bridge-ux/package.json:7)):
 
-- output folder: `concael-bridge-ux/dist/concael-bridge-ux/` (default Angular dist naming)
+- output folder: `conceal-bridge-ux/dist/conceal-bridge-ux/` (default Angular dist naming)
 - contains:
   - `index.html`
   - hashed JS/CSS bundles (because of `outputHashing: "all"`)
-  - copied assets from [`public/`](concael-bridge-ux/public:1) (e.g. `/images/...`)
+  - copied assets from [`public/`](conceal-bridge-ux/public:1) (e.g. `/images/...`)
 
 ## SPA Routing Requirements (Rewrites)
 
-Because this is an SPA using Angular Router (see [`provideRouter(routes)`](concael-bridge-ux/src/app/app.config.ts:11)), hosting must rewrite unknown paths to `index.html`.
+Because this is an SPA using Angular Router (see [`provideRouter(routes)`](conceal-bridge-ux/src/app/app.config.ts:11)), hosting must rewrite unknown paths to `index.html`.
 
 **Generic rule:**
 - If request path is not a real file, serve `/index.html`.
 
 Examples:
 - `/swap/ccx-to-evm/eth` should serve `index.html` and let Angular route it.
-- Legacy redirects like `/eth` are handled by Angular router config in [`app.routes.ts`](concael-bridge-ux/src/app/app.routes.ts:21).
+- Legacy redirects like `/eth` are handled by Angular router config in [`app.routes.ts`](conceal-bridge-ux/src/app/app.routes.ts:21).
 
 ## Caching Policy (Best Practice)
 
@@ -81,8 +81,8 @@ Rationale:
 
 ### 3) Runtime config file (if adopted)
 
-If you implement [`runtime_config.md`](concael-bridge-ux/ai_spec/runtime_config.md:1) and serve:
-- [`/config.json`](concael-bridge-ux/public/config.json:1)
+If you implement [`runtime_config.md`](conceal-bridge-ux/ai_spec/runtime_config.md:1) and serve:
+- [`/config.json`](conceal-bridge-ux/public/config.json:1)
 
 Set:
 - `Cache-Control: no-cache`
@@ -101,7 +101,7 @@ Also configure the host rewrite rules to rewrite under that subpath.
 
 ### Build-time environments
 
-When environment files are introduced (per [`environment_configuration.md`](concael-bridge-ux/ai_spec/environment_configuration.md:1)), builds produce different bundles per env.
+When environment files are introduced (per [`environment_configuration.md`](conceal-bridge-ux/ai_spec/environment_configuration.md:1)), builds produce different bundles per env.
 
 Recommended:
 - production bundle deployed to production host
@@ -109,12 +109,12 @@ Recommended:
 
 ### Runtime config
 
-If you deploy the same bundle to multiple envs, adopt runtime config (per [`runtime_config.md`](concael-bridge-ux/ai_spec/runtime_config.md:1)) and vary only `config.json`.
+If you deploy the same bundle to multiple envs, adopt runtime config (per [`runtime_config.md`](conceal-bridge-ux/ai_spec/runtime_config.md:1)) and vary only `config.json`.
 
 ## Security Headers Integration
 
 Apply at the CDN/host level:
-- CSP + other headers in [`security_headers_and_csp.md`](concael-bridge-ux/ai_spec/security_headers_and_csp.md:1)
+- CSP + other headers in [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1)
 
 At minimum:
 - `X-Content-Type-Options: nosniff`
@@ -141,5 +141,5 @@ At minimum:
    - immutable for hashed assets
    - no-cache for `index.html`
    - no-cache for `config.json` (if used)
-4. Apply headers from [`security_headers_and_csp.md`](concael-bridge-ux/ai_spec/security_headers_and_csp.md:1).
-5. Validate with smoke tests and E2E where possible (see [`e2e_testing.md`](concael-bridge-ux/ai_spec/e2e_testing.md:1)).
+4. Apply headers from [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1).
+5. Validate with smoke tests and E2E where possible (see [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1)).
