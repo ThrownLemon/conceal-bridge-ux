@@ -2,687 +2,427 @@
 
 ## Project Overview
 
-**Project Name:** [Your Project Name]
+**Project Name:** Concael Bridge UX (workspace project: [`concael-bridge-ux`](concael-bridge-ux/package.json:1))
 
-**Purpose:** [Brief description of what this application does]
+**Purpose:** A web UI for bridging (swapping) between **Conceal (CCX)** and **wrapped CCX (wCCX)** on EVM networks (**Ethereum**, **BNB Smart Chain**, **Polygon**). The UI:
+- connects to an EVM wallet (injected providers + WalletConnect),
+- calls the bridge backend API to initialize/execute swaps,
+- sends native gas-fee transactions or ERC-20 transfers (wCCX),
+- polls backend state until the swap completes.
 
-**Angular Version:** [e.g., 18.x, 19.x]
+**Angular Version:** Angular **21.0.x** (CLI **21.0.x**)  
+- Dependencies pinned in [`concael-bridge-ux/package.json`](concael-bridge-ux/package.json:1)
+- CLI version referenced in [`concael-bridge-ux/README.md`](concael-bridge-ux/README.md:1)
 
-**Target Platform:** [Web, Mobile-responsive, PWA, etc.]
+**Target Platform:** Web SPA (responsive), static build output suitable for typical static hosting.
 
 **Key Features:**
-- [Feature 1]
-- [Feature 2]
-- [Feature 3]
+- Standalone app bootstrapped via [`bootstrapApplication()`](concael-bridge-ux/src/main.ts:1)
+- Route-level lazy loading with [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:3)
+- Wallet UX: MetaMask / Trust / Binance Wallet / WalletConnect via [`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:33)
+- Swap UX for CCX→wCCX and wCCX→CCX via [`SwapPage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:400)
+- Tailwind CSS UI (utility-first) via [`src/styles.css`](concael-bridge-ux/src/styles.css:1) and PostCSS plugin config in [`.postcssrc.json`](concael-bridge-ux/.postcssrc.json:1)
+
+---
 
 ## Project Structure
 
 ### Folder Organization
+
+This project uses the newer Angular “public assets” approach (no `src/assets/`).
+
 ```
-src/
-├── app/
-│   ├── core/              # Singleton services, guards, interceptors
-│   ├── shared/            # Shared components, directives, pipes
-│   ├── features/          # Feature modules
-│   │   ├── feature-a/
-│   │   └── feature-b/
-│   ├── models/            # TypeScript interfaces and types
-│   ├── services/          # Application services
-│   └── guards/            # Route guards
-├── assets/                # Static assets (images, fonts, etc.)
-├── environments/          # Environment configuration files
-└── styles/                # Global styles
+concael-bridge-ux/
+├── angular.json
+├── package.json
+├── public/                   # Static assets served/copied to build output
+│   ├── favicon.ico
+│   └── images/...
+└── src/
+    ├── index.html
+    ├── main.ts               # bootstrapApplication()
+    ├── styles.css            # global styles + Tailwind import
+    └── app/
+        ├── core/             # API + app config + wallet + chain metadata
+        ├── pages/            # Route-level pages (standalone)
+        └── shared/           # Reusable UI components
 ```
 
-### Naming Conventions
-- **Components:** `kebab-case.component.ts` (e.g., `user-profile.component.ts`)
-- **Services:** `kebab-case.service.ts` (e.g., `auth.service.ts`)
-- **Models:** `PascalCase` (e.g., `User`, `ProductDetail`)
-- **Guards:** `kebab-case.guard.ts` (e.g., `auth.guard.ts`)
-- **Pipes:** `kebab-case.pipe.ts` (e.g., `currency-format.pipe.ts`)
+**Key locations:**
+- Entry point: [`concael-bridge-ux/src/main.ts`](concael-bridge-ux/src/main.ts:1)
+- App root component: [`concael-bridge-ux/src/app/app.ts`](concael-bridge-ux/src/app/app.ts:1)
+- App providers: [`concael-bridge-ux/src/app/app.config.ts`](concael-bridge-ux/src/app/app.config.ts:1)
+- Routes: [`concael-bridge-ux/src/app/app.routes.ts`](concael-bridge-ux/src/app/app.routes.ts:1)
+- Backend config token: [`concael-bridge-ux/src/app/core/app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:1)
+
+### Naming Conventions (Observed)
+
+- **Pages:** `kebab-case.page.ts` (examples: [`home.page.ts`](concael-bridge-ux/src/app/pages/home/home.page.ts:1), [`swap.page.ts`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:1))
+- **Components:** `kebab-case.component.ts` (example: [`wallet-button.component.ts`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:1))
+- **Services:** `kebab-case.service.ts` (examples: [`bridge-api.service.ts`](concael-bridge-ux/src/app/core/bridge-api.service.ts:1), [`evm-wallet.service.ts`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:1))
+- **Types:** simple `*.ts` files (example: [`bridge-types.ts`](concael-bridge-ux/src/app/core/bridge-types.ts:1))
+
+---
 
 ## Architecture & Patterns
 
 ### Component Architecture
-- [ ] Using **Standalone Components** (recommended for new projects)
-- [ ] Using **NgModules** (legacy approach)
+
+- [x] Using **Standalone Components**
+  - Root bootstraps via [`bootstrapApplication()`](concael-bridge-ux/src/main.ts:1)
+  - Pages/components declare `imports` directly (example: [`App`](concael-bridge-ux/src/app/app.ts:5))
 
 ### State Management
-- [ ] **Services with RxJS** (simple state)
-- [ ] **Signals** (Angular 16+ reactive primitives)
-- [ ] **NgRx** (complex state management)
-- [ ] **Other:** [Specify if using Akita, NGXS, etc.]
 
-**State Management Pattern:**
-[Describe how state flows through the application]
+- [x] **Signals** + computed signals (Angular 16+ reactive primitives)
+  - Example usage: [`signal()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:1), [`computed()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:419)
+- [x] **Services with RxJS** for API and side-effects
+  - Example: [`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:13)
+
+**State Management Pattern (Project-specific):**
+- UI state lives locally in components as `signal()`s (e.g., busy flags, step state, error/status messages).
+- Derived state uses `computed()`.
+- Router params + form streams are converted using [`toSignal()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:409) to integrate RxJS with signals.
+- Services encapsulate integration with:
+  - backend HTTP API ([`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:13))
+  - EVM wallet/provider ([`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:33))
 
 ### Routing Strategy
-- **Route Configuration Location:** [e.g., `app.routes.ts` or `app-routing.module.ts`]
-- **Lazy Loading:** [Yes/No - specify which modules/routes are lazy loaded]
-- **Route Guards Used:** [List guards like AuthGuard, RoleGuard, etc.]
+
+- **Route configuration location:** [`concael-bridge-ux/src/app/app.routes.ts`](concael-bridge-ux/src/app/app.routes.ts:1)
+- **Lazy loading:** Yes (route-level lazy load components via `loadComponent`)
+  - Home page: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:6)
+  - Swap page: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:16)
+  - Not found: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:28)
+- **Route guards used:** None found in this project.
 
 ### Change Detection Strategy
-- **Default Strategy:** [Default or OnPush]
-- **When to use OnPush:** [Specify criteria]
+
+- **Default strategy:** `OnPush` (used across pages/components)
+  - Root uses [`ChangeDetectionStrategy.OnPush`](concael-bridge-ux/src/app/app.ts:7)
+  - Pages use [`ChangeDetectionStrategy.OnPush`](concael-bridge-ux/src/app/pages/home/home.page.ts:24)
+- **When to use OnPush (project guideline):**
+  - Always, unless a component relies on mutable objects / non-signal state that cannot be easily represented with inputs/signals/observables.
+
+---
 
 ## Code Standards & Best Practices
 
 ### TypeScript Configuration
-- **Strict Mode:** [Enabled/Disabled]
-- **Strict Templates:** [Enabled/Disabled]
-- **No Implicit Any:** [Enabled/Disabled]
+
+From [`concael-bridge-ux/tsconfig.json`](concael-bridge-ux/tsconfig.json:1):
+
+- **Strict Mode:** Enabled (`"strict": true`)
+- **Strict Templates:** Enabled (`"strictTemplates": true`)
+- **No Implicit Any:** Enabled via `"strict": true`
+
+Notable compiler options:
+- `"target": "ES2022"` ([`tsconfig.json`](concael-bridge-ux/tsconfig.json:15))
+- `"module": "preserve"` ([`tsconfig.json`](concael-bridge-ux/tsconfig.json:16))
+- `"isolatedModules": true` ([`tsconfig.json`](concael-bridge-ux/tsconfig.json:12))
 
 ### RxJS Patterns
-- **Subscription Management:** [takeUntil, async pipe, etc.]
-- **Preferred Operators:** [List commonly used operators]
-- **Avoid:** [Anti-patterns to avoid]
 
-**Example:**
-```typescript
-// Preferred: Use async pipe in templates
-data$ = this.service.getData();
+**Subscription Management:**
+- Prefer `takeUntilDestroyed()` to auto-cleanup subscriptions in components:
+  - Example: [`takeUntilDestroyed()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:6) used when subscribing to network changes.
+- Prefer `toSignal()` for router params / form streams:
+  - Example: [`toSignal()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:409)
+- For one-shot calls in async flows, use `firstValueFrom()`:
+  - Example: [`firstValueFrom()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:8)
 
-// Or use takeUntil for manual subscriptions
-private destroy$ = new Subject<void>();
+**Preferred Operators (observed):**
+- `switchMap`, `catchError`, `filter`, `map`, `take`, `timer` (see imports in [`SwapPage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:5))
 
-ngOnDestroy() {
-  this.destroy$.next();
-  this.destroy$.complete();
-}
-```
+**Avoid (project anti-patterns):**
+- Leaking subscriptions (use `takeUntilDestroyed()` when manually subscribing)
+- Storing async state in mutable fields without signals/observables
 
 ### Form Handling
-- [ ] **Reactive Forms** (preferred)
-- [ ] **Template-Driven Forms**
-- [ ] **Typed Forms** (Angular 14+)
+
+- [x] **Reactive Forms** (preferred)
+- [x] **Typed Forms** via `NonNullableFormBuilder` (Angular 14+)
+  - Example: [`NonNullableFormBuilder`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:3)
 
 ### Error Handling
-- **Global Error Handler:** [Yes/No - location if yes]
-- **HTTP Interceptor:** [Yes/No - location if yes]
-- **User-Facing Error Messages:** [Strategy for displaying errors]
 
-### Accessibility Requirements
-- **WCAG Level:** [A, AA, AAA]
-- **ARIA Labels:** [Required for all interactive elements]
-- **Keyboard Navigation:** [Required/Not Required]
-- **Screen Reader Testing:** [Required/Not Required]
+- **Global Error Handler:** No custom handler found. App enables browser global error listeners via:
+  - [`provideBrowserGlobalErrorListeners()`](concael-bridge-ux/src/app/app.config.ts:1)
+- **HTTP Interceptor:** None found; HttpClient is provided directly via:
+  - [`provideHttpClient()`](concael-bridge-ux/src/app/app.config.ts:2)
+- **User-Facing Error Messages (strategy):**
+  - Components store `pageError` / `statusMessage` in signals and render conditionally:
+    - Example: [`pageError`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:445), [`statusMessage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:446)
+  - Backend call errors commonly handled with `catchError` → set error message → return fallback observable.
+
+### Accessibility Requirements (Current State)
+
+This project uses semantic HTML and includes some ARIA attributes (menus/modals), but there is no explicit WCAG policy in-repo.
+
+- **WCAG Level:** Not specified (treat as “aim for AA”).
+- **ARIA Labels:** Used where appropriate (example modal uses `role="dialog"` and `aria-modal="true"` in [`WalletButtonComponent`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:163)).
+- **Keyboard Navigation:** Not explicitly documented; components should continue improving focus management for menus/modals.
+
+---
 
 ## Dependencies & Third-Party Libraries
 
-### Core Dependencies
+### Core Dependencies (from [`package.json`](concael-bridge-ux/package.json:25))
+
 ```json
 {
-  "@angular/core": "[version]",
-  "@angular/common": "[version]",
-  "@angular/router": "[version]",
-  "@angular/forms": "[version]"
+  "@angular/core": "^21.0.5",
+  "@angular/common": "^21.0.5",
+  "@angular/router": "^21.0.5",
+  "@angular/forms": "^21.0.5",
+  "rxjs": "~7.8.2",
+  "typescript": "~5.9.3"
 }
 ```
 
 ### UI Libraries
-- [ ] **Angular Material** - [version]
-- [ ] **PrimeNG** - [version]
-- [ ] **Bootstrap** - [version]
-- [ ] **Tailwind CSS** - [version]
-- [ ] **Custom UI Library** - [details]
 
-### Additional Libraries
-- **HTTP Client:** [@angular/common/http]
-- **Date Handling:** [date-fns, moment, dayjs, etc.]
-- **State Management:** [NgRx, Akita, etc.]
-- **Charts/Visualization:** [Chart.js, ng2-charts, etc.]
-- **Other:** [List any other key dependencies]
+- [x] **Tailwind CSS** - `^4.1.18` ([`package.json`](concael-bridge-ux/package.json:38))
+  - Integrated via PostCSS plugin in [`.postcssrc.json`](concael-bridge-ux/.postcssrc.json:1)
+  - Imported in global stylesheet [`src/styles.css`](concael-bridge-ux/src/styles.css:3)
+
+### Web3 / Wallet Libraries
+
+- **viem** - `^2.41.2` ([`package.json`](concael-bridge-ux/package.json:25))
+  - Used for EVM wallet client + chain switching + tx receipts:
+    - See [`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:3)
+- **WalletConnect v2** - `@walletconnect/ethereum-provider ^2.23.1` ([`package.json`](concael-bridge-ux/package.json:25))
+  - Provider initialization in [`#resolveProvider()`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:298)
+
+### Other
+
+- **QR Code generation**
+  - `qrcode` `^1.5.4` (CommonJS; explicitly allowed by Angular build)
+  - See `allowedCommonJsDependencies` in [`angular.json`](concael-bridge-ux/angular.json:27)
 
 ### Internal/Custom Packages
-[List any internal npm packages or libraries]
+
+None detected (no internal npm packages referenced in [`package.json`](concael-bridge-ux/package.json:1)).
+
+---
 
 ## Environment Configuration
 
 ### Environment Files
-```
-src/environments/
-├── environment.ts          # Development
-├── environment.prod.ts     # Production
-├── environment.staging.ts  # Staging (if applicable)
-```
 
-### Environment Variables
-```typescript
-export const environment = {
-  production: false,
-  apiUrl: '[API_BASE_URL]',
-  apiKey: '[API_KEY]',
-  features: {
-    featureA: true,
-    featureB: false
-  }
-};
-```
+This project does **not** use the classic Angular `src/environments/` pattern (no environment files in this workspace).
+
+Instead, it uses an `InjectionToken` that provides runtime-ish config via a factory:
+
+- [`APP_CONFIG`](concael-bridge-ux/src/app/core/app-config.ts:17)
+
+Current defaults (checked into source):
+- `apiBaseUrl` defaults to a **testing** backend URL in [`app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:19)
+- `walletConnectProjectId` is present in [`app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:22)
+
+**Important:** The comment notes these values should be “overridden at build time”, but no override mechanism is defined in this repo (e.g. file replacements or define plugin). If you need production/staging builds, add a documented config strategy (file replacements, environment injection, runtime `config.json`, etc.).
 
 ### Build Configurations
-- **Development:** `ng serve` or `ng build`
-- **Production:** `ng build --configuration production`
-- **Staging:** `ng build --configuration staging`
+
+From [`concael-bridge-ux/angular.json`](concael-bridge-ux/angular.json:16):
+
+- **Development:** `development` configuration (source maps enabled, optimization off)
+- **Production:** `production` configuration (output hashing, budgets) and is the **default** build configuration
+
+---
 
 ## Build & Deployment
 
-### Build Commands
+### Build Commands (as configured)
+
+Scripts in [`package.json`](concael-bridge-ux/package.json:4):
+
+- `npm run start` → runs Angular dev server
+- `npm run build` → production build by default (because defaultConfiguration is production)
+- `npm run watch` → development build in watch mode
+- `npm run test` → unit tests
+
+Raw Angular CLI equivalents (same behavior as scripts):
+
 ```bash
-# Development build
+# Dev server (development configuration is default for serve)
+ng serve
+
+# Production build (default build configuration is production)
 ng build
 
-# Production build
+# Explicit dev build
+ng build --configuration development
+
+# Explicit prod build
 ng build --configuration production
-
-# Build with specific configuration
-ng build --configuration [config-name]
-
-# Build with base href
-ng build --base-href /my-app/
 ```
 
 ### Build Output
-- **Output Directory:** `dist/[project-name]`
-- **Build Optimization:** [Enabled/Disabled for production]
-- **Source Maps:** [Generated for development only]
+
+- **Output directory:** `dist/concael-bridge-ux` (Angular default for the project name)
+- **Production optimizations:** Enabled by default (production configuration)
+- **Source maps:** Enabled in `development` configuration
+  - See `sourceMap: true` in [`angular.json`](concael-bridge-ux/angular.json:50)
 
 ### Deployment Target
-- **Platform:** [Azure, AWS S3, Firebase Hosting, Netlify, etc.]
-- **Deployment Command:** [Specify if using CLI tools]
-- **Environment Variables:** [How are they injected?]
+
+Not specified in this repo. Build artifacts are static and can be deployed to any static hosting (S3/CloudFront, Netlify, Vercel static, Nginx, etc.).
 
 ### CI/CD Pipeline
-- **CI Tool:** [GitHub Actions, GitLab CI, Jenkins, etc.]
-- **Pipeline Configuration:** [Location of config file]
-- **Deployment Triggers:** [On merge to main, manual, etc.]
 
-**Pipeline Steps:**
-1. [Install dependencies]
-2. [Run linting]
-3. [Run tests]
-4. [Build for production]
-5. [Deploy to hosting]
+Not specified in this repo (no GitHub Actions/GitLab/Jenkins config found under this project directory).
+
+---
 
 ## Testing Requirements
 
 ### Unit Testing
-- **Framework:** [Jasmine/Karma or Jest]
-- **Coverage Target:** [e.g., 80%]
-- **Run Command:** `ng test`
 
-**Testing Patterns:**
-```typescript
-// Example test structure
-describe('ComponentName', () => {
-  let component: ComponentName;
-  let fixture: ComponentFixture<ComponentName>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ComponentName]
-    }).compileComponents();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
-```
+- **Framework:** Vitest (types configured)
+  - [`vitest/globals`](concael-bridge-ux/tsconfig.spec.json:7)
+- **Run command:** `ng test` (also via `npm run test`)
+  - Scripts in [`package.json`](concael-bridge-ux/package.json:4)
 
 ### E2E Testing
-- **Framework:** [Cypress, Playwright, Protractor (deprecated)]
-- **Run Command:** [e.g., `npm run e2e`]
-- **Test Location:** [e.g., `cypress/e2e/`]
 
-### Testing Best Practices
-- Mock HTTP calls using `HttpClientTestingModule`
-- Use `ComponentFixture` for component testing
-- Test user interactions, not implementation details
-- [Add project-specific testing guidelines]
+Not configured (Angular CLI doesn’t include an e2e framework by default; see note in [`README.md`](concael-bridge-ux/README.md:53)).
+
+---
 
 ## Common Commands
 
 ### Development
+
+Use the scripts defined in [`concael-bridge-ux/package.json`](concael-bridge-ux/package.json:4):
+
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
-ng serve
-
-# Start with specific port
-ng serve --port 4201
-
-# Start with proxy configuration
-ng serve --proxy-config proxy.conf.json
-
-# Open in browser
-ng serve --open
-```
-
-### Code Generation
-```bash
-# Generate component
-ng generate component features/[feature-name]/[component-name]
-
-# Generate service
-ng generate service services/[service-name]
-
-# Generate guard
-ng generate guard guards/[guard-name]
-
-# Generate pipe
-ng generate pipe pipes/[pipe-name]
-
-# Generate module (if using modules)
-ng generate module features/[module-name] --routing
+npm run start
 ```
 
 ### Quality Assurance
-```bash
-# Run linting
-ng lint
 
-# Fix linting issues
-ng lint --fix
-
-# Run unit tests
-ng test
-
-# Run tests with coverage
-ng test --code-coverage
-
-# Run e2e tests
-npm run e2e
-```
+There is no `lint` script configured in [`package.json`](concael-bridge-ux/package.json:4). If linting is desired, add ESLint config + `ng lint` (or `eslint`) script.
 
 ### Build
+
 ```bash
-# Development build
-ng build
+# Production build (default)
+npm run build
 
-# Production build
-ng build --configuration production
-
-# Analyze bundle size
-ng build --stats-json
-npm run analyze  # if configured
+# Dev build watch
+npm run watch
 ```
 
-## Development Workflow
+---
 
-### Branch Naming Conventions
-- **Feature:** `feature/[feature-name]`
-- **Bug Fix:** `fix/[bug-description]`
-- **Hotfix:** `hotfix/[issue-description]`
-- **Refactor:** `refactor/[description]`
+## Development Workflow (Repo-specific Notes)
 
-### Commit Message Format
-```
-type(scope): subject
+This repo does not include branch/commit conventions in this project folder. If you adopt conventions, ensure they align with your org defaults.
 
-body (optional)
-
-footer (optional)
-```
-
-**Types:**
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Build process or auxiliary tool changes
-
-**Example:**
-```
-feat(auth): add password reset functionality
-
-Implemented password reset flow with email verification.
-Added new reset-password component and service.
-
-Closes #123
-```
-
-### Code Review Checklist
-- [ ] Code follows project style guidelines
-- [ ] All tests pass
-- [ ] No console.log statements in production code
-- [ ] Components use OnPush change detection where appropriate
-- [ ] Proper error handling implemented
-- [ ] Accessibility requirements met
-- [ ] No hardcoded values (use environment variables)
-- [ ] Documentation updated if needed
-
-### When to Create New Components
-- **Create new component when:**
-  - Logic/template is reused in multiple places
-  - Component exceeds 200-300 lines
-  - Component has distinct, separable responsibility
-  - Component represents a logical UI section
-
-- **Modify existing component when:**
-  - Adding minor functionality to existing feature
-  - Fixing bugs
-  - Refactoring without changing interface
+---
 
 ## API Integration
 
 ### API Configuration
-- **Base URL:** [e.g., `environment.apiUrl`]
-- **API Version:** [e.g., v1, v2]
-- **Authentication:** [JWT, OAuth, API Key, etc.]
 
-### HTTP Interceptor
-**Location:** [e.g., `src/app/core/interceptors/auth.interceptor.ts`]
+- **Base URL:** `APP_CONFIG.apiBaseUrl` from [`app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:3)
+- **URL composition:** `base/network/path` via [`#url()`](concael-bridge-ux/src/app/core/bridge-api.service.ts:20)
+- **Authentication:** None implemented in this UI (no auth headers/interceptors found).
 
-**Purpose:**
-- Add authentication tokens
-- Handle global errors
-- Log requests/responses
-- Transform requests/responses
+### HTTP Client
 
-### Authentication/Authorization
-- **Auth Service Location:** [path to auth service]
-- **Token Storage:** [localStorage, sessionStorage, cookies]
-- **Token Refresh:** [Automatic/Manual strategy]
-- **Protected Routes:** [How routes are protected]
+- Provided globally via [`provideHttpClient()`](concael-bridge-ux/src/app/app.config.ts:2)
+- Service wrapper: [`BridgeApiService`](concael-bridge-ux/src/app/core/bridge-api.service.ts:13)
 
-### API Error Handling
-```typescript
-// Example error handling pattern
-this.httpClient.get(url).pipe(
-  catchError((error: HttpErrorResponse) => {
-    // Handle different error types
-    if (error.status === 401) {
-      // Handle unauthorized
-    } else if (error.status === 404) {
-      // Handle not found
-    }
-    return throwError(() => error);
-  })
-);
-```
+### API Error Handling (Observed)
 
-### Data Models/Interfaces
-**Location:** [e.g., `src/app/models/`]
+- Uses `catchError(() => of(fallback))` for polling/balance endpoints:
+  - Example: [`catchError(() => of({ result: false, balance: 0 }))`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:511)
 
-**Example:**
-```typescript
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-}
-
-export enum UserRole {
-  Admin = 'admin',
-  User = 'user'
-}
-```
+---
 
 ## Styling Guidelines
 
 ### CSS Methodology
-- [ ] **BEM** (Block Element Modifier)
-- [ ] **Utility-First** (Tailwind, etc.)
-- [ ] **Component-Scoped** (Angular default)
-- [ ] **Other:** [Specify]
+
+- [x] **Utility-First** (Tailwind)
+- [x] **Component-Scoped** (Angular default) — but most styling is via Tailwind utility classes in templates
 
 ### Styling Technology
-- [ ] **SCSS/SASS**
-- [ ] **CSS**
-- [ ] **Less**
-- [ ] **Styled Components**
 
-### Theme Configuration
-- **Theme Location:** [e.g., `src/styles/themes/`]
-- **CSS Variables:** [Yes/No - location if yes]
-- **Dark Mode:** [Supported/Not Supported]
-
-### Responsive Breakpoints
-```scss
-// Example breakpoints
-$breakpoint-mobile: 576px;
-$breakpoint-tablet: 768px;
-$breakpoint-desktop: 992px;
-$breakpoint-wide: 1200px;
-```
+- [x] **CSS** (global stylesheet is `.css`)
+  - [`src/styles.css`](concael-bridge-ux/src/styles.css:1)
 
 ### Global Styles
-**Location:** [e.g., `src/styles/styles.scss`]
 
-**Structure:**
-- Variables and mixins
-- Reset/normalize styles
-- Typography
-- Utility classes
-- Component overrides
+- Location: [`concael-bridge-ux/src/styles.css`](concael-bridge-ux/src/styles.css:1)
+- Tailwind import: [`@import "tailwindcss";`](concael-bridge-ux/src/styles.css:3)
 
-### Component Styling Best Practices
-- Use `:host` for component root styling
-- Avoid deep selectors (`::ng-deep`) when possible
-- Keep styles component-scoped
-- Use CSS custom properties for theming
-- [Add project-specific guidelines]
+### Theme / Dark Mode
+
+- App sets `color-scheme: dark` at [`:root`](concael-bridge-ux/src/styles.css:5)
+- Most UI uses Tailwind colors for dark styling.
+
+---
 
 ## Performance Considerations
 
 ### Lazy Loading
-**Modules/Routes to Lazy Load:**
-- [List feature modules that should be lazy loaded]
 
-**Example:**
-```typescript
-{
-  path: 'admin',
-  loadChildren: () => import('./features/admin/admin.routes')
-}
-```
+Route-level component lazy loading is used for all main pages:
+- Home: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:6)
+- Swap: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:16)
+- Not found: [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:28)
 
 ### Change Detection Optimization
-- Use OnPush change detection for presentational components
-- Avoid function calls in templates
-- Use `trackBy` with `*ngFor`
-- Detach change detector when not needed
+
+- Components use `OnPush` by default:
+  - Example: [`ChangeDetectionStrategy.OnPush`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:61)
+- Signals are used heavily; avoid calling functions repeatedly in templates unless memoized via `computed()`.
 
 ### Bundle Optimization
-- **Target Bundle Size:** [e.g., < 500KB initial bundle]
-- **Code Splitting:** [Strategy for splitting bundles]
-- **Tree Shaking:** [Enabled/Configuration]
 
-### Image Optimization
-- Use WebP format where supported
-- Implement lazy loading for images
-- Use `loading="lazy"` attribute
-- Optimize image sizes before uploading
+Production build has budgets configured:
+- Initial bundle warning at 500kB and error at 1MB:
+  - [`budgets`](concael-bridge-ux/angular.json:36)
+- Component style budgets:
+  - [`anyComponentStyle`](concael-bridge-ux/angular.json:42)
 
-### TrackBy Functions
-```typescript
-// Always use trackBy with *ngFor
-trackByFn(index: number, item: any): any {
-  return item.id; // Use unique identifier
-}
-```
+---
 
-```html
-<div *ngFor="let item of items; trackBy: trackByFn">
-  {{ item.name }}
-</div>
-```
+## Common Pitfalls & Gotchas (Project-specific)
 
-## Common Pitfalls & Gotchas
+1. **WalletConnect not configured**
+   - **Cause:** `walletConnectProjectId` is empty or invalid.
+   - **Where:** [`APP_CONFIG.walletConnectProjectId`](concael-bridge-ux/src/app/core/app-config.ts:11)
+   - **Solution:** Provide a valid WalletConnect project ID for the target environment.
 
-### Known Issues
-1. **[Issue Description]**
-   - **Cause:** [Why this happens]
-   - **Solution:** [How to fix/avoid]
+2. **Wrong backend environment**
+   - **Cause:** `apiBaseUrl` is currently set to a testing endpoint in source.
+   - **Where:** [`APP_CONFIG.apiBaseUrl`](concael-bridge-ux/src/app/core/app-config.ts:19)
+   - **Solution:** Establish a production/staging config strategy and ensure the correct base URL per deployment.
 
-2. **[Issue Description]**
-   - **Cause:** [Why this happens]
-   - **Solution:** [How to fix/avoid]
+3. **CommonJS dependency warnings**
+   - **Cause:** `qrcode` is CommonJS.
+   - **Solution:** It is already allowed via `allowedCommonJsDependencies` in [`angular.json`](concael-bridge-ux/angular.json:27).
 
-### Browser Compatibility
-- **Minimum Supported Browsers:**
-  - Chrome: [version]
-  - Firefox: [version]
-  - Safari: [version]
-  - Edge: [version]
-
-### Memory Leak Prevention
-```typescript
-// Always unsubscribe from observables
-private destroy$ = new Subject<void>();
-
-ngOnInit() {
-  this.dataService.getData()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(data => {
-      // Handle data
-    });
-}
-
-ngOnDestroy() {
-  this.destroy$.next();
-  this.destroy$.complete();
-}
-```
-
-**Or use async pipe in templates (preferred):**
-```html
-<div *ngIf="data$ | async as data">
-  {{ data }}
-</div>
-```
-
-### Common Bugs and Solutions
-1. **ExpressionChangedAfterItHasBeenCheckedError**
-   - Use `ChangeDetectorRef.detectChanges()` carefully
-   - Move logic to `ngAfterViewInit` if needed
-
-2. **Route Parameter Issues**
-   - Use `ActivatedRoute` properly
-   - Subscribe to params in `ngOnInit`
-
-3. **Form Validation Not Working**
-   - Ensure validators are properly applied
-   - Check FormControl initialization
-
-## Component Generation Guidelines
-
-### When to Use Angular CLI
-```bash
-# Generate component with OnPush strategy
-ng g c features/my-feature/my-component --change-detection OnPush
-
-# Generate standalone component
-ng g c features/my-feature/my-component --standalone
-
-# Generate component without test file
-ng g c features/my-feature/my-component --skip-tests
-```
-
-### Component Template Structure
-```typescript
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
-
-@Component({
-  selector: 'app-my-component',
-  templateUrl: './my-component.component.html',
-  styleUrls: ['./my-component.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush // If using OnPush
-})
-export class MyComponentComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
-
-  constructor() { }
-
-  ngOnInit(): void {
-    // Initialization logic
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-}
-```
-
-### Input/Output Patterns
-```typescript
-// Input with default value
-@Input() title: string = 'Default Title';
-
-// Required input (Angular 16+)
-@Input({ required: true }) userId!: string;
-
-// Output event
-@Output() itemSelected = new EventEmitter<Item>();
-
-// Emit event
-onItemClick(item: Item): void {
-  this.itemSelected.emit(item);
-}
-```
-
-### Lifecycle Hook Usage
-- **ngOnInit:** Component initialization, API calls, subscriptions
-- **ngOnChanges:** React to input property changes
-- **ngAfterViewInit:** Access view children, DOM manipulation
-- **ngOnDestroy:** Cleanup, unsubscribe from observables
-- **ngDoCheck:** Custom change detection (use sparingly)
-
-## Angular CLI MCP Integration (If Available)
-
-When the Angular CLI MCP server is available, use these tools to assist with development:
-
-### Documentation Tools
-- Use `search_documentation` for Angular API questions
-- Use `get_best_practices` before generating new code
-- Use `find_examples` for reference implementations
-
-### Project Analysis
-- Use `list_projects` to understand workspace structure
-- Use `onpush_zoneless_migration` when optimizing change detection
-
-### Code Modernization
-- Use `modernize` (experimental) to update legacy code patterns
-- Always commit code before using experimental tools
-
-Refer to the Angular CLI MCP Integration Guide for detailed usage instructions.
+---
 
 ## Additional Resources
 
-### Documentation
-- **Project Documentation:** [Link to project docs]
-- **API Documentation:** [Link to API docs]
-- **Design System:** [Link to design system/style guide]
+- Project readme: [`concael-bridge-ux/README.md`](concael-bridge-ux/README.md:1)
+- Product/architecture docs live in [`concael-bridge-ux/ai_docs/`](concael-bridge-ux/ai_docs/angular_build_guide.md:1)
 
-### Team Contacts
-- **Tech Lead:** [Name/Contact]
-- **DevOps:** [Name/Contact]
-- **QA Lead:** [Name/Contact]
+---
 
-### Useful Links
-- **Repository:** [GitHub/GitLab URL]
-- **CI/CD Dashboard:** [Link]
-- **Staging Environment:** [URL]
-- **Production Environment:** [URL]
-- **Bug Tracker:** [Jira/GitHub Issues URL]
+## Related docs/specs in this repo
 
-## Quick Reference
-
-### Most Common Tasks
-1. **Start development:** `ng serve`
-2. **Create component:** `ng g c features/[name]`
-3. **Run tests:** `ng test`
-4. **Build for production:** `ng build --configuration production`
-5. **Check code quality:** `ng lint`
-
-### Emergency Contacts
-- **Production Issues:** [Contact/Slack channel]
-- **Deployment Issues:** [Contact/Slack channel]
-- **Security Concerns:** [Contact/Email]
+- Angular coding conventions for this repo: [`angular_best_practices.md`](concael-bridge-ux/ai_docs/angular_best_practices.md:1)
+- External Angular reference links: [`angular_key_resources.md`](concael-bridge-ux/ai_docs/angular_key_resources.md:1)
+- UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](concael-bridge-ux/ai_docs/style_guide.md:1)
+- Wallet integration and supported connectors: [`wallets.md`](concael-bridge-ux/ai_docs/wallets.md:1)
+- Backend API contract (endpoints + response shapes): [`backend_api.md`](concael-bridge-ux/ai_docs/backend_api.md:1)
+- Error handling conventions across the app: [`error_handling.md`](concael-bridge-ux/ai_docs/error_handling.md:1)
+- Testing strategy (unit/E2E plan + web3 mocking): [`testing.md`](concael-bridge-ux/ai_docs/testing.md:1)

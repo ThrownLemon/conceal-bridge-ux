@@ -1351,3 +1351,17 @@ try {
 - **Ethereum JSON-RPC Specification:** https://ethereum.github.io/execution-apis/api-documentation/
 - **EIP-1559 Gas Explanation:** https://eips.ethereum.org/EIPS/eip-1559
 - **Contract ABI Specification:** https://docs.soliditylang.org/en/latest/abi-spec.html
+
+## Related docs/specs in this repo
+
+- [`ai_docs/wallets.md`](./wallets.md)
+- [`ai_docs/smart_conctracts.md`](./smart_conctracts.md)
+- [`ai_docs/backend_api.md`](./backend_api.md)
+- [`ai_docs/error_handling.md`](./error_handling.md)
+- [`ai_docs/security.md`](./security.md)
+- [`ai_docs/testing.md`](./testing.md)
+- [`ai_docs/bridge_overview.md`](./bridge_overview.md)
+- [`ai_docs/bridge_user_guide.md`](./bridge_user_guide.md)
+- [`ai_docs/bridge_architecture.md`](./bridge_architecture.md)
+- [`ai_spec/http_and_error_handling.md`](../ai_spec/http_and_error_handling.md)
+- [`ai_spec/security_headers_and_csp.md`](../ai_spec/security_headers_and_csp.md)

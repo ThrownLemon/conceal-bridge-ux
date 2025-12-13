@@ -172,3 +172,16 @@ The Conceal Network Bridge represents a strategic evolution for the Conceal ecos
 - Path for broader adoption and integration
 
 As the first Cryptonote coin to bridge multiple networks, Conceal Network is pioneering the intersection of privacy and DeFi accessibility.
+
+## Related docs/specs in this repo
+
+- [`ai_docs/bridge_user_guide.md`](./bridge_user_guide.md)
+- [`ai_docs/bridge_architecture.md`](./bridge_architecture.md)
+- [`ai_docs/wallets.md`](./wallets.md)
+- [`ai_docs/web3_integrations.md`](./web3_integrations.md)
+- [`ai_docs/backend_api.md`](./backend_api.md)
+- [`ai_docs/smart_conctracts.md`](./smart_conctracts.md)
+- [`ai_docs/error_handling.md`](./error_handling.md)
+- [`ai_docs/security.md`](./security.md)
+- [`ai_spec/http_and_error_handling.md`](../ai_spec/http_and_error_handling.md)
+- [`ai_spec/runtime_config.md`](../ai_spec/runtime_config.md)
