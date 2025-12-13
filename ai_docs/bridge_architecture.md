@@ -85,7 +85,7 @@ src/app/
    ↓
 2. Estimate Gas Fee
    ↓
-3. User Pays Gas Fee (MetaMask/WalletConnect)
+3. User Pays Gas Fee (MetaMask/Injected)
    ↓
 4. Initialize Swap (API: /api/ccx/wccx/swap/init)
    ↓
@@ -575,7 +575,7 @@ export class BridgeService {
   }
 
   /**
-   * Pay gas fee via MetaMask/WalletConnect
+   * Pay gas fee via MetaMask/Injected Wallet
    */
   private async payGasFee(gasAmount: string): Promise<string> {
     const walletClient = this.walletService.getWalletClient();

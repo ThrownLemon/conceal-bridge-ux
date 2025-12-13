@@ -39,7 +39,7 @@ We mainly defend user funds and user privacy by:
    - Validate addresses/amounts and config-derived addresses before sending txs or making irreversible backend calls (see validation patterns in [`SwapPage.startCcxToEvm()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:598)).
 
 3. **Minimize signature/transaction requests**
-   - Only request exactly the permissions and RPC methods needed (WalletConnect initialization lists required methods in [`EvmWalletService.#resolveProvider()`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:298)).
+   - Only request exactly the permissions and RPC methods needed.
    - Do not add message signing or typed-data signing flows unless required and clearly documented.
 
 4. **Prefer explicit user confirmation**
@@ -151,7 +151,6 @@ Rules:
 ### 5.3 Don’t leak sensitive config in logs
 Runtime config includes:
 - backend base URL: [`AppConfig.apiBaseUrl`](concael-bridge-ux/src/app/core/app-config.ts:8)
-- WalletConnect project ID: [`AppConfig.walletConnectProjectId`](concael-bridge-ux/src/app/core/app-config.ts:11)
 
 Rules:
 - Avoid logging config values in production builds.
@@ -241,7 +240,6 @@ Rules:
   - be deliberate about `connect-src` allowlists for:
     - backend base URL from [`AppConfig.apiBaseUrl`](concael-bridge-ux/src/app/core/app-config.ts:8)
     - chain metadata API host used by [`EvmChainMetadataService`](concael-bridge-ux/src/app/core/evm-chain-metadata.service.ts:43)
-    - WalletConnect hosts implied by [`EvmWalletService.#resolveProvider()`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:298)
 
 ---
 

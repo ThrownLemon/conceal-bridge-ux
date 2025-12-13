@@ -111,7 +111,6 @@ These appear in the current codebase and should remain consistent:
 | User rejected a wallet request | `code === 4001` | “Request was cancelled in your wallet.” | [`SwapPage.addTokenToWallet()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:560), [`WalletButtonComponent.friendlyError()`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466) |
 | Wallet request already pending | `code === -32002` | “A wallet request is already pending. Please open your wallet.” | [`HomePage.switchWalletToSelectedNetwork()`](concael-bridge-ux/src/app/pages/home/home.page.ts:411), [`WalletButtonComponent.friendlyError()`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466) |
 | Chain not added to wallet (MetaMask common) | `code === 4902` | Automatically add chain and retry switch | [`EvmWalletService.ensureChain()`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:213) |
-| Wallet doesn’t support feature (common in WalletConnect) | `code === -32603` or message contains “not supported” | Explain manual fallback steps | [`SwapPage.addTokenToWallet()`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:568) |
 
 ### 5.2 Wallet connect UX rules
 Wallet connect UI uses a local error signal [`WalletButtonComponent.error`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:317) and maps errors with [`WalletButtonComponent.friendlyError()`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466).

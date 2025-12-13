@@ -6,12 +6,6 @@ export interface AppConfig {
    * (without a trailing slash).
    */
   apiBaseUrl: string;
-
-  /**
-   * WalletConnect v2 Project ID.
-   * Create one at https://cloud.walletconnect.com and paste it here (or override at build time).
-   */
-  walletConnectProjectId: string;
 }
 
 export const APP_CONFIG = new InjectionToken<AppConfig>('APP_CONFIG', {
@@ -19,7 +13,6 @@ export const APP_CONFIG = new InjectionToken<AppConfig>('APP_CONFIG', {
   factory: () => ({
     //apiBaseUrl: 'https://bridge.conceal.network/backend',
     apiBaseUrl: 'https://bridge.conceal.network/testing/backend',
-    walletConnectProjectId: '26a4fa315dff49e1a8cac7d4f83ed7f4',
   }),
 });
 

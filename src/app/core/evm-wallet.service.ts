@@ -20,7 +20,7 @@ type Eip1193Provider = {
   connect?: () => Promise<void> | void;
 };
 
-export type WalletConnectorId = 'metamask' | 'trust' | 'binance' | 'walletconnect';
+export type WalletConnectorId = 'metamask' | 'trust' | 'binance';
 
 type ProviderWithFlags = Eip1193Provider & {
   isMetaMask?: boolean;
@@ -59,7 +59,7 @@ export class EvmWalletService {
     () => typeof window !== 'undefined' && !!(window as unknown as { BinanceChain?: unknown }).BinanceChain,
   );
 
-  readonly walletConnectConfigured = computed(() => this.#appConfig.walletConnectProjectId.trim().length > 0);
+
 
   /**
    * Legacy name used across the app: indicates an injected EVM provider is present.
@@ -75,7 +75,7 @@ export class EvmWalletService {
   });
 
   isConnectorAvailable(connector: WalletConnectorId): boolean {
-    if (connector === 'walletconnect') return this.walletConnectConfigured();
+
     if (connector === 'binance') return this.hasBinanceProvider();
 
     const injected = this.#injectedProvider();
@@ -155,9 +155,7 @@ export class EvmWalletService {
     this.#setProvider(provider, connector);
 
     // WalletConnect's provider requires connect() before request() calls.
-    if (connector === 'walletconnect') {
-      await (provider.connect?.() ?? Promise.resolve());
-    }
+
 
     const { walletClient } = this.getClients(mainnet, provider);
     const accounts = await walletClient.requestAddresses();
@@ -194,12 +192,14 @@ export class EvmWalletService {
     this.#address.set(null);
     this.#chainId.set(null);
     this.#connector.set(null);
+    /*
     // For WalletConnect, fully clear provider/session (real disconnect).
     if (connector === 'walletconnect') {
       this.#detachListeners?.();
       this.#detachListeners = null;
       this.#provider.set(null);
     }
+    */
   }
 
   async ensureChain(chain: Chain): Promise<void> {
@@ -296,40 +296,7 @@ export class EvmWalletService {
   }
 
   async #resolveProvider(connector: WalletConnectorId): Promise<Eip1193Provider> {
-    if (connector === 'walletconnect') {
-      if (!this.walletConnectConfigured()) {
-        throw new Error('WalletConnect is not configured (missing project ID).');
-      }
-      const { default: EthereumProvider } = await import('@walletconnect/ethereum-provider');
-      // Reuse provider if already created.
-      const existing = this.#provider();
-      if (this.#connector() === 'walletconnect' && existing) return existing;
 
-      const provider = (await EthereumProvider.init({
-        projectId: this.#appConfig.walletConnectProjectId.trim(),
-        // Supported EVM networks in this app.
-        chains: [1, 56, 137],
-        showQrModal: true,
-        // WalletConnect v2 validates requested RPC methods against the session.
-        // Include all methods we use (and a few common safe ones).
-        methods: [
-          'eth_chainId',
-          'eth_accounts',
-          'eth_requestAccounts',
-          'eth_sendTransaction',
-          'eth_sign',
-          'personal_sign',
-          'eth_signTypedData',
-          'eth_signTypedData_v4',
-          'wallet_switchEthereumChain',
-          'wallet_addEthereumChain',
-          'wallet_watchAsset',
-        ],
-        events: ['accountsChanged', 'chainChanged', 'disconnect'],
-      })) as unknown as Eip1193Provider;
-
-      return provider;
-    }
 
     if (connector === 'binance') {
       const binance = this.#binanceProvider();

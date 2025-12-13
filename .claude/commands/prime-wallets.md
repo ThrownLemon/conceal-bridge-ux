@@ -1,4 +1,4 @@
-# Context for — Wallets / Web3 (Viem + WalletConnect)
+# Context for — Wallets / Web3 (Viem + Injected)
 > Purpose: load the minimum context to safely change wallet connection UX, provider handling, chain switching, and on-chain tx flows.
 
 ## Key rules (read this before coding)
@@ -6,7 +6,6 @@
 - **Hydration must not prompt** (startup uses silent account/chain checks; do not add wallet permission prompts during hydration).
 - **Preserve disconnect semantics** (the “user disconnected” localStorage flag prevents surprise reconnects).
 - **Network switching must go through the wallet service** (don’t re-implement RPC calls in components).
-- **WalletConnect must keep a minimal method/event list** (only what the app uses).
 - **Transactions are not final at “hash returned”**: always wait for confirmations configured by backend chain config
 
 ## Read the following files

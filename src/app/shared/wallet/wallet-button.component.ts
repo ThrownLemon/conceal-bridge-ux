@@ -283,22 +283,7 @@ type Variant = 'header' | 'primary';
                 <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
               </button>
 
-              <button
-                type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-left hover:bg-slate-50 disabled:opacity-60"
-                [disabled]="!wallet.walletConnectConfigured()"
-                (click)="selectConnector('walletconnect')"
-              >
-                <span class="flex items-center gap-3">
-                  <img class="h-7 w-7" src="/images/wallets/walletconnect.svg" alt="WalletConnect logo" loading="lazy" decoding="async" />
-                  <span class="font-medium">WalletConnect</span>
-                </span>
-                @if (!wallet.walletConnectConfigured()) {
-                  <span class="text-xs text-amber-700">Not configured</span>
-                } @else {
-                  <span class="text-xs text-[var(--cb-color-muted)]">QR</span>
-                }
-              </button>
+
             </div>
           }
         </div>
@@ -468,9 +453,7 @@ export class WalletButtonComponent {
     if (code === 4001) return 'Connection request was cancelled in your wallet.';
     if (code === -32002) return 'A wallet request is already pending. Please open your wallet extension.';
 
-    if (connector === 'walletconnect' && !this.wallet.walletConnectConfigured()) {
-      return 'WalletConnect is not configured yet.';
-    }
+
 
     const raw = e instanceof Error ? e.message : 'Failed to connect wallet.';
     if (raw.includes('No injected EVM wallet')) return 'No wallet extension detected in this browser.';
@@ -500,7 +483,7 @@ export class WalletButtonComponent {
   }
 
   connectorConnectingHint(connector: WalletConnectorId): string {
-    if (connector === 'walletconnect') return 'Approve the connection in your wallet app.';
+
     return `Open the ${this.connectorName(connector)} browser extension to connect your wallet.`;
   }
 

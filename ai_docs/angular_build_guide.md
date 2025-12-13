@@ -5,7 +5,7 @@
 **Project Name:** Concael Bridge UX (workspace project: [`concael-bridge-ux`](concael-bridge-ux/package.json:1))
 
 **Purpose:** A web UI for bridging (swapping) between **Conceal (CCX)** and **wrapped CCX (wCCX)** on EVM networks (**Ethereum**, **BNB Smart Chain**, **Polygon**). The UI:
-- connects to an EVM wallet (injected providers + WalletConnect),
+- connects to an EVM wallet (injected providers),
 - calls the bridge backend API to initialize/execute swaps,
 - sends native gas-fee transactions or ERC-20 transfers (wCCX),
 - polls backend state until the swap completes.
@@ -19,7 +19,7 @@
 **Key Features:**
 - Standalone app bootstrapped via [`bootstrapApplication()`](concael-bridge-ux/src/main.ts:1)
 - Route-level lazy loading with [`loadComponent`](concael-bridge-ux/src/app/app.routes.ts:3)
-- Wallet UX: MetaMask / Trust / Binance Wallet / WalletConnect via [`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:33)
+- Wallet UX: MetaMask / Trust / Binance Wallet via [`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:33)
 - Swap UX for CCX→wCCX and wCCX→CCX via [`SwapPage`](concael-bridge-ux/src/app/pages/swap/swap.page.ts:400)
 - Tailwind CSS UI (utility-first) via [`src/styles.css`](concael-bridge-ux/src/styles.css:1) and PostCSS plugin config in [`.postcssrc.json`](concael-bridge-ux/.postcssrc.json:1)
 
@@ -191,7 +191,6 @@ This project uses semantic HTML and includes some ARIA attributes (menus/modals)
 - **viem** - `^2.41.2` ([`package.json`](concael-bridge-ux/package.json:25))
   - Used for EVM wallet client + chain switching + tx receipts:
     - See [`EvmWalletService`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:3)
-- **WalletConnect v2** - `@walletconnect/ethereum-provider ^2.23.1` ([`package.json`](concael-bridge-ux/package.json:25))
   - Provider initialization in [`#resolveProvider()`](concael-bridge-ux/src/app/core/evm-wallet.service.ts:298)
 
 ### Other
@@ -393,11 +392,6 @@ Production build has budgets configured:
 ---
 
 ## Common Pitfalls & Gotchas (Project-specific)
-
-1. **WalletConnect not configured**
-   - **Cause:** `walletConnectProjectId` is empty or invalid.
-   - **Where:** [`APP_CONFIG.walletConnectProjectId`](concael-bridge-ux/src/app/core/app-config.ts:11)
-   - **Solution:** Provide a valid WalletConnect project ID for the target environment.
 
 2. **Wrong backend environment**
    - **Cause:** `apiBaseUrl` is currently set to a testing endpoint in source.

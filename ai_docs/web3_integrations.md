@@ -6,7 +6,6 @@ This guide provides comprehensive instructions for integrating Web3 functionalit
 
 **Key Dependencies:**
 - `viem@^2.41.2` - Core Web3 functionality
-- `@walletconnect/ethereum-provider@^2.23.1` - WalletConnect integration
 
 ## Why Viem?
 
@@ -1098,7 +1097,7 @@ await transactionService.waitForTransaction(transferHash, chainId);
 
 ### 1. Never Expose Private Keys
 - Private keys should never be stored in the application
-- Always use wallet providers (MetaMask, WalletConnect)
+- Always use wallet providers (MetaMask, etc.)
 - Never log sensitive information
 
 ### 2. Validate All Inputs

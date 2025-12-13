@@ -1,6 +1,6 @@
 # Testing Guide — Concael Bridge UX (AI Agent)
 
-This guide defines **how to test this project** (Angular 21 + Vitest + viem + WalletConnect) and how the AI agent should structure tests so they are reliable in CI and do not depend on real wallets or real chains.
+This guide defines **how to test this project** (Angular 21 + Vitest + viem) and how the AI agent should structure tests so they are reliable in CI and do not depend on real wallets or real chains.
 
 Core references:
 - Unit test runner & scripts: [`package.json`](concael-bridge-ux/package.json:4), Angular test builder: [`angular.json`](concael-bridge-ux/angular.json:70)
@@ -22,7 +22,6 @@ Core references:
 **Rule:** keep unit tests **deterministic** and runnable without:
 - external HTTP
 - real wallet extensions
-- real WalletConnect sessions
 - real chain RPC calls
 
 ---
@@ -179,7 +178,7 @@ Use the plan in [`e2e_testing.md`](concael-bridge-ux/ai_spec/e2e_testing.md:1). 
 
 ## 9) AI agent checklist (before adding/adjusting tests)
 
-- Tests do not call real external endpoints (backend, LI.FI metadata, WalletConnect, chain RPC).
+- Tests do not call real external endpoints (backend, LI.FI metadata, chain RPC).
 - Web3 tests mock at the boundary (`EvmWalletService` or provider) unless a smaller unit requires mocking viem (see [`web3_integrations.md`](concael-bridge-ux/ai_docs/web3_integrations.md:1014)).
 - Test fixtures match actual interfaces (see [`bridge-types.ts`](concael-bridge-ux/src/app/core/bridge-types.ts:1)).
 - Component tests follow current patterns in [`app.spec.ts`](concael-bridge-ux/src/app/app.spec.ts:1).
