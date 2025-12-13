@@ -1,24 +1,22 @@
-import { ChangeDetectionStrategy, Component, effect, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import * as QRCode from 'qrcode';
+import { QrCode } from './qr-code.utils';
 
 @Component({
   selector: 'app-qr-code',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="grid place-items-center gap-2">
-      @if (dataUrl(); as url) {
-        <img
-          class="h-auto rounded-lg bg-white p-2 shadow-sm"
-          [attr.alt]="alt()"
+      @if (qrData(); as qr) {
+        <svg
+          class="block rounded-lg bg-white p-2 shadow-sm"
           [attr.width]="size()"
           [attr.height]="size()"
-          [src]="url"
-        />
-      } @else if (isLoading()) {
-        <div class="text-sm text-[var(--cb-color-muted)]">Generating QR…</div>
-      } @else if (error(); as err) {
-        <div class="text-sm text-red-300">{{ err }}</div>
+          [attr.viewBox]="qr.viewBox"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path [attr.d]="qr.path" fill="#0f172a" />
+        </svg>
       } @else {
         <div class="text-sm text-[var(--cb-color-muted)]">No QR data.</div>
       }
@@ -30,52 +28,33 @@ export class QrCodeComponent {
   readonly size = input<number>(260);
   readonly alt = input<string>('QR code');
 
-  readonly dataUrl = signal<string | null>(null);
-  readonly isLoading = signal(false);
-  readonly error = signal<string | null>(null);
+  readonly qrData = computed(() => {
+    const text = this.data().trim();
+    if (!text) return null;
 
-  constructor() {
-    let generation = 0;
+    try {
+      const qr = QrCode.encodeText(text, QrCode.Ecc.MEDIUM);
+      const size = qr.size;
+      const modules = [];
 
-    effect(() => {
-      const value = this.data().trim();
-      const size = this.size();
-
-      generation += 1;
-      const current = generation;
-
-      if (!value) {
-        this.dataUrl.set(null);
-        this.error.set(null);
-        this.isLoading.set(false);
-        return;
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          if (qr.getModule(x, y)) {
+            // Simple 1x1 rect path
+            modules.push(`M${x},${y}h1v1h-1z`);
+          }
+        }
       }
 
-      this.isLoading.set(true);
-      this.error.set(null);
-
-      void QRCode.toDataURL(value, {
-        width: size,
-        margin: 1,
-        errorCorrectionLevel: 'M',
-        color: { dark: '#0f172a', light: '#ffffff' },
-      })
-        .then((url: string) => {
-          if (current !== generation) return;
-          this.dataUrl.set(url);
-        })
-        .catch((e: unknown) => {
-          if (current !== generation) return;
-          const msg = e instanceof Error ? e.message : 'Failed to generate QR code.';
-          this.error.set(msg);
-          this.dataUrl.set(null);
-        })
-        .finally(() => {
-          if (current !== generation) return;
-          this.isLoading.set(false);
-        });
-    });
-  }
+      return {
+        viewBox: `0 0 ${size} ${size}`,
+        path: modules.join(''),
+      };
+    } catch (e) {
+      console.error('QR Gen Error:', e);
+      return null;
+    }
+  });
 }
 
 
