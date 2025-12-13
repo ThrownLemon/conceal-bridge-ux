@@ -253,7 +253,7 @@ type Variant = 'header' | 'primary';
                 (click)="selectConnector('metamask')"
               >
                 <span class="flex items-center gap-3">
-                  <img class="h-7 w-7" src="/images/wallets/metamask.png" alt="MetaMask logo" loading="lazy" decoding="async" />
+                  <img class="h-7 w-7" src="images/wallets/metamask.png" alt="MetaMask logo" loading="lazy" decoding="async" />
                   <span class="font-medium">MetaMask</span>
                 </span>
                 <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
@@ -265,7 +265,7 @@ type Variant = 'header' | 'primary';
                 (click)="selectConnector('trust')"
               >
                 <span class="flex items-center gap-3">
-                  <img class="h-7 w-7" src="/images/wallets/trustwallet.png" alt="Trust Wallet logo" loading="lazy" decoding="async" />
+                  <img class="h-7 w-7" src="images/wallets/trustwallet.png" alt="Trust Wallet logo" loading="lazy" decoding="async" />
                   <span class="font-medium">Trust Wallet</span>
                 </span>
                 <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
@@ -277,7 +277,7 @@ type Variant = 'header' | 'primary';
                 (click)="selectConnector('binance')"
               >
                 <span class="flex items-center gap-3">
-                  <img class="h-7 w-7" src="/images/wallets/binance.svg" alt="Binance logo" loading="lazy" decoding="async" />
+                  <img class="h-7 w-7" src="images/wallets/binance.svg" alt="Binance logo" loading="lazy" decoding="async" />
                   <span class="font-medium">Binance Wallet</span>
                 </span>
                 <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
@@ -315,9 +315,9 @@ export class WalletButtonComponent {
 
   readonly connectedChainLogo = computed(() => {
     const chainId = this.wallet.chainId();
-    if (chainId === 1) return '/images/branding/eth.png';
-    if (chainId === 56) return '/images/branding/bsc.png';
-    if (chainId === 137) return '/images/branding/plg.png';
+    if (chainId === 1) return 'images/branding/eth.png';
+    if (chainId === 56) return 'images/branding/bsc.png';
+    if (chainId === 137) return 'images/branding/plg.png';
     return this.connectedChain()?.logoUri ?? null;
   });
 
@@ -337,9 +337,9 @@ export class WalletButtonComponent {
   });
 
   readonly evmNetworkOptions = computed(() => [
-    { key: 'eth' as const, label: 'Ethereum', logo: '/images/branding/eth.png', chain: EVM_NETWORKS.eth.chain },
-    { key: 'bsc' as const, label: 'BNB Smart Chain', logo: '/images/branding/bsc.png', chain: EVM_NETWORKS.bsc.chain },
-    { key: 'plg' as const, label: 'Polygon', logo: '/images/branding/plg.png', chain: EVM_NETWORKS.plg.chain },
+    { key: 'eth' as const, label: 'Ethereum', logo: 'images/branding/eth.png', chain: EVM_NETWORKS.eth.chain },
+    { key: 'bsc' as const, label: 'BNB Smart Chain', logo: 'images/branding/bsc.png', chain: EVM_NETWORKS.bsc.chain },
+    { key: 'plg' as const, label: 'Polygon', logo: 'images/branding/plg.png', chain: EVM_NETWORKS.plg.chain },
   ]);
 
   readonly buttonClass = computed(() => {
@@ -469,10 +469,10 @@ export class WalletButtonComponent {
   }
 
   connectorLogo(connector: WalletConnectorId): string {
-    if (connector === 'metamask') return '/images/wallets/metamask.png';
-    if (connector === 'trust') return '/images/wallets/trustwallet.png';
-    if (connector === 'binance') return '/images/wallets/binance.svg';
-    return '/images/wallets/walletconnect.svg';
+    if (connector === 'metamask') return 'images/wallets/metamask.png';
+    if (connector === 'trust') return 'images/wallets/trustwallet.png';
+    if (connector === 'binance') return 'images/wallets/binance.svg';
+    return 'images/wallets/walletconnect.svg';
   }
 
   connectorInstallUrl(connector: WalletConnectorId): string {

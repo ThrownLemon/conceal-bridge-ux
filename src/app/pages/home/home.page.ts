@@ -13,10 +13,10 @@ import { WalletButtonComponent } from '../../shared/wallet/wallet-button.compone
 type NetworkKey = 'ccx' | EvmNetworkKey;
 
 const NETWORK_LOGOS: Record<NetworkKey, string> = {
-  ccx: '/images/branding/ccx.png',
-  eth: '/images/branding/eth.png',
-  bsc: '/images/branding/bsc.png',
-  plg: '/images/branding/plg.png',
+  ccx: 'images/branding/ccx.png',
+  eth: 'images/branding/eth.png',
+  bsc: 'images/branding/bsc.png',
+  plg: 'images/branding/plg.png',
 };
 
 @Component({
