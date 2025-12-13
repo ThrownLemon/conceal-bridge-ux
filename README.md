@@ -24,6 +24,8 @@ High-level product + architecture docs:
 - Wallets / Web3 integrations: [ai_docs/wallets.md](./ai_docs/wallets.md), [ai_docs/web3_integrations.md](./ai_docs/web3_integrations.md)
 - Security + error handling: [ai_docs/security.md](./ai_docs/security.md), [ai_docs/error_handling.md](./ai_docs/error_handling.md)
 - Build guide (repo-specific): [ai_docs/angular_build_guide.md](./ai_docs/angular_build_guide.md)
+- **Deployment guide:** [ai_docs/deployment.md](./ai_docs/deployment.md)
+- **CI/CD pipeline:** [ai_docs/ci_cd.md](./ai_docs/ci_cd.md)
 
 Specs (implementation-focused):
 
@@ -103,3 +105,58 @@ E2E is not configured in this workspace by default. If/when you add an E2E frame
 
 - [ai_spec/e2e_testing.md](./ai_spec/e2e_testing.md)
 - [ai_docs/testing.md](./ai_docs/testing.md)
+
+## Deployment
+
+### Automated Deployment (Recommended)
+
+The project uses **GitHub Actions** for automated deployment. Simply push to the `main` branch:
+
+```bash
+git push origin main
+```
+
+The workflow will automatically:
+1. Run tests
+2. Build the production bundle
+3. Deploy to GitHub Pages
+
+**Monitor deployment:** Check the **Actions** tab in your GitHub repository.
+
+For details, see [ai_docs/ci_cd.md](./ai_docs/ci_cd.md).
+
+### Manual Deployment
+
+If you need to deploy manually:
+
+This project is configured for automated deployment to GitHub Pages using `angular-cli-ghpages`.
+
+**Deploy command:**
+
+```bash
+npm run deploy
+```
+
+Or directly with the Angular CLI:
+
+```bash
+ng deploy --base-href=/conceal-bridge-ux/
+```
+
+This will:
+1. Build the production bundle
+2. Create a `404.html` file (for SPA routing support)
+3. Push the build output to the `gh-pages` branch
+
+**Live URL:** https://thrownlemon.github.io/conceal-bridge-ux/
+
+**Configuration:**
+- The `deploy` target is configured in `angular.json`
+- The `--base-href` flag ensures assets load correctly under the GitHub Pages subdirectory
+
+**First-time setup:**
+After the first successful deployment, ensure your repository **Settings > Pages** is configured to deploy from the `gh-pages` branch.
+
+For more details on deployment strategy, caching, and security headers, see:
+- [ai_spec/deployment_static_hosting.md](./ai_spec/deployment_static_hosting.md)
+- [ai_spec/security_headers_and_csp.md](./ai_spec/security_headers_and_csp.md)

@@ -268,11 +268,42 @@ ng build --configuration production
 
 ### Deployment Target
 
-Not specified in this repo. Build artifacts are static and can be deployed to any static hosting (S3/CloudFront, Netlify, Vercel static, Nginx, etc.).
+**GitHub Pages** (configured via `angular-cli-ghpages`)
+
+- **Deploy command:** `ng deploy --base-href=/conceal-bridge-ux/`
+- **Live URL:** https://thrownlemon.github.io/conceal-bridge-ux/
+- **Configuration:** Deploy target is configured in [`angular.json`](conceal-bridge-ux/angular.json) under the `deploy` architect target
+- **SPA Routing:** The tool automatically creates a `404.html` file (copy of `index.html`) to support client-side routing on GitHub Pages
+
+Build artifacts are static and can be deployed to any static hosting (S3/CloudFront, Netlify, Vercel static, Nginx, etc.), but GitHub Pages is the current configured target.
+
+For deployment details, see:
+- [`ai_spec/deployment_static_hosting.md`](conceal-bridge-ux/ai_spec/deployment_static_hosting.md)
+- [`README.md`](conceal-bridge-ux/README.md) (Deployment section)
 
 ### CI/CD Pipeline
 
-Not specified in this repo (no GitHub Actions/GitLab/Jenkins config found under this project directory).
+
+**GitHub Actions** (configured for automated deployment)
+
+- **Workflow file:** `.github/workflows/deploy.yml`
+- **Trigger:** Automatic on push to `main` branch, or manual via workflow dispatch
+- **Steps:**
+  1. Checkout code
+  2. Setup Node.js (v20)
+  3. Install dependencies (`npm ci`)
+  4. Run tests (`npm run test`)
+  5. Build production bundle (`npm run build`)
+  6. Deploy to GitHub Pages (`npm run deploy`)
+
+The workflow automatically deploys to GitHub Pages whenever changes are pushed to the `main` branch.
+
+**Manual trigger:** You can also trigger the workflow manually from the GitHub Actions tab in your repository.
+
+For CI/CD details and alternative configurations, see:
+- [`ai_spec/ci_cd_pipeline.md`](conceal-bridge-ux/ai_spec/ci_cd_pipeline.md)
+- [`.github/workflows/deploy.yml`](conceal-bridge-ux/.github/workflows/deploy.yml)
+
 
 ---
 
