@@ -2,6 +2,12 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.3.
 
+## Product docs
+
+- **UX spec / design plan**: `SPEC_BRIDGE_UX.md`
+- **Concept/background**: `ABOUT.md`
+- **User guide**: `USER_GUIDE.md`
+
 ## Development server
 
 To start a local development server, run:
