@@ -1,9 +1,10 @@
 # Spec: Conceal Branding, Typography & Design Tokens — Concael Bridge UX
 
-## Context / Current State
-
 > [!NOTE]
 > **Status: Implemented**
+
+## Context / Current State
+
 > Fonts are self-hosted in `public/fonts/` and configured in `styles.css`.
 > Tokens are defined in `:root`.
 

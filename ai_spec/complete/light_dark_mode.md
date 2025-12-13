@@ -1,5 +1,8 @@
 # Spec: Light/Dark Mode — Concael Bridge UX
 
+> [!NOTE]
+> **Status: Implemented**
+
 ## Context
 - The app is currently **dark-only** (`color-scheme: dark` in `:root`).
 - Conceal branding tokens were recently introduced in `styles.css`.

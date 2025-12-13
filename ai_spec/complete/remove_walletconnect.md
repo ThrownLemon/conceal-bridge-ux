@@ -1,5 +1,8 @@
 # Spec: Remove WalletConnect Integration
 
+> [!NOTE]
+> **Status: Implemented**
+
 ## 1. Context & Rationale
 The project is experiencing build issues related to the `@walletconnect/ethereum-provider` dependency in the Angular environment. To ensure stability and simplify the maintenance burden, we will remove WalletConnect support entirely. The app will rely on injected providers (MetaMask, Trust Wallet, Binance Wallet, etc.) for EVM connectivity.
 

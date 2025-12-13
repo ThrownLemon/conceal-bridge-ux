@@ -1,5 +1,8 @@
 # Spec: Environment Configuration (Prod vs Testing) — Concael Bridge UX
 
+> [!NOTE]
+> **Status: Implemented**
+
 ## Context / Current State
 
 - The app currently hardcodes environment-like values inside the injection token factory in [`APP_CONFIG`](concael-bridge-ux/src/app/core/app-config.ts:17), including:

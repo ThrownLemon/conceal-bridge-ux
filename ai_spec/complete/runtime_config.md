@@ -1,5 +1,8 @@
 # Spec: Runtime Configuration (No-Rebuild) — Concael Bridge UX
 
+> [!NOTE]
+> **Status: Implemented**
+
 ## Context / Current State
 
 - The app currently injects configuration via [`APP_CONFIG`](concael-bridge-ux/src/app/core/app-config.ts:17), which is effectively “build-time” because it is compiled into the bundle.
