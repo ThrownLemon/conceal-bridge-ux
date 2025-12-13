@@ -1,4 +1,4 @@
-# Conceal Bridge UX (`concael-bridge-ux`)
+# Conceal Bridge UX (`conceal-bridge-ux`)
 
 Angular 21 standalone SPA for bridging between native ₡CCX and wrapped CCX ($wCCX) on EVM networks (Ethereum / BNB Smart Chain / Polygon).
 

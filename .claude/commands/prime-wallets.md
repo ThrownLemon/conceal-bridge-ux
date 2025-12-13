@@ -1,0 +1,32 @@
+# Context Prime — Wallets / Web3 (Viem + WalletConnect)
+> Purpose: load the minimum context to safely change wallet connection UX, provider handling, chain switching, and on-chain tx flows.
+
+## Key rules (read this before coding)
+- **Never handle secrets** (no private keys / seed phrases; never log them).
+- **Hydration must not prompt** (startup uses silent account/chain checks; do not add wallet permission prompts during hydration).
+- **Preserve disconnect semantics** (the “user disconnected” localStorage flag prevents surprise reconnects).
+- **Network switching must go through the wallet service** (don’t re-implement RPC calls in components).
+- **WalletConnect must keep a minimal method/event list** (only what the app uses).
+- **Transactions are not final at “hash returned”**: always wait for confirmations configured by backend chain config.
+
+## Run the following commands
+
+git ls-files
+
+## Read the following files
+> Read the files below and nothing else.
+
+ai_docs/wallets.md
+ai_docs/security.md
+ai_docs/error_handling.md
+ai_docs/smart_conctracts.md
+
+src/app/core/app-config.ts
+src/app/core/bridge-types.ts
+src/app/core/evm-networks.ts
+
+src/app/core/evm-wallet.service.ts
+src/app/shared/wallet/wallet-button.component.ts
+
+src/app/pages/swap/swap.page.ts
+src/viem-window.d.ts
