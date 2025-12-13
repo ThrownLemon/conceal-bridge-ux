@@ -27,7 +27,7 @@ type Variant = 'header' | 'primary';
           <!-- Network pill -->
           <button
             type="button"
-            class="relative z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-100 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+            class="relative z-50 inline-flex items-center gap-2 rounded-full border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-semibold text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
             (click)="toggleNetworkMenu()"
             aria-haspopup="menu"
             [attr.aria-expanded]="isNetworkMenuOpen()"
@@ -35,18 +35,18 @@ type Variant = 'header' | 'primary';
             @if (currentNetworkLogo(); as logo) {
               <img class="h-5 w-5 rounded-full" [src]="logo" [alt]="currentNetworkName() + ' logo'" loading="lazy" decoding="async" />
             } @else {
-              <span class="h-5 w-5 rounded-full bg-slate-700" aria-hidden="true"></span>
+              <span class="h-5 w-5 rounded-full bg-[var(--cb-color-border)]" aria-hidden="true"></span>
             }
             <span class="hidden sm:inline">{{ currentNetworkName() }}</span>
-            <span class="text-slate-300">▾</span>
+            <span class="text-[var(--cb-color-text-secondary)]">▾</span>
           </button>
 
           @if (isNetworkMenuOpen()) {
-            <div class="absolute left-0 top-full z-50 mt-2 w-56 rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-lg backdrop-blur" role="menu">
+            <div class="absolute left-0 top-full z-50 mt-2 w-56 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-1 shadow-lg backdrop-blur" role="menu">
               @for (opt of evmNetworkOptions(); track opt.key) {
                 <button
                   type="button"
-                  class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-slate-200 hover:bg-white/5"
+                  class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-[var(--cb-color-text)] hover:bg-[var(--cb-color-text)]/5"
                   role="menuitem"
                   (click)="switchNetwork(opt.key)"
                   [disabled]="isSwitchingNetwork()"
@@ -56,7 +56,7 @@ type Variant = 'header' | 'primary';
                 </button>
               }
               @if (networkStatus(); as s) {
-                <div class="px-3 py-2 text-[11px] text-slate-400" aria-live="polite">{{ s }}</div>
+                <div class="px-3 py-2 text-[11px] text-[var(--cb-color-muted)]" aria-live="polite">{{ s }}</div>
               }
             </div>
           }
@@ -64,7 +64,7 @@ type Variant = 'header' | 'primary';
           <!-- Wallet pill -->
           <button
             type="button"
-            class="relative z-50 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-100 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+            class="relative z-50 inline-flex items-center gap-2 rounded-full border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-semibold text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
             (click)="toggleWalletMenu()"
             aria-haspopup="menu"
             [attr.aria-expanded]="isWalletMenuOpen()"
@@ -72,17 +72,17 @@ type Variant = 'header' | 'primary';
             @if (currentWalletLogo(); as wlogo) {
               <img class="h-5 w-5 rounded-full bg-white" [src]="wlogo" alt="Wallet logo" loading="lazy" decoding="async" />
             } @else {
-              <span class="h-5 w-5 rounded-full bg-slate-700" aria-hidden="true"></span>
+              <span class="h-5 w-5 rounded-full bg-[var(--cb-color-border)]" aria-hidden="true"></span>
             }
             <span class="font-mono">{{ wallet.shortAddress() }}</span>
-            <span class="text-slate-300">▾</span>
+            <span class="text-[var(--cb-color-text-secondary)]">▾</span>
           </button>
 
           @if (isWalletMenuOpen()) {
-            <div class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-lg backdrop-blur" role="menu">
+            <div class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-1 shadow-lg backdrop-blur" role="menu">
               <button
                 type="button"
-                class="w-full rounded-lg px-3 py-2 text-left text-xs text-slate-200 hover:bg-white/5"
+                class="w-full rounded-lg px-3 py-2 text-left text-xs text-[var(--cb-color-text)] hover:bg-[var(--cb-color-text)]/5"
                 role="menuitem"
                 (click)="copyAddressFromHeader()"
               >
@@ -90,7 +90,7 @@ type Variant = 'header' | 'primary';
               </button>
               <button
                 type="button"
-                class="w-full rounded-lg px-3 py-2 text-left text-xs text-slate-200 hover:bg-white/5"
+                class="w-full rounded-lg px-3 py-2 text-left text-xs text-[var(--cb-color-text)] hover:bg-[var(--cb-color-text)]/5"
                 role="menuitem"
                 (click)="disconnectFromHeader()"
               >
@@ -103,7 +103,7 @@ type Variant = 'header' | 'primary';
         <!-- Non-header connected state (kept simple) -->
         <button
           type="button"
-          class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-100 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+          class="inline-flex items-center gap-2 rounded-full border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-semibold text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
           (click)="toggleMenu()"
           aria-haspopup="menu"
           [attr.aria-expanded]="isMenuOpen()"
@@ -119,7 +119,7 @@ type Variant = 'header' | 'primary';
                 decoding="async"
               />
             } @else {
-              <span class="h-5 w-5 rounded-full bg-slate-700" aria-hidden="true"></span>
+              <span class="h-5 w-5 rounded-full bg-[var(--cb-color-border)]" aria-hidden="true"></span>
             }
             <span class="hidden sm:inline">{{ chain.name }}</span>
           }
@@ -129,12 +129,12 @@ type Variant = 'header' | 'primary';
         @if (isMenuOpen()) {
           <div class="relative">
             <div
-              class="absolute right-0 mt-2 w-52 rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-lg backdrop-blur"
+              class="absolute right-0 mt-2 w-52 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-1 shadow-lg backdrop-blur"
               role="menu"
             >
               <button
                 type="button"
-                class="w-full rounded-lg px-3 py-2 text-left text-xs text-slate-200 hover:bg-white/5"
+                class="w-full rounded-lg px-3 py-2 text-left text-xs text-[var(--cb-color-text)] hover:bg-[var(--cb-color-text)]/5"
                 role="menuitem"
                 (click)="copyAddress()"
               >
@@ -142,7 +142,7 @@ type Variant = 'header' | 'primary';
               </button>
               <button
                 type="button"
-                class="w-full rounded-lg px-3 py-2 text-left text-xs text-slate-200 hover:bg-white/5"
+                class="w-full rounded-lg px-3 py-2 text-left text-xs text-[var(--cb-color-text)] hover:bg-[var(--cb-color-text)]/5"
                 role="menuitem"
                 (click)="disconnect()"
               >
@@ -160,7 +160,7 @@ type Variant = 'header' | 'primary';
         (click)="close()"
       >
         <div
-          class="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-xl"
+          class="w-full max-w-md rounded-2xl bg-[var(--cb-color-surface)] p-6 text-[var(--cb-color-text)] shadow-xl"
           role="dialog"
           aria-modal="true"
           aria-label="Connect wallet"
@@ -171,7 +171,7 @@ type Variant = 'header' | 'primary';
               @if (activeConnector()) {
                 <button
                   type="button"
-                  class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+                  class="rounded-lg p-2 text-[var(--cb-color-muted)] hover:bg-[var(--cb-color-border)]/50 hover:text-[var(--cb-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
                   (click)="backToList()"
                   aria-label="Back"
                 >
@@ -184,7 +184,7 @@ type Variant = 'header' | 'primary';
             </div>
             <button
               type="button"
-              class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+              class="rounded-lg p-2 text-[var(--cb-color-muted)] hover:bg-[var(--cb-color-border)]/50 hover:text-[var(--cb-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
               (click)="close()"
               aria-label="Close"
             >
@@ -205,7 +205,7 @@ type Variant = 'header' | 'primary';
                 </div>
 
                 <a
-                  class="mt-2 inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100"
+                  class="mt-2 inline-flex w-full items-center justify-center rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-4 py-3 text-sm font-semibold text-[var(--cb-color-text)] hover:bg-[var(--cb-color-border)]/30"
                   [href]="connectorInstallUrl(c)"
                   target="_blank"
                   rel="noopener"
@@ -216,10 +216,10 @@ type Variant = 'header' | 'primary';
                 <div class="text-center">
                   @if (isConnecting()) {
                     <div class="text-lg font-semibold">Requesting Connection</div>
-                    <div class="mt-2 text-sm text-slate-600">{{ connectorConnectingHint(c) }}</div>
+                    <div class="mt-2 text-sm text-[var(--cb-color-muted)]">{{ connectorConnectingHint(c) }}</div>
                   } @else {
                     <div class="text-lg font-semibold">Connect {{ connectorName(c) }}</div>
-                    <div class="mt-2 text-sm text-slate-600">Click below to connect your wallet.</div>
+                    <div class="mt-2 text-sm text-[var(--cb-color-muted)]">Click below to connect your wallet.</div>
                   }
                 </div>
 
@@ -231,7 +231,7 @@ type Variant = 'header' | 'primary';
 
                 <button
                   type="button"
-                  class="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-amber-500 px-4 py-3 text-sm font-semibold text-black hover:bg-amber-400 disabled:opacity-60"
+                  class="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-[var(--cb-color-accent)] px-4 py-3 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 disabled:opacity-60"
                   [disabled]="isConnecting()"
                   (click)="connect(c)"
                 >
@@ -249,38 +249,38 @@ type Variant = 'header' | 'primary';
             <div class="mt-5 grid gap-3">
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-left hover:bg-slate-50"
+                class="flex w-full items-center justify-between rounded-xl border border-[var(--cb-color-border)] px-4 py-3 text-left hover:bg-[var(--cb-color-border)]/20"
                 (click)="selectConnector('metamask')"
               >
                 <span class="flex items-center gap-3">
                   <img class="h-7 w-7" src="/images/wallets/metamask.png" alt="MetaMask logo" loading="lazy" decoding="async" />
                   <span class="font-medium">MetaMask</span>
                 </span>
-                <span class="text-xs text-slate-500">Browser extension</span>
+                <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
               </button>
 
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-left hover:bg-slate-50"
+                class="flex w-full items-center justify-between rounded-xl border border-[var(--cb-color-border)] px-4 py-3 text-left hover:bg-[var(--cb-color-border)]/20"
                 (click)="selectConnector('trust')"
               >
                 <span class="flex items-center gap-3">
                   <img class="h-7 w-7" src="/images/wallets/trustwallet.png" alt="Trust Wallet logo" loading="lazy" decoding="async" />
                   <span class="font-medium">Trust Wallet</span>
                 </span>
-                <span class="text-xs text-slate-500">Browser extension</span>
+                <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
               </button>
 
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-left hover:bg-slate-50"
+                class="flex w-full items-center justify-between rounded-xl border border-[var(--cb-color-border)] px-4 py-3 text-left hover:bg-[var(--cb-color-border)]/20"
                 (click)="selectConnector('binance')"
               >
                 <span class="flex items-center gap-3">
                   <img class="h-7 w-7" src="/images/wallets/binance.svg" alt="Binance logo" loading="lazy" decoding="async" />
                   <span class="font-medium">Binance Wallet</span>
                 </span>
-                <span class="text-xs text-slate-500">Browser extension</span>
+                <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
               </button>
 
               <button
@@ -296,7 +296,7 @@ type Variant = 'header' | 'primary';
                 @if (!wallet.walletConnectConfigured()) {
                   <span class="text-xs text-amber-700">Not configured</span>
                 } @else {
-                  <span class="text-xs text-slate-500">QR</span>
+                  <span class="text-xs text-[var(--cb-color-muted)]">QR</span>
                 }
               </button>
             </div>
@@ -359,9 +359,9 @@ export class WalletButtonComponent {
 
   readonly buttonClass = computed(() => {
     if (this.variant() === 'primary') {
-      return 'inline-flex w-full items-center justify-center rounded-xl bg-amber-500 px-4 py-4 text-base font-semibold text-black hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40';
+      return 'inline-flex w-full items-center justify-center rounded-xl bg-[var(--cb-color-accent)] px-4 py-4 text-base font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40';
     }
-    return 'rounded-lg bg-amber-500 px-3 py-2 text-xs font-semibold text-black hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40';
+    return 'rounded-lg bg-[var(--cb-color-accent)] px-3 py-2 text-xs font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40';
   });
 
   open(): void {

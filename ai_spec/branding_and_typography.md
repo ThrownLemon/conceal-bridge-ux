@@ -2,6 +2,14 @@
 
 ## Context / Current State
 
+> [!NOTE]
+> **Status: Implemented**
+> Fonts are self-hosted in `public/fonts/` and configured in `styles.css`.
+> Tokens are defined in `:root`.
+
+- The UI is “dark-first” with Conceal branding applied.
+
+
 - The UI is already “dark-first”:
   - global preference: [`color-scheme`](concael-bridge-ux/src/styles.css:6)
   - app shell uses dark neutrals: [`bg-slate-950`](concael-bridge-ux/src/app/app.html:1)

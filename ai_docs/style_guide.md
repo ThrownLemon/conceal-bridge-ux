@@ -133,37 +133,35 @@ Based on your brand guidelines:
 
 **Rule:** do not introduce many new accent colors. Keep: dark neutrals + amber CTA + optional cyan “info”.
 
-### 3.3 If you need tokens, prefer CSS custom properties in one place
-If you need consistent tokenization, define CSS variables in [`styles.css`](concael-bridge-ux/src/styles.css:1) and reference them from custom component classes (see [`@layer`](concael-bridge-ux/node_modules/tailwindcss/index.css:1)).
+### 3.3 CSS Custom Properties (Tokens)
+Implemented in [`:root`](concael-bridge-ux/src/styles.css:5). Use these for consistent theming:
 
-Example approach (conceptual):
-- `--cb-bg`, `--cb-surface`, `--cb-border`, `--cb-accent`, `--cb-accent-2`, `--cb-text`, `--cb-muted`
-
-**Rule:** keep tokens additive. Do not break existing Tailwind class usage unless refactoring intentionally.
+```css
+/* Colors */
+--cb-color-bg        /* #000000 */
+--cb-color-surface   /* #101010 */
+--cb-color-border    /* #808080 */
+--cb-color-text      /* #ffffff */
+--cb-color-muted     /* #9CA3AF */
+--cb-color-accent    /* #f59e0b */
+--cb-color-accent-2  /* #00F0FF */
+```
 
 ---
 
 ## 4) Typography (fonts & usage)
 
-### 4.1 Current state
-The app does not explicitly load custom fonts yet (see [`index.html`](concael-bridge-ux/src/index.html:1) and minimal global CSS in [`styles.css`](concael-bridge-ux/src/styles.css:1)).
+### 4.1 Implemented Fonts (Local)
+The app serves fonts locally from [`public/fonts/`](concael-bridge-ux/public/fonts:1) and defines them in global CSS.
 
-### 4.2 Conceal typography guidance (recommended)
-Use the Conceal font set as follows:
+- **Poppins** (`--cb-font-ui`): Main UI font.
+- **Montserrat** (`--cb-font-heading`): Headings.
+- **Lora** (`--cb-font-serif`): Editorials.
 
-- **Poppins**: UI base font (buttons, labels, most body text)
-- **Montserrat**: headings and navigational labels (optional if you want a more “technical” feel)
-- **Lora**: long-form / quotes / editorial text (use sparingly)
-
-**Rule:** keep typography modern and legible. Most UI text should remain sans-serif.
-
-### 4.3 If adding fonts
-If you add fonts, do it in a way compatible with strict CSP and static hosting. Coordinate with:
-- [`security_headers_and_csp.md`](concael-bridge-ux/ai_spec/security_headers_and_csp.md:1)
-
-Implementation options:
-- self-host fonts under [`public/`](concael-bridge-ux/public:1)
-- or load via a trusted provider and allowlist it in CSP (less preferred)
+These map to Tailwind's default theme via `@theme`:
+- `font-sans` → Poppins
+- `font-display` → Montserrat
+- `font-serif` → Lora
 
 ---
 
@@ -208,17 +206,22 @@ Guidelines:
 
 ---
 
-## 7) Dark mode (current behavior)
+## 7) Light/Dark Mode (Implemented)
 
-The app currently opts into dark color scheme globally:
-- [`color-scheme`](concael-bridge-ux/src/styles.css:6)
+The app now fully supports both Light and Dark modes, with **Dark Mode as the default**.
 
-**Interpretation:** this is effectively a dark-only UI today.
+### 7.1 Implementation Strategy
+- **Strategy:** Tailwind's `selector` strategy (`darkMode: 'selector'`).
+- **Mechanism:** A `.dark` class is toggled on the `<html>` element by `ThemeService`.
+- **Persistence:** User preference is saved to `localStorage` key `theme` ('light' | 'dark'). Defaults to 'dark' if unset.
+- **Tokens:** CSS variables in `src/styles.css` handle the theming.
+  - `:root` defines **Light Mode** values.
+  - `:root.dark` overrides these with **Dark Mode** values.
 
-Rules:
-- Keep dark-first contrast.
-- Ensure focus rings remain visible against dark surfaces (see focus ring usage in [`WalletButtonComponent`](concael-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:30)).
-- If a future product requirement demands light mode, implement it deliberately (tokens + class-based switching). Do not accidentally introduce mixed-mode styling.
+### 7.2 Styling Rules
+- **Use Tokens:** ALWAYS use the defined CSS variables (e.g., `bg-[var(--cb-color-surface)]`, `text-[var(--cb-color-text)]`) instead of hardcoded colors like `bg-slate-950` or `text-white`.
+- **Hover States:** Use token-based opacities for hover states to ensure visibility in both modes (e.g., `hover:bg-[var(--cb-color-text)]/5` works for both dark and light text).
+- **Default Theme:** The app initializes in Dark Mode. Light Mode is an opt-in user choice via the toggle in the header.
 
 ---
 

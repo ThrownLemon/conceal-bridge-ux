@@ -25,17 +25,17 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
   imports: [ReactiveFormsModule, WalletButtonComponent],
   template: `
     <section class="mx-auto max-w-3xl">
-      <h1 class="text-balance text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
+      <h1 class="text-balance text-3xl font-semibold tracking-tight text-[var(--cb-color-text)] sm:text-4xl">
         Conceal Bridge
       </h1>
-      <p class="mt-3 text-pretty text-slate-300">
+      <p class="mt-3 text-pretty text-[var(--cb-color-muted)]">
         Swap between Conceal (CCX) and wrapped CCX (wCCX) on Ethereum, BSC, or Polygon.
       </p>
 
-      <div class="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 shadow-sm backdrop-blur">
+      <div class="mt-8 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)]/50 p-5 shadow-sm backdrop-blur">
         <form class="grid gap-5" [formGroup]="form" (ngSubmit)="go()">
           <fieldset class="grid gap-3">
-            <legend class="text-sm font-medium text-slate-200">Networks</legend>
+            <legend class="text-sm font-medium text-[var(--cb-color-text)]">Networks</legend>
 
             @if (isFromMenuOpen() || isToMenuOpen()) {
               <div class="fixed inset-0 z-40" (click)="closeMenus()" aria-hidden="true"></div>
@@ -43,11 +43,11 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
 
             <div class="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
               <div class="grid gap-2">
-                <div class="text-sm font-medium text-slate-200">From</div>
+                <div class="text-sm font-medium text-[var(--cb-color-text-secondary)]">From</div>
                 <div class="relative">
                   <button
                     type="button"
-                    class="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-slate-950/40 p-3 text-left hover:border-white/20"
+                    class="flex w-full items-center gap-3 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 text-left hover:border-[var(--cb-color-border)]/50"
                     (click)="toggleFromMenu()"
                     aria-haspopup="listbox"
                     [attr.aria-expanded]="isFromMenuOpen()"
@@ -55,23 +55,23 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
                     @if (fromDisplay(); as n) {
                       <img class="h-7 w-7 rounded-full" [src]="n.logoUri" [alt]="n.label + ' logo'" loading="lazy" decoding="async" />
                       <div class="min-w-0 flex-1">
-                        <div class="truncate text-sm font-semibold text-slate-100">{{ n.label }}</div>
-                        <div class="truncate text-xs text-slate-400">{{ n.subtitle }}</div>
+                        <div class="truncate text-sm font-semibold text-[var(--cb-color-text)]">{{ n.label }}</div>
+                        <div class="truncate text-xs text-[var(--cb-color-muted)]">{{ n.subtitle }}</div>
                       </div>
                     }
-                    <span class="text-slate-300">▾</span>
+                    <span class="text-[var(--cb-color-text-secondary)]">▾</span>
                   </button>
 
                   @if (isFromMenuOpen()) {
                     <div
-                      class="absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-white/10 bg-slate-950 shadow-lg"
+                      class="absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] shadow-lg"
                       role="listbox"
                       aria-label="From network"
                     >
                       @for (o of networkOptions(); track o.key) {
                         <button
                           type="button"
-                          class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-slate-100 hover:bg-white/5"
+                          class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-[var(--cb-color-text)] hover:bg-black/5 dark:hover:bg-white/5"
                           (click)="setFromNetwork(o.key)"
                           role="option"
                         >
@@ -87,7 +87,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
               <div class="flex justify-center">
                 <button
                   type="button"
-                  class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-100 hover:border-white/20"
+                  class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                   (click)="swapNetworks()"
                   aria-label="Swap networks"
                 >
@@ -96,11 +96,11 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
               </div>
 
               <div class="grid gap-2">
-                <div class="text-sm font-medium text-slate-200">To</div>
+                <div class="text-sm font-medium text-[var(--cb-color-text-secondary)]">To</div>
                 <div class="relative">
                   <button
                     type="button"
-                    class="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-slate-950/40 p-3 text-left hover:border-white/20"
+                    class="flex w-full items-center gap-3 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 text-left hover:border-[var(--cb-color-border)]/50"
                     (click)="toggleToMenu()"
                     aria-haspopup="listbox"
                     [attr.aria-expanded]="isToMenuOpen()"
@@ -108,23 +108,23 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
                     @if (toDisplay(); as n) {
                       <img class="h-7 w-7 rounded-full" [src]="n.logoUri" [alt]="n.label + ' logo'" loading="lazy" decoding="async" />
                       <div class="min-w-0 flex-1">
-                        <div class="truncate text-sm font-semibold text-slate-100">{{ n.label }}</div>
-                        <div class="truncate text-xs text-slate-400">{{ n.subtitle }}</div>
+                        <div class="truncate text-sm font-semibold text-[var(--cb-color-text)]">{{ n.label }}</div>
+                        <div class="truncate text-xs text-[var(--cb-color-muted)]">{{ n.subtitle }}</div>
                       </div>
                     }
-                    <span class="text-slate-300">▾</span>
+                    <span class="text-[var(--cb-color-text-secondary)]">▾</span>
                   </button>
 
                   @if (isToMenuOpen()) {
                     <div
-                      class="absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-white/10 bg-slate-950 shadow-lg"
+                      class="absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] shadow-lg"
                       role="listbox"
                       aria-label="To network"
                     >
                       @for (o of networkOptions(); track o.key) {
                         <button
                           type="button"
-                          class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-slate-100 hover:bg-white/5"
+                          class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-[var(--cb-color-text)] hover:bg-[var(--cb-color-text)]/5"
                           (click)="setToNetwork(o.key)"
                           role="option"
                         >
@@ -138,7 +138,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
               </div>
             </div>
 
-            <p class="text-xs text-slate-400">
+            <p class="text-xs text-[var(--cb-color-muted)]">
               One side must be Conceal (CCX). Logos/names are loaded from a public chain metadata API.
             </p>
             @if (networkSwitchStatus(); as status) {
@@ -147,7 +147,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
           </fieldset>
 
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="text-xs text-slate-400">
+            <div class="text-xs text-[var(--cb-color-muted)]">
               By continuing, you agree to the bridge Terms &amp; Conditions.
             </div>
 
@@ -155,7 +155,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
               <app-wallet-button variant="primary" />
             } @else {
               <button
-                class="inline-flex items-center justify-center rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-black hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+                class="inline-flex items-center justify-center rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
                 type="submit"
               >
                 Continue
@@ -165,25 +165,25 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
         </form>
       </div>
 
-      <div class="mt-10 grid gap-3 text-sm text-slate-300 sm:grid-cols-2">
+      <div class="mt-10 grid gap-3 text-sm text-[var(--cb-color-muted)] sm:grid-cols-2">
         <a
-          class="rounded-xl border border-white/10 bg-white/5 p-4 hover:border-white/20"
+          class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-4 hover:border-[var(--cb-color-border)]/50"
           href="https://concealnetwork.medium.com/conceal-bridge-user-guide-2ad03eee4963"
           target="_blank"
           rel="noopener"
         >
-          <div class="font-medium text-slate-100">User guide</div>
-          <div class="mt-1 text-slate-300">How the bridge works and how to complete swaps safely.</div>
+          <div class="font-medium text-[var(--cb-color-text)]">User guide</div>
+          <div class="mt-1 text-[var(--cb-color-muted)]">How the bridge works and how to complete swaps safely.</div>
         </a>
 
         <a
-          class="rounded-xl border border-white/10 bg-white/5 p-4 hover:border-white/20"
+          class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-4 hover:border-[var(--cb-color-border)]/50"
           href="https://metamask.io/download.html"
           target="_blank"
           rel="noopener"
         >
-          <div class="font-medium text-slate-100">Get MetaMask</div>
-          <div class="mt-1 text-slate-300">You’ll need an EVM wallet to send gas fees or wCCX.</div>
+          <div class="font-medium text-[var(--cb-color-text)]">Get MetaMask</div>
+          <div class="mt-1 text-[var(--cb-color-muted)]">You’ll need an EVM wallet to send gas fees or wCCX.</div>
         </a>
       </div>
     </section>

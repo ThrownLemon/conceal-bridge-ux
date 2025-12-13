@@ -3,7 +3,127 @@
 @import "tailwindcss";
 
 :root {
+  /* Default to Light Mode values in :root (triggered when no .dark class is present) */
+  color-scheme: light;
+
+  /* Conceal Design Tokens (Light Mode Mappings) */
+  /* Colors */
+  --cb-color-bg: #ffffff;
+  --cb-color-surface: #f3f4f6;
+  /* gray-100 */
+  --cb-color-border: #e5e7eb;
+  /* gray-200 */
+  --cb-color-text: #0f172a;
+  /* slate-900 */
+  --cb-color-muted: #64748b;
+  /* slate-500 */
+  --cb-color-text-secondary: #475569;
+  /* slate-600 */
+  --cb-color-accent: #d97706;
+  /* amber-600 (slightly darker for contrast on white) */
+  --cb-color-accent-2: #0891b2;
+  /* cyan-600 */
+
+  /* Typography (unchanged) */
+  --cb-font-ui: 'Poppins', sans-serif;
+  --cb-font-heading: 'Montserrat', sans-serif;
+  --cb-font-serif: 'Lora', serif;
+
+  /* WalletConnect Theme Overrides (Light) */
+  /* Reown/AppKit uses explicit mode variables if needed, generally follows system. */
+  --w3m-font-family: var(--cb-font-ui);
+  --w3m-accent: var(--cb-color-accent);
+}
+
+/* Dark Mode Overrides */
+:root.dark {
   color-scheme: dark;
+
+  /* Conceal Design Tokens (Dark Mode Defaults) */
+  --cb-color-bg: #000000;
+  --cb-color-surface: #101010;
+  --cb-color-border: #808080;
+  --cb-color-text: #ffffff;
+  --cb-color-muted: #9CA3AF;
+  --cb-color-text-secondary: #cbd5e1;
+  --cb-color-accent: #f59e0b;
+  /* amber-500 */
+  --cb-color-accent-2: #00F0FF;
+  /* cyan */
+}
+
+/* Local Fonts */
+/* Poppins */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Poppins-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/Poppins-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/Poppins-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Poppins-Bold.woff2') format('woff2');
+}
+
+/* Montserrat */
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/Montserrat-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Montserrat-Bold.woff2') format('woff2');
+}
+
+/* Lora */
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Lora-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Lora-Italic.woff2') format('woff2');
+}
+
+@theme {
+  --font-sans: var(--cb-font-ui);
+  --font-display: var(--cb-font-heading);
+  --font-serif: var(--cb-font-serif);
 }
 
 html,

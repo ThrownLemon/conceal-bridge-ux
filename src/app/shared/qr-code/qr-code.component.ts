@@ -16,11 +16,11 @@ import * as QRCode from 'qrcode';
           [src]="url"
         />
       } @else if (isLoading()) {
-        <div class="text-sm text-slate-400">Generating QR…</div>
+        <div class="text-sm text-[var(--cb-color-muted)]">Generating QR…</div>
       } @else if (error(); as err) {
         <div class="text-sm text-red-300">{{ err }}</div>
       } @else {
-        <div class="text-sm text-slate-400">No QR data.</div>
+        <div class="text-sm text-[var(--cb-color-muted)]">No QR data.</div>
       }
     </div>
   `,
