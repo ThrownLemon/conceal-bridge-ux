@@ -61,14 +61,11 @@ The backend base URL is provided via the `APP_CONFIG` injection token in:
 
 - `src/app/core/app-config.ts`
 
-**Important:** Right now, `apiBaseUrl` is hardcoded to the *testing* backend URL in source. This means:
+**Configuration:** The app uses Angular environment files for configuration.
+- **Development (default):** Uses `src/environments/environment.development.ts` (Testing backend).
+- **Production (`npm run build`):** Uses `src/environments/environment.ts` (Production backend).
 
-- `npm run start` (dev server) uses the testing backend (intended).
-- `npm run build` (production build) will also still bundle the testing backend URL (until you implement environment/config overrides).
-
-There is a repo spec describing how to move this to standard Angular environment file replacements:
-
-- [ai_spec/environment_configuration.md](./ai_spec/environment_configuration.md)
+The `APP_CONFIG` injection token in `src/app/core/app-config.ts` reads from the active environment file.
 
 ### WalletConnect project ID
 

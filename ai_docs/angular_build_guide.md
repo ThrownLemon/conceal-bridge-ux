@@ -209,17 +209,19 @@ None detected (no internal npm packages referenced in [`package.json`](concael-b
 
 ### Environment Files
 
-This project does **not** use the classic Angular `src/environments/` pattern (no environment files in this workspace).
+This project uses the standard Angular `src/environments/` pattern with build-time file replacements.
 
-Instead, it uses an `InjectionToken` that provides runtime-ish config via a factory:
+- **Files:**
+  - [`src/environments/environment.ts`](concael-bridge-ux/src/environments/environment.ts:1): **Production** configuration (default).
+  - [`src/environments/environment.development.ts`](concael-bridge-ux/src/environments/environment.development.ts:1): **Development/Testing** configuration.
 
-- [`APP_CONFIG`](concael-bridge-ux/src/app/core/app-config.ts:17)
+- **Usage:**
+  - `APP_CONFIG` in [`app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:1) imports `environment` to provide values at runtime.
 
-Current defaults (checked into source):
-- `apiBaseUrl` defaults to a **testing** backend URL in [`app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:19)
-- `walletConnectProjectId` is present in [`app-config.ts`](concael-bridge-ux/src/app/core/app-config.ts:22)
-
-**Important:** The comment notes these values should be “overridden at build time”, but no override mechanism is defined in this repo (e.g. file replacements or define plugin). If you need production/staging builds, add a documented config strategy (file replacements, environment injection, runtime `config.json`, etc.).
+- **Configuration Strategy:**
+  - `ng build` (Production): Uses `environment.ts` (default).
+  - `ng build --configuration development`: Replaces `environment.ts` with `environment.development.ts` via `fileReplacements` in `angular.json`.
+  - `ng serve`: Uses `development` configuration by default.
 
 ### Build Configurations
 
@@ -393,10 +395,7 @@ Production build has budgets configured:
 
 ## Common Pitfalls & Gotchas (Project-specific)
 
-2. **Wrong backend environment**
-   - **Cause:** `apiBaseUrl` is currently set to a testing endpoint in source.
-   - **Where:** [`APP_CONFIG.apiBaseUrl`](concael-bridge-ux/src/app/core/app-config.ts:19)
-   - **Solution:** Establish a production/staging config strategy and ensure the correct base URL per deployment.
+
 
 3. **CommonJS dependency warnings**
    - **Cause:** `qrcode` is CommonJS.

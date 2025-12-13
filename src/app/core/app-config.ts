@@ -1,4 +1,5 @@
 import { InjectionToken } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 export interface AppConfig {
   /**
@@ -11,8 +12,7 @@ export interface AppConfig {
 export const APP_CONFIG = new InjectionToken<AppConfig>('APP_CONFIG', {
   providedIn: 'root',
   factory: () => ({
-    //apiBaseUrl: 'https://bridge.conceal.network/backend',
-    apiBaseUrl: 'https://bridge.conceal.network/testing/backend',
+    apiBaseUrl: environment.apiBaseUrl,
   }),
 });
 
