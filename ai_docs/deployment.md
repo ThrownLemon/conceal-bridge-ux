@@ -4,13 +4,13 @@
 
 This document provides comprehensive deployment instructions for the Conceal Bridge UX application. The app is a static Angular SPA that can be deployed to any static hosting provider.
 
-## Current Deployment: GitHub Pages
+## Current Deployment: GitHub Pages (Native GitHub Actions)
 
-The project is currently configured for automated deployment to GitHub Pages using `angular-cli-ghpages`.
+The project uses **GitHub Actions** with the official `actions/deploy-pages` action for secure, automated deployment.
 
 ## Automated Deployment (Recommended)
 
-The project uses **GitHub Actions** for continuous deployment. Deployment happens automatically when you push to the `main` branch.
+Deployment happens automatically when you push to the `main` branch.
 
 **Workflow:** `.github/workflows/deploy.yml`
 
@@ -19,7 +19,7 @@ The project uses **GitHub Actions** for continuous deployment. Deployment happen
 2. GitHub Actions automatically runs:
    - Tests
    - Production build
-   - Deployment to GitHub Pages
+   - Deployment to GitHub Pages (using `actions/deploy-pages@v4`)
 3. Live site updates at https://thrownlemon.github.io/conceal-bridge-ux/
 
 **Monitor deployment:**
@@ -28,83 +28,89 @@ The project uses **GitHub Actions** for continuous deployment. Deployment happen
 
 For detailed CI/CD documentation, see [ai_docs/ci_cd.md](ci_cd.md).
 
+### Why Native GitHub Actions?
+
+We use the official `actions/deploy-pages@v4` instead of third-party tools because:
+
+✅ **Secure** - No third-party dependencies with vulnerabilities  
+✅ **Official** - Maintained by GitHub  
+✅ **Integrated** - Works seamlessly with GitHub Pages settings  
+✅ **Simple** - No additional npm packages required  
+✅ **Reliable** - Direct integration with GitHub infrastructure  
+
+**Previous approach (deprecated):** We previously used `angular-cli-ghpages`, but it has a critical security vulnerability (CVE in `gh-pages` < 5.0.0 - prototype pollution). The native GitHub Actions approach is more secure.
+
 ## Manual Deployment
 
-If you need to deploy manually (e.g., from a feature branch or for testing):
+There is **no manual deployment** with this setup. All deployments happen via GitHub Actions.
 
-### Quick Deploy
+If you need to deploy from a branch other than `main`:
+1. Go to **Actions** tab in GitHub
+2. Select **Deploy to GitHub Pages** workflow
+3. Click **Run workflow**
+4. Select your branch
+5. Click **Run workflow**
 
-```bash
-npm run deploy
-```
+## Configuration Details
 
-This single command will:
-1. Build the production bundle
-2. Create a `404.html` file for SPA routing support
-3. Push the build output to the `gh-pages` branch
-4. Trigger GitHub Pages to update the live site
+### GitHub Actions Workflow
 
-### Live URL
+The workflow (`.github/workflows/deploy.yml`) has two jobs:
 
-**Production:** https://thrownlemon.github.io/conceal-bridge-ux/
+#### 1. Build Job
+- Checks out code
+- Sets up Node.js 20
+- Installs dependencies (`npm ci`)
+- Runs tests
+- Builds production bundle
+- Uploads build artifact to GitHub Pages
 
-### Configuration Details
+#### 2. Deploy Job
+- Deploys the artifact using `actions/deploy-pages@v4`
+- Runs after build job completes
+- Uses `github-pages` environment
 
-#### angular.json
+### Base HREF
 
-The deploy target is configured in `angular.json`:
+The app is configured for subdirectory hosting with `--base-href=/conceal-bridge-ux/` in the build configuration.
+
+This is set in `angular.json`:
 
 ```json
 {
-  "architect": {
-    "deploy": {
-      "builder": "angular-cli-ghpages:deploy",
-      "options": {}
+  "configurations": {
+    "production": {
+      "baseHref": "/conceal-bridge-ux/"
     }
   }
 }
 ```
 
-#### package.json
+**Note:** You may need to add this configuration if it's not already present.
 
-A convenience script is provided:
+### Live URL
 
-```json
-{
-  "scripts": {
-    "deploy": "ng deploy --base-href=/conceal-bridge-ux/"
-  }
-}
-```
+**Production:** https://thrownlemon.github.io/conceal-bridge-ux/
 
-The `--base-href` flag is **critical** for GitHub Pages subdirectory hosting. It ensures:
-- All asset paths are correctly prefixed with `/conceal-bridge-ux/`
-- The Angular router's base URL is set correctly
-- Fonts, images, and other static assets load properly
+## First-Time Setup
 
-### First-Time Setup
-
-After your first successful deployment:
+After pushing the workflow file to your repository:
 
 1. Go to your GitHub repository
 2. Navigate to **Settings > Pages**
-3. Ensure the source is set to **Deploy from a branch**
-4. Select the **gh-pages** branch
-5. Click **Save**
+3. Under **Source**, select **GitHub Actions** (not "Deploy from a branch")
+4. Save (if needed)
+5. Push to `main` branch to trigger the first deployment
 
-GitHub Pages will automatically deploy whenever the `gh-pages` branch is updated.
+GitHub will automatically deploy on every subsequent push to `main`.
 
-### SPA Routing Support
+## SPA Routing Support
 
-GitHub Pages does not natively support SPA routing (client-side routing). The `angular-cli-ghpages` tool solves this by:
+The native GitHub Actions deployment automatically handles SPA routing correctly. When a user navigates to a deep link (e.g., `/conceal-bridge-ux/swap/ccx-to-evm/eth`), GitHub Pages serves the `index.html` and the Angular router handles the client-side navigation.
 
-1. Creating a `404.html` file that is a copy of `index.html`
-2. When a user navigates to a deep link (e.g., `/conceal-bridge-ux/swap/ccx-to-evm/eth`), GitHub Pages serves the `404.html`
-3. The Angular app bootstraps and the router handles the client-side navigation
+**No 404.html hack needed** - The `actions/deploy-pages` action handles this automatically.
 
-This is a standard workaround for SPAs on GitHub Pages.
-
-### Security Headers
+## Security Headers
 
 GitHub Pages does **not** support custom HTTP headers. To provide basic security, we use a `<meta>` tag in `index.html`:
 
@@ -129,7 +135,7 @@ GitHub Pages does **not** support custom HTTP headers. To provide basic security
 
 For production deployments requiring stricter security, consider alternative hosting (see below).
 
-### Asset Path Handling
+## Asset Path Handling
 
 The app uses **relative paths** for assets to support subdirectory hosting:
 
@@ -138,40 +144,56 @@ The app uses **relative paths** for assets to support subdirectory hosting:
 
 This ensures assets load correctly when the app is hosted under `/conceal-bridge-ux/` instead of the domain root.
 
-### Troubleshooting
+## Troubleshooting
 
-#### Assets not loading (404 errors)
+### Deployment fails
+
+**Symptom:** GitHub Actions workflow fails.
+
+**Common causes:**
+- Test failures
+- Build errors
+- Permissions issues
+
+**Solution:**
+1. Check the GitHub Actions logs in the **Actions** tab
+2. Look for errors in the "Run tests" or "Build production bundle" steps
+3. Run locally to reproduce: `npm ci && npm run test && npm run build`
+4. Verify GitHub Pages is enabled in repository settings
+5. Ensure the repository has Pages enabled (Settings > Pages > Source: GitHub Actions)
+
+### Assets not loading (404 errors)
 
 **Symptom:** Fonts or images return 404 errors.
 
-**Solution:** Ensure you're using the `--base-href` flag when deploying:
-```bash
-ng deploy --base-href=/conceal-bridge-ux/
-```
+**Solution:**
+1. Verify the build includes the assets: check `dist/conceal-bridge-ux/` after building
+2. Ensure asset paths are relative (not absolute with leading `/`)
+3. Check that `angular.json` has `baseHref` set correctly
 
-#### Deep links return 404
+### Deep links return 404
 
 **Symptom:** Refreshing a page like `/swap/ccx-to-evm/eth` returns a 404 error.
 
-**Solution:** This should be handled automatically by the `404.html` file. If it's not working:
-1. Check that `404.html` exists in the `gh-pages` branch
-2. Verify GitHub Pages is serving from the `gh-pages` branch
+**Solution:** This should be handled automatically by GitHub Actions deployment. If it's not working:
+1. Verify you're using `actions/deploy-pages@v4` in the workflow
+2. Check that GitHub Pages source is set to "GitHub Actions" (not "Deploy from a branch")
+3. Review the deployment logs in the Actions tab
 
-#### Deployment fails
+### Permissions errors
 
-**Symptom:** Deployment fails (manual or automated).
-
-**Common causes:**
-- Git authentication issues (ensure you have push access to the repository)
-- Build errors (run `npm run build` first to verify the build succeeds)
-- Test failures (check GitHub Actions logs)
-- Missing `angular-cli-ghpages` dependency (run `npm install`)
+**Symptom:** Workflow fails with permissions error.
 
 **Solution:**
-1. **For automated deployment:** Check the GitHub Actions logs in the **Actions** tab
-2. **For manual deployment:** Run `npm run build` and `npm run test` locally to identify issues
-3. Verify you have push access to the repository
-4. Ensure all dependencies are installed: `npm ci`
+1. Verify the workflow has the correct permissions:
+   ```yaml
+   permissions:
+     contents: read
+     pages: write
+     id-token: write
+   ```
+2. Check repository settings: Settings > Actions > General > Workflow permissions
+3. Ensure "Read and write permissions" is enabled
 
 ---
 
@@ -308,45 +330,6 @@ Create a `vercel.json` file:
 
 5. **Add custom headers** (via Lambda@Edge or CloudFront Functions)
 
-### Nginx
-
-**Advantages:**
-- Self-hosted
-- Full control
-- Custom headers and caching
-
-**Configuration:**
-
-```nginx
-server {
-    listen 80;
-    server_name bridge.conceal.network;
-
-    root /var/www/conceal-bridge-ux;
-    index index.html;
-
-    # SPA routing
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Cache hashed assets
-    location ~* \.(js|css)$ {
-        add_header Cache-Control "public, max-age=31536000, immutable";
-    }
-
-    # Don't cache index.html
-    location = /index.html {
-        add_header Cache-Control "no-cache";
-    }
-
-    # Security headers
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self';" always;
-}
-```
-
 ---
 
 ## Environment-Specific Deployments
@@ -399,31 +382,6 @@ Before deploying to production:
 
 ---
 
-## Monitoring and Observability
-
-### Client-Side Error Tracking
-
-The app uses Angular's built-in error handling:
-
-```typescript
-provideBrowserGlobalErrorListeners()
-```
-
-**Recommendation:** Integrate a service like Sentry for production error tracking:
-
-1. Install: `npm install @sentry/angular`
-2. Configure in `app.config.ts`
-3. Add Sentry DSN to environment files
-
-### Analytics
-
-**Recommendation:** Add Google Analytics or similar:
-
-1. Add tracking script to `index.html`
-2. Configure CSP to allow analytics domain
-
----
-
 ## Related Documentation
 
 - **CI/CD Pipeline:** `ai_docs/ci_cd.md`
@@ -439,6 +397,6 @@ provideBrowserGlobalErrorListeners()
 
 For deployment issues:
 1. Check the troubleshooting section above
-2. Review the deployment spec: `ai_spec/deployment_static_hosting.md`
-3. Check GitHub Actions logs (if CI/CD is configured)
+2. Review GitHub Actions logs in the **Actions** tab
+3. Review the deployment spec: `ai_spec/deployment_static_hosting.md`
 4. Verify build output: `npm run build`

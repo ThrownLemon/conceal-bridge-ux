@@ -108,7 +108,7 @@ E2E is not configured in this workspace by default. If/when you add an E2E frame
 
 ## Deployment
 
-### Automated Deployment (Recommended)
+### Automated Deployment via GitHub Actions
 
 The project uses **GitHub Actions** for automated deployment. Simply push to the `main` branch:
 
@@ -123,40 +123,27 @@ The workflow will automatically:
 
 **Monitor deployment:** Check the **Actions** tab in your GitHub repository.
 
-For details, see [ai_docs/ci_cd.md](./ai_docs/ci_cd.md).
-
-### Manual Deployment
-
-If you need to deploy manually:
-
-This project is configured for automated deployment to GitHub Pages using `angular-cli-ghpages`.
-
-**Deploy command:**
-
-```bash
-npm run deploy
-```
-
-Or directly with the Angular CLI:
-
-```bash
-ng deploy --base-href=/conceal-bridge-ux/
-```
-
-This will:
-1. Build the production bundle
-2. Create a `404.html` file (for SPA routing support)
-3. Push the build output to the `gh-pages` branch
-
 **Live URL:** https://thrownlemon.github.io/conceal-bridge-ux/
 
-**Configuration:**
-- The `deploy` target is configured in `angular.json`
-- The `--base-href` flag ensures assets load correctly under the GitHub Pages subdirectory
+### Configuration
 
-**First-time setup:**
-After the first successful deployment, ensure your repository **Settings > Pages** is configured to deploy from the `gh-pages` branch.
+**Workflow file:** `.github/workflows/deploy.yml`
 
-For more details on deployment strategy, caching, and security headers, see:
-- [ai_spec/deployment_static_hosting.md](./ai_spec/deployment_static_hosting.md)
-- [ai_spec/security_headers_and_csp.md](./ai_spec/security_headers_and_csp.md)
+The workflow uses the native GitHub Actions deployment method (`actions/deploy-pages@v4`) which is:
+- ✅ Secure (no third-party dependencies with vulnerabilities)
+- ✅ Official GitHub solution
+- ✅ Automatically handles SPA routing
+- ✅ Integrated with GitHub Pages settings
+
+### First-Time Setup
+
+After pushing the workflow file:
+
+1. Go to your GitHub repository
+2. Navigate to **Settings > Pages**
+3. Under **Source**, select **GitHub Actions**
+4. The deployment will happen automatically on the next push to `main`
+
+For detailed deployment information, see:
+- [ai_docs/deployment.md](./ai_docs/deployment.md)
+- [ai_docs/ci_cd.md](./ai_docs/ci_cd.md)

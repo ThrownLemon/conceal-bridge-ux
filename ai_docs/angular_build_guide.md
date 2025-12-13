@@ -268,17 +268,26 @@ ng build --configuration production
 
 ### Deployment Target
 
-**GitHub Pages** (configured via `angular-cli-ghpages`)
+**GitHub Pages** (via native GitHub Actions)
 
-- **Deploy command:** `ng deploy --base-href=/conceal-bridge-ux/`
+- **Deployment method:** GitHub Actions workflow using `actions/deploy-pages@v4`
+- **Workflow file:** `.github/workflows/deploy.yml`
 - **Live URL:** https://thrownlemon.github.io/conceal-bridge-ux/
-- **Configuration:** Deploy target is configured in [`angular.json`](conceal-bridge-ux/angular.json) under the `deploy` architect target
-- **SPA Routing:** The tool automatically creates a `404.html` file (copy of `index.html`) to support client-side routing on GitHub Pages
+- **Trigger:** Automatic on push to `main` branch, or manual via workflow dispatch
+- **SPA Routing:** Handled automatically by GitHub Actions deployment
 
-Build artifacts are static and can be deployed to any static hosting (S3/CloudFront, Netlify, Vercel static, Nginx, etc.), but GitHub Pages is the current configured target.
+**Why native GitHub Actions?**
+- ✅ Secure (no third-party dependencies with vulnerabilities)
+- ✅ Official GitHub solution
+- ✅ No manual deployment needed
+- ✅ Integrated with GitHub Pages settings
+
+Build artifacts are static and can be deployed to any static hosting (S3/CloudFront, Netlify, Vercel static, Nginx, etc.), but GitHub Pages via GitHub Actions is the current configured target.
 
 For deployment details, see:
-- [`ai_spec/deployment_static_hosting.md`](conceal-bridge-ux/ai_spec/deployment_static_hosting.md)
+- [`.github/workflows/deploy.yml`](conceal-bridge-ux/.github/workflows/deploy.yml)
+- [`ai_docs/deployment.md`](conceal-bridge-ux/ai_docs/deployment.md)
+- [`ai_docs/ci_cd.md`](conceal-bridge-ux/ai_docs/ci_cd.md)
 - [`README.md`](conceal-bridge-ux/README.md) (Deployment section)
 
 ### CI/CD Pipeline

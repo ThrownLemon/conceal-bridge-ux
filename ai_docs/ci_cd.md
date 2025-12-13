@@ -20,48 +20,28 @@ The workflow runs automatically on:
 
 ### Pipeline Stages
 
-#### 1. Checkout
-- Uses `actions/checkout@v4`
-- Checks out the repository code
+The workflow has two separate jobs for better organization and security:
 
-#### 2. Setup Node.js
-- Uses `actions/setup-node@v4`
-- Node.js version: **20** (LTS)
-- Enables npm caching for faster builds
+#### Job 1: Build
+1. **Checkout** - Uses `actions/checkout@v4` to check out the repository code
+2. **Setup Node.js** - Uses `actions/setup-node@v4` with Node.js 20 and npm caching
+3. **Install Dependencies** - Runs `npm ci` for deterministic builds
+4. **Run Tests** - Runs `npm run test -- --run --reporter=verbose`
+5. **Build Production Bundle** - Runs `npm run build`
+6. **Setup Pages** - Configures GitHub Pages using `actions/configure-pages@v4`
+7. **Upload Artifact** - Uploads the build output using `actions/upload-pages-artifact@v3`
 
-#### 3. Install Dependencies
-```bash
-npm ci
-```
-- Uses `npm ci` (not `npm install`) for deterministic, reproducible builds
-- Respects the `package-lock.json` lockfile
-- Faster and more reliable than `npm install` in CI environments
+#### Job 2: Deploy
+1. **Deploy to GitHub Pages** - Uses `actions/deploy-pages@v4` to deploy the artifact
+   - Runs after the build job completes successfully
+   - Uses the `github-pages` environment
+   - Outputs the deployment URL
 
-#### 4. Run Tests
-```bash
-npm run test -- --run --reporter=verbose
-```
-- Runs the Vitest unit test suite
-- Uses `--run` flag to run tests once (no watch mode)
-- Uses `--reporter=verbose` for detailed output in CI logs
-- **Build fails if tests fail**
-
-#### 5. Build Production Bundle
-```bash
-npm run build
-```
-- Builds the production-optimized bundle
-- Uses the production configuration (default in `angular.json`)
-- Output: `dist/conceal-bridge-ux/`
-
-#### 6. Deploy to GitHub Pages
-```bash
-npm run deploy
-```
-- Deploys the built application to GitHub Pages
-- Uses `angular-cli-ghpages` under the hood
-- Pushes to the `gh-pages` branch
-- Automatically creates `404.html` for SPA routing support
+This two-job structure provides:
+- ✅ Better separation of concerns
+- ✅ Clearer logs and debugging
+- ✅ Ability to retry deployment without rebuilding
+- ✅ Integration with GitHub's deployment environments
 
 ### Permissions
 
