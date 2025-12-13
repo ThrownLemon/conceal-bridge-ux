@@ -102,7 +102,7 @@ After pushing the workflow file to your repository:
 4. Save (if needed)
 5. Push to `main` branch to trigger the first deployment
 
-GitHub will automatically deploy on every subsequent push to `main`.
+GitHub will automatically deploy on every subsequent push to `master`.
 
 ## SPA Routing Support
 

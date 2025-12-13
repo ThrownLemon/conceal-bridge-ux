@@ -142,7 +142,7 @@ After pushing the workflow file:
 1. Go to your GitHub repository
 2. Navigate to **Settings > Pages**
 3. Under **Source**, select **GitHub Actions**
-4. The deployment will happen automatically on the next push to `main`
+4. The deployment will happen automatically on the next push to `master`
 
 For detailed deployment information, see:
 - [ai_docs/deployment.md](./ai_docs/deployment.md)

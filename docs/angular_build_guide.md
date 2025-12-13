@@ -273,7 +273,7 @@ ng build --configuration production
 - **Deployment method:** GitHub Actions workflow using `actions/deploy-pages@v4`
 - **Workflow file:** `.github/workflows/deploy.yml`
 - **Live URL:** https://thrownlemon.github.io/conceal-bridge-ux/
-- **Trigger:** Automatic on push to `main` branch, or manual via workflow dispatch
+- **Trigger:** Automatic on push to `master` branch, or manual via workflow dispatch
 - **SPA Routing:** Handled automatically by GitHub Actions deployment
 
 **Why native GitHub Actions?**
@@ -296,7 +296,7 @@ For deployment details, see:
 **GitHub Actions** (configured for automated deployment)
 
 - **Workflow file:** `.github/workflows/deploy.yml`
-- **Trigger:** Automatic on push to `main` branch, or manual via workflow dispatch
+- **Trigger:** Automatic on push to `master` branch, or manual via workflow dispatch
 - **Steps:**
   1. Checkout code
   2. Setup Node.js (v20)

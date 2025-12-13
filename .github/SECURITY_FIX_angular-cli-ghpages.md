@@ -91,7 +91,7 @@ If you have an existing deployment using `angular-cli-ghpages`:
 
 ### For New Deployments
 
-The workflow will automatically deploy when you push to `main`. No additional setup required beyond:
+The workflow will automatically deploy when you push to `master`. No additional setup required beyond:
 
 1. Enabling GitHub Pages in repository settings
 2. Setting source to "GitHub Actions"
