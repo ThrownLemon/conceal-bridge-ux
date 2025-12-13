@@ -1,4 +1,4 @@
-# Context Prime — Testing (Unit + Future E2E)
+# Context for — Testing (Unit + Future E2E)
 > Purpose: load the minimum testing context to add/change tests safely (Angular 21 + Vitest + web3 mocking constraints).
 
 ## Key rules (read this before coding)
@@ -8,12 +8,7 @@
   - stub [`EvmWalletService`](src/app/core/evm-wallet.service.ts:1)
 - Follow existing Angular TestBed patterns in the repo; keep fixtures typed (avoid `any`).
 
-## Run the following commands
-
-git ls-files
-
 ## Read the following files
-> Read the files below and nothing else.
 
 ai_docs/testing.md
 ai_docs/error_handling.md

@@ -1,4 +1,4 @@
-# Context Prime — Backend API (Client Integration)
+# Context for — Backend API (Client Integration)
 > Purpose: load the *minimum* context needed to safely change anything related to backend API calls, response handling, retries/timeouts, and swap-state polling.
 
 ## Key rules (read this before coding)
@@ -9,12 +9,7 @@
 - **Never “auto-retry” non-idempotent operations** (swap init/exec) unless the backend explicitly guarantees idempotency.
 - **Polling must be cancelable** (keep the existing pattern that is bound to component destruction).
 
-## Run the following commands
-
-git ls-files
-
 ## Read the following files
-> Read the files below and nothing else.
 
 ai_docs/backend_api.md
 ai_docs/error_handling.md

@@ -1,4 +1,4 @@
-# Context Prime — Build / Deploy / Runtime Config
+# Context for — Build / Deploy / Runtime Config
 > Purpose: load the minimum context to modify build, deployment, runtime configuration, or environment-specific behavior safely.
 
 ## Key rules (read this before coding)
@@ -7,12 +7,7 @@
   - Current code uses an InjectionToken config pattern; don’t silently hardcode prod endpoints.
 - If adding new build/deploy behavior (headers, CSP, assets, routing rewrites), keep it compatible with static hosting.
 
-## Run the following commands
-
-git ls-files
-
 ## Read the following files
-> Read the files below and nothing else.
 
 README.md
 package.json

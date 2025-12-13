@@ -1,4 +1,4 @@
-# Context Prime — Smart Contracts / On-chain Verification (wCCX ERC-20)
+# Context for — Smart Contracts / On-chain Verification (wCCX ERC-20)
 > Purpose: load the minimum context for changes involving wCCX contract interactions, tx validation rules, units/decimals, and chain/provider consistency.
 
 ## Key rules (read this before coding)
@@ -10,12 +10,7 @@
   - use config-derived units/decimals and `parseUnits()`/`parseEther()` patterns
 - Deposit verification in the backend is based on **tx hash + calldata decode** (not event scanning). Frontend work should not assume event-based verification.
 
-## Run the following commands
-
-git ls-files
-
 ## Read the following files
-> Read the files below and nothing else.
 
 ai_docs/smart_conctracts.md
 ai_docs/backend_api.md

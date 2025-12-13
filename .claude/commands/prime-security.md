@@ -1,4 +1,4 @@
-# Context Prime — Security (Frontend + Hosting/CSP)
+# Context for — Security (Frontend + Hosting/CSP)
 > Purpose: load the minimum security context so changes don’t introduce fund-risk, secret leakage, or web security regressions (CSP/headers).
 
 ## Key rules (read this before coding)
@@ -9,12 +9,7 @@
 - **External links** must use `target="_blank"` + `rel="noopener"` (prevent tab-nabbing).
 - **CSP/headers**: if you add a new external host (images, fonts, APIs), update the CSP spec accordingly.
 
-## Run the following commands
-
-git ls-files
-
 ## Read the following files
-> Read the files below and nothing else.
 
 ai_docs/security.md
 ai_docs/error_handling.md
