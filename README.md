@@ -2,13 +2,13 @@
 
 Angular 21 standalone SPA for bridging between native ₡CCX and wrapped CCX ($wCCX) on EVM networks (Ethereum / BNB Smart Chain / Polygon).
 
-- Production URL: https://bridge.conceal.network
+- Production URL: <https://bridge.conceal.network>
 
 ## What this app does
 
 At a high level, the UI:
 
-- connects to an EVM wallet (injected providers + WalletConnect),
+- connects to an EVM wallet,
 - calls the bridge backend API to initialize/execute swaps,
 - sends on-chain transactions (native gas-fee transactions or ERC-20 transfers),
 - polls backend state until the swap completes.
@@ -26,12 +26,6 @@ High-level product + architecture docs:
 - Build guide (repo-specific): [docs/build_guide.md](./docs/build_guide.md)
 - **Deployment guide:** [docs/deployment.md](./docs/deployment.md)
 - **CI/CD pipeline:** [docs/ci_cd.md](./docs/ci_cd.md)
-
-Specs (implementation-focused):
-
-- Environment config plan (prod vs testing): [ai_spec/environment_configuration.md](./ai_spec/environment_configuration.md)
-- Runtime config: [ai_spec/runtime_config.md](./ai_spec/runtime_config.md)
-- HTTP + error handling: [ai_spec/http_and_error_handling.md](./ai_spec/http_and_error_handling.md)
 
 ## Tech notes
 
@@ -53,7 +47,7 @@ npm run start
 
 This runs the Angular dev server. The app will be available at:
 
-- http://localhost:4200/
+- <http://localhost:4200/>
 
 ## Configuration
 
@@ -125,9 +119,9 @@ The workflow will automatically:
 
 **Monitor deployment:** Check the **Actions** tab in your GitHub repository.
 
-**Live URL:** https://thrownlemon.github.io/conceal-bridge-ux/
+**Live URL:** <https://thrownlemon.github.io/conceal-bridge-ux/>
 
-### Configuration
+### Workflow Configuration
 
 **Workflow file:** `.github/workflows/deploy.yml`
 
