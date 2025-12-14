@@ -404,7 +404,7 @@ Before deploying to production:
 - **Deployment Spec:** `ai_spec/deployment_static_hosting.md`
 - **Security Headers:** `ai_spec/security_headers_and_csp.md`
 - **Environment Configuration:** `ai_spec/environment_configuration.md`
-- **Build Guide:** `docs/angular_build_guide.md`
+- **Build Guide:** `docs/build_guide.md`
 - **CI/CD Spec:** `ai_spec/ci_cd_pipeline.md`
 
 ---

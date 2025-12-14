@@ -182,4 +182,4 @@ If “switch endpoints without rebuild” is needed, add a runtime-loaded JSON c
 2. Update [`APP_CONFIG`](conceal-bridge-ux/src/app/core/app-config.ts:17) to source values from `environment`.
 3. Add `fileReplacements` for the `development` configuration in [`angular.json`](conceal-bridge-ux/angular.json:34).
 4. (Optional) Add scripts in [`package.json`](conceal-bridge-ux/package.json:4).
-5. Update the docs section “Environment Configuration” in [`angular_build_guide.md`](conceal-bridge-ux/docs/angular_build_guide.md:1) to reflect the new approach.
+5. Update the docs section “Environment Configuration” in [`build_guide.md`](conceal-bridge-ux/docs/build_guide.md:1) to reflect the new approach.

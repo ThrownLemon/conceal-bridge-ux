@@ -13,7 +13,7 @@
 docs/bridge_overview.md
 docs/bridge_user_guide.md
 docs/bridge_architecture.md
-docs/angular_build_guide.md
+docs/build_guide.md
 
 src/app/app.routes.ts
 src/app/pages/swap/swap.page.ts

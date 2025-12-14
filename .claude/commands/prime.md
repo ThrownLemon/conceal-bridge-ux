@@ -119,12 +119,13 @@ Use for (or use equivalent built-in browser tools):
 
 ## Angular Best Practices
 
-1. docs/angular_build_guide.md
+1. docs/build_guide.md
 2. docs/angular_best_practices.md
 
 ## Project Overview
 
 1. docs/bridge_overview.md
+2. docs/project_history.md
 
 # Workflow
 

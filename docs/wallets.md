@@ -1,6 +1,6 @@
-# Wallets Guide — conceal Bridge UX (AI Agent)
+# Wallets Guide
 
-This guide documents **how wallet integration works in this repo** and the conventions the AI agent must follow when implementing wallet-related changes.
+This guide documents **how wallet integrations work** and the conventions you should follow when implementing wallet-related changes.
 
 Primary implementation references:
 

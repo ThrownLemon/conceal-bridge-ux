@@ -23,7 +23,7 @@ High-level product + architecture docs:
 - Backend API contract (endpoints + shapes): [docs/backend_api.md](./docs/backend_api.md)
 - Wallets / Web3 integrations: [docs/wallets.md](./docs/wallets.md), [docs/web3_integrations.md](./docs/web3_integrations.md)
 - Security + error handling: [docs/security.md](./docs/security.md), [docs/error_handling.md](./docs/error_handling.md)
-- Build guide (repo-specific): [docs/angular_build_guide.md](./docs/angular_build_guide.md)
+- Build guide (repo-specific): [docs/build_guide.md](./docs/build_guide.md)
 - **Deployment guide:** [docs/deployment.md](./docs/deployment.md)
 - **CI/CD pipeline:** [docs/ci_cd.md](./docs/ci_cd.md)
 

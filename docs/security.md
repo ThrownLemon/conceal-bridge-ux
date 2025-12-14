@@ -1,6 +1,6 @@
-# Security Guide — conceal Bridge UX (AI Agent)
+# Security Guide
 
-This guide defines **security requirements and safe implementation rules** for the conceal Bridge UX frontend. It is written to inform AI-assisted changes so features remain safe-by-default.
+This guide defines **security requirements and safe implementation rules**.
 
 Core references in this repo:
 

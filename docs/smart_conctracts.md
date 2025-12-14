@@ -1,8 +1,8 @@
-# Smart contracts (wCCX) in Conceal Bridge
+# Smart contracts
 
 This project’s “bridge” is **not** a complex on-chain bridge contract. The swap is orchestrated **off-chain** by the backend engine, and the EVM side uses a **standard ERC-20 contract** (wCCX) plus plain native-coin transfers for fees.
 
-The goal of this doc is to teach an AI agent where contract data comes from, which contract methods are used, and the repo’s patterns for reading/verifying transactions.
+The goal of this doc is to show where contract data comes from, which contract methods are used, and the repo’s patterns for reading/verifying transactions.
 
 ---
 

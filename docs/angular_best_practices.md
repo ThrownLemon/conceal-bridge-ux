@@ -1,4 +1,4 @@
-## Angular Best Practices (Angular v21)
+## Angular Best Practices
 
 This document targets **Angular v21** and is intended to guide both humans and AI code generation.
 
@@ -10,7 +10,7 @@ This document targets **Angular v21** and is intended to guide both humans and A
 
 ---
 
-## Angular (v21) Best Practices
+## Angular Best Practices
 
 ### Standalone-first (NgModules are legacy)
 
@@ -198,7 +198,7 @@ This document targets **Angular v21** and is intended to guide both humans and A
 
 ## Related docs/specs in this repo
 
-- Project-specific build + architecture notes: [`angular_build_guide.md`](conceal-bridge-ux/docs/angular_build_guide.md:1)
+- Project-specific build + architecture notes: [`build_guide.md`](conceal-bridge-ux/docs/build_guide.md:1)
 - UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](conceal-bridge-ux/docs/style_guide.md:1)
 - Testing conventions (Angular TestBed + Web3 mocking): [`testing.md`](conceal-bridge-ux/docs/testing.md:1)
 - Error handling conventions used across the app: [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)

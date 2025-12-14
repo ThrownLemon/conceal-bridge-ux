@@ -1,4 +1,4 @@
-# Angular Project Build Guide for AI Agent
+# Project Build Guide
 
 ## Project Overview
 
@@ -354,7 +354,15 @@ npm run start
 
 ### Quality Assurance
 
-There is no `lint` script configured in [`package.json`](conceal-bridge-ux/package.json:4). If linting is desired, add ESLint config + `ng lint` (or `eslint`) script.
+There is a `lint` script configured in [`package.json`](conceal-bridge-ux/package.json:4) using Angular ESLint.
+
+```bash
+# Run linting
+npm run lint
+
+# Fix auto-fixable lint issues
+npm run lint:fix
+```
 
 ### Build
 
@@ -438,25 +446,23 @@ Route-level component lazy loading is used for all main pages:
 
 Production build has budgets configured:
 
-- Initial bundle warning at 500kB and error at 1MB:
+- Initial bundle warning at 3MB and error at 6MB:
   - [`budgets`](conceal-bridge-ux/angular.json:36)
 - Component style budgets:
-  - [`anyComponentStyle`](conceal-bridge-ux/angular.json:42)
+  - [`anyComponentStyle`](conceal-bridge-ux/angular.json:42) (Warning: 4kB, Error: 8kB)
 
 ---
 
 ## Common Pitfalls & Gotchas (Project-specific)
 
-3. **CommonJS dependency warnings**
-   - **Cause:** `qrcode` is CommonJS.
-   - **Solution:** It is already allowed via `allowedCommonJsDependencies` in [`angular.json`](conceal-bridge-ux/angular.json:27).
+None currently identified.
 
 ---
 
 ## Additional Resources
 
 - Project readme: [`conceal-bridge-ux/README.md`](conceal-bridge-ux/README.md:1)
-- Product/architecture docs live in [`conceal-bridge-ux/docs/`](conceal-bridge-ux/docs/angular_build_guide.md:1)
+- Product/architecture docs live in [`conceal-bridge-ux/docs/`](conceal-bridge-ux/docs/build_guide.md:1)
 
 ---
 
@@ -469,3 +475,11 @@ Production build has budgets configured:
 - Backend API contract (endpoints + response shapes): [`backend_api.md`](conceal-bridge-ux/docs/backend_api.md:1)
 - Error handling conventions across the app: [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)
 - Testing strategy (unit/E2E plan + web3 mocking): [`testing.md`](conceal-bridge-ux/docs/testing.md:1)
+
+### Official Angular Best Practices (Local Copies)
+
+- [Style Guide](conceal-bridge-ux/docs/angular-style-guide.md)
+- [Security Best Practices](conceal-bridge-ux/docs/angular-security.md)
+- [Accessibility (a11y)](conceal-bridge-ux/docs/angular-a11y.md)
+- [Error Handling](conceal-bridge-ux/docs/angular-error-handling.md)
+- [Runtime Performance](conceal-bridge-ux/docs/angular-runtime-performance.md)

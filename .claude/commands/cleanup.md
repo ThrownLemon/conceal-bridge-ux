@@ -44,13 +44,16 @@
    - Use `grep` to find references to modified components/logic in `docs/`, `ai_spec/`, and `.claude/`.
    - **Key Files to Check**:
      - `README.md` (Setup instructions, features)
-     - `docs/angular_build_guide.md` (Architecture, dependencies)
+     - `docs/build_guide.md` (Architecture, dependencies)
      - `docs/backend_api.md` (If API calls changed)
      - `docs/*.md` (General check for any related docs)
      - `ai_spec/` (Update specs if implementation diverged from plan)
 
 3. **Update Agent Context**:
    - If you added new tools or patterns, update `.claude/commands/prime.md` or other context files.
+   - **Project History**:
+     - If you made a _major_ change (arch/refactor/feature), append a bullet point to `docs/project_history.md`.
+     - _Criteria_: Would a future agent need to know this to understand why the code looks this way?
 
 ## 3. Artifact Finalization
 

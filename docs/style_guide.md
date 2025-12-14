@@ -1,6 +1,6 @@
-# Style Guide — conceal Bridge UX (AI Agent)
+# Style Guide
 
-This guide defines **UI style conventions** for conceal Bridge UX (Angular 21 + Tailwind v4). It is designed to inform AI-assisted work so new UI matches the product’s current look and the Conceal brand.
+This guide defines **UI style conventions** for the project (Angular 21 + Tailwind v4).
 
 Key implementation references:
 

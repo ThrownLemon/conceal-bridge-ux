@@ -1,6 +1,6 @@
-# Testing Guide — conceal Bridge UX (AI Agent)
+# Testing Guide
 
-This guide defines **how to test this project** (Angular 21 + Vitest + viem) and how the AI agent should structure tests so they are reliable in CI and do not depend on real wallets or real chains.
+This guide defines **how to test this project** (Angular 21 + Vitest + viem) and how you should structure tests so they are reliable in CI and do not depend on real wallets or real chains.
 
 Core references:
 

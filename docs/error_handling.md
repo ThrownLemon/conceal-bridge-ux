@@ -1,6 +1,6 @@
-# Error Handling Guide — conceal Bridge UX (AI Agent)
+# Error Handling Guide
 
-This guide defines **how the AI agent should handle and present errors** across the conceal Bridge UX application, based on the project’s current architecture and patterns.
+This guide defines **how you should handle and present errors** across the project’s current architecture and patterns.
 
 Core code references:
 

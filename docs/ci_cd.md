@@ -350,7 +350,7 @@ Track deployment success rate over time. If failures increase:
 ## Related Documentation
 
 - **Deployment Guide:** `docs/deployment.md`
-- **Build Guide:** `docs/angular_build_guide.md`
+- **Build Guide:** `docs/build_guide.md`
 - **Testing Guide:** `docs/testing.md`
 - **CI/CD Spec:** `ai_spec/ci_cd_pipeline.md`
 
