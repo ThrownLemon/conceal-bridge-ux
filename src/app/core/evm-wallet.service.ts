@@ -10,15 +10,18 @@ import {
   type Hash,
 } from 'viem';
 import { mainnet } from 'viem/chains';
-import { APP_CONFIG } from './app-config';
+// import { APP_CONFIG } from './app-config';
 
-type Eip1193Provider = {
-  request: (args: { method: string; params?: unknown[] | Record<string, unknown> }) => Promise<unknown>;
-  on?: (event: string, listener: (...args: any[]) => void) => void;
-  removeListener?: (event: string, listener: (...args: any[]) => void) => void;
+interface Eip1193Provider {
+  request: (args: {
+    method: string;
+    params?: unknown[] | Record<string, unknown>;
+  }) => Promise<unknown>;
+  on?: (event: string, listener: (...args: unknown[]) => void) => void;
+  removeListener?: (event: string, listener: (...args: unknown[]) => void) => void;
   disconnect?: () => Promise<void> | void;
   connect?: () => Promise<void> | void;
-};
+}
 
 export type WalletConnectorId = 'metamask' | 'trust' | 'binance';
 
@@ -33,7 +36,6 @@ type ProviderWithFlags = Eip1193Provider & {
 @Injectable({ providedIn: 'root' })
 export class EvmWalletService {
   readonly #destroyRef = inject(DestroyRef);
-  readonly #appConfig = inject(APP_CONFIG);
 
   static readonly DISCONNECTED_STORAGE_KEY = 'conceal_bridge_wallet_disconnected';
 
@@ -56,10 +58,10 @@ export class EvmWalletService {
     () => typeof window !== 'undefined' && !!(window as unknown as { ethereum?: unknown }).ethereum,
   );
   readonly hasBinanceProvider = computed(
-    () => typeof window !== 'undefined' && !!(window as unknown as { BinanceChain?: unknown }).BinanceChain,
+    () =>
+      typeof window !== 'undefined' &&
+      !!(window as unknown as { BinanceChain?: unknown }).BinanceChain,
   );
-
-
 
   /**
    * Legacy name used across the app: indicates an injected EVM provider is present.
@@ -75,7 +77,6 @@ export class EvmWalletService {
   });
 
   isConnectorAvailable(connector: WalletConnectorId): boolean {
-
     if (connector === 'binance') return this.hasBinanceProvider();
 
     const injected = this.#injectedProvider();
@@ -84,7 +85,8 @@ export class EvmWalletService {
     if (connector === 'metamask') return !!injected.isMetaMask;
 
     // Trust Wallet desktop extension may not always set flags; treat "not MetaMask" as acceptable.
-    if (connector === 'trust') return !!(injected.isTrust || injected.isTrustWallet) || !injected.isMetaMask;
+    if (connector === 'trust')
+      return !!(injected.isTrust || injected.isTrustWallet) || !injected.isMetaMask;
 
     return false;
   }
@@ -156,7 +158,6 @@ export class EvmWalletService {
 
     // WalletConnect's provider requires connect() before request() calls.
 
-
     const { walletClient } = this.getClients(mainnet, provider);
     const accounts = await walletClient.requestAddresses();
 
@@ -170,7 +171,6 @@ export class EvmWalletService {
 
   async disconnect(): Promise<void> {
     const provider = this.#provider();
-    const connector = this.#connector();
     try {
       // Prefer a real disconnect if the provider supports ERC-7846.
       // This prompts the wallet to revoke connection, when supported.
@@ -221,7 +221,12 @@ export class EvmWalletService {
     }
   }
 
-  async watchErc20Asset(params: { address: Address; symbol: string; decimals: number; image?: string }) {
+  async watchErc20Asset(params: {
+    address: Address;
+    symbol: string;
+    decimals: number;
+    image?: string;
+  }) {
     const provider = this.#provider() ?? this.#injectedProvider();
     if (!provider) throw new Error('No EVM wallet provider available.');
     const { walletClient } = this.getClients(mainnet, provider);
@@ -235,7 +240,7 @@ export class EvmWalletService {
     const p = provider ?? this.#provider() ?? this.#injectedProvider();
     if (!p) throw new Error('No EVM wallet provider available.');
 
-    const transport = custom(p as any);
+    const transport = custom(p as never);
     const walletClient = createWalletClient({ chain, transport });
     const publicClient = createPublicClient({ chain, transport });
 
@@ -296,8 +301,6 @@ export class EvmWalletService {
   }
 
   async #resolveProvider(connector: WalletConnectorId): Promise<Eip1193Provider> {
-
-
     if (connector === 'binance') {
       const binance = this.#binanceProvider();
       if (!binance) throw new Error('Binance Wallet not detected in this browser.');
@@ -316,7 +319,9 @@ export class EvmWalletService {
       // Trust on desktop is often injected without flags; prefer letting it work.
       // Only hard-fail if it's clearly MetaMask-only.
       if (injected.isMetaMask) {
-        throw new Error('Trust Wallet not detected. Please install Trust Wallet or choose another wallet.');
+        throw new Error(
+          'Trust Wallet not detected. Please install Trust Wallet or choose another wallet.',
+        );
       }
     }
 
@@ -330,8 +335,9 @@ export class EvmWalletService {
     this.#provider.set(provider);
     this.#connector.set(connector);
 
-    const onAccountsChanged = (accounts: string[]) => {
-      if (this.#disconnectedByUser()) {
+    const onAccountsChanged = (args: unknown) => {
+      const accounts = args as string[];
+      if (!accounts || accounts.length === 0) {
         this.#address.set(null);
         return;
       }
@@ -339,8 +345,8 @@ export class EvmWalletService {
       this.#address.set(next && isAddress(next) ? (next as Address) : null);
     };
 
-    const onChainChanged = (chainIdHex: string) => {
-      const id = Number.parseInt(chainIdHex, 16);
+    const onChainChanged = (chainIdHex: unknown) => {
+      const id = Number.parseInt(chainIdHex as string, 16);
       this.#chainId.set(Number.isFinite(id) ? id : null);
     };
 
@@ -373,5 +379,3 @@ export class EvmWalletService {
     }
   }
 }
-
-

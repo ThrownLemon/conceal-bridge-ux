@@ -42,6 +42,7 @@ Define a CI/CD pipeline that:
 ## Proposed CI Tooling
 
 This spec is CI-tool agnostic. Recommended implementations:
+
 - GitHub Actions
 - GitLab CI
 - Jenkins
@@ -53,10 +54,12 @@ The pipeline stages remain the same.
 ### Stage 1 — Checkout + Toolchain Setup
 
 **Inputs:**
+
 - Node version (pin using `.nvmrc` or CI config)
 - npm version pinned to `"npm@11.7.0"` in [`package.json`](conceal-bridge-ux/package.json:24)
 
 **Actions:**
+
 1. Checkout repo
 2. Install Node (recommended: LTS compatible with npm 11.x; pin explicitly)
 3. Ensure npm version:
@@ -65,9 +68,11 @@ The pipeline stages remain the same.
 ### Stage 2 — Install Dependencies
 
 Run from the project directory:
+
 - `cd conceal-bridge-ux && npm ci`
 
 Rationale:
+
 - `npm ci` ensures lockfile fidelity and reproducible builds (lockfile exists at [`package-lock.json`](conceal-bridge-ux/package-lock.json:1)).
 
 ### Stage 3 — Static Checks (Lint + Type Checks)
@@ -77,39 +82,48 @@ After implementing lint tooling per [`linting_and_formatting.md`](conceal-bridge
 - `npm run lint`
 
 Optional additional checks:
+
 - `tsc -p tsconfig.app.json --noEmit` (if you want a separate explicit typecheck step)
   - [`tsconfig.app.json`](conceal-bridge-ux/tsconfig.app.json:1)
 
 ### Stage 4 — Unit Tests
 
 Run:
+
 - `npm run test`
 
 Notes:
+
 - This uses Angular unit test builder in [`angular.json`](conceal-bridge-ux/angular.json:70).
 - Vitest is present as a dev dependency in [`package.json`](conceal-bridge-ux/package.json:48), and types are configured in [`tsconfig.spec.json`](conceal-bridge-ux/tsconfig.spec.json:7).
 
 CI expectations:
+
 - run headless (ensure test builder is configured accordingly if needed)
 - publish test results if the CI tool supports it (JUnit or similar)
 
 ### Stage 5 — Build
 
 Run:
+
 - `npm run build`
 
 Important detail:
+
 - Default build configuration is production (`defaultConfiguration` is `"production"` in [`angular.json`](conceal-bridge-ux/angular.json:56)).
 
 If supporting a testing build output (optional):
+
 - `ng build --configuration development` or a dedicated `testing` config (see [`environment_configuration.md`](conceal-bridge-ux/ai_spec/environment_configuration.md:1)).
 
 ### Stage 6 — Artifact Packaging
 
 Archive:
+
 - `conceal-bridge-ux/dist/` or specifically `conceal-bridge-ux/dist/conceal-bridge-ux/`
 
 Recommended artifact naming:
+
 - include commit SHA and environment:
   - `conceal-bridge-ux-${GIT_SHA}.zip`
 
@@ -118,6 +132,7 @@ Recommended artifact naming:
 This stage depends on hosting provider. The spec defines an interface:
 
 **Inputs:**
+
 - artifact path (dist)
 - environment name (`production`, `testing`, `staging`)
 - target base URL / domain
@@ -125,6 +140,7 @@ This stage depends on hosting provider. The spec defines an interface:
 - caching rules (hashed assets vs index)
 
 The details are specified in the deployment spec:
+
 - [`deployment_static_hosting.md`](conceal-bridge-ux/ai_spec/deployment_static_hosting.md:1)
 
 ## Environment Strategy

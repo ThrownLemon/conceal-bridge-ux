@@ -13,5 +13,3 @@ export const EVM_NETWORKS: Record<EvmNetworkKey, EvmNetworkInfo> = {
   bsc: { key: 'bsc', label: 'BNB Smart Chain Mainnet', chain: bsc },
   plg: { key: 'plg', label: 'Polygon Mainnet', chain: polygon },
 };
-
-

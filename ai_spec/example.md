@@ -2,7 +2,7 @@
 
 **Status**: Draft  
 **Project**: `conceal-bridge-ux` (Angular)  
-**Last updated**: 2025-12-13  
+**Last updated**: 2025-12-13
 
 ## Goals & non-goals
 
@@ -33,6 +33,7 @@ The UX must clearly communicate:
 - **Waiting and confirmations** are normal.
 
 Reference docs already in-repo:
+
 - `ABOUT.md` (what wCCX is, supported ecosystems, links)
 - `USER_GUIDE.md` (user-facing steps)
 
@@ -42,6 +43,7 @@ Reference docs already in-repo:
 - **Secondary user**: a wCCX holder who wants privacy/untraceability (unwrap back to CCX).
 
 Primary scenarios:
+
 - **S1 — Wrap**: User swaps **CCX → wCCX** on a selected EVM network.
 - **S2 — Unwrap**: User swaps **wCCX → CCX** from their EVM wallet to a CCX address.
 
@@ -71,6 +73,7 @@ Primary scenarios:
 **User intent**: “I have CCX; I want wCCX on an EVM network.”
 
 **Step A1 — Collect inputs**
+
 - Inputs:
   - **CCX from address** (string, validated)
   - **EVM recipient address** (0x address; can be “Use connected wallet”)
@@ -81,6 +84,7 @@ Primary scenarios:
   - Must not exceed **available wCCX liquidity** (if provided).
 
 **Step A2 — Wallet actions (gas fee payment)**
+
 - Ensure wallet is connected.
 - Ensure wallet is on the selected network (prompt switch/add if needed).
 - Ask backend for:
@@ -93,6 +97,7 @@ Primary scenarios:
   - Handle common wallet errors (user rejected, request pending).
 
 **Step A3 — Initialize swap with backend**
+
 - Call `swap/init` endpoint with:
   - amount, from CCX address, to EVM address, email (optional), and the EVM fee tx hash
 - Backend returns **paymentId**.
@@ -100,6 +105,7 @@ Primary scenarios:
   - Display paymentId clearly and allow copy.
 
 **Step A4 — User sends CCX deposit**
+
 - UI shows:
   - Bridge **CCX deposit address** (from config)
   - **Payment ID** to include
@@ -109,6 +115,7 @@ Primary scenarios:
   - Explain that confirmations can take minutes; keep the page open.
 
 **Step A5 — Poll & complete**
+
 - Poll backend for swap state using paymentId.
 - When result is true, show:
   - swapped amount
@@ -121,6 +128,7 @@ Primary scenarios:
 **User intent**: “I have wCCX; I want CCX to a CCX address.”
 
 **Step B1 — Collect inputs**
+
 - Inputs:
   - CCX recipient address
   - Amount
@@ -130,6 +138,7 @@ Primary scenarios:
   - Must not exceed **available CCX liquidity** (if provided).
 
 **Step B2 — Wallet actions (wCCX transfer)**
+
 - Ensure wallet is connected and on selected network.
 - Determine token decimals from config (`units` → decimals) with sane fallback.
 - Read ERC-20 balance to confirm sufficient wCCX.
@@ -140,12 +149,14 @@ Primary scenarios:
   - Provide “Add wCCX token” helper (wallet_watchAsset or manual fallback).
 
 **Step B3 — Backend init/exec**
+
 - Call backend `swap/init` with from EVM address, to CCX address, tx hash, amount, email.
 - Call backend `swap/exec` with paymentId (and optional email).
 - UX requirements:
   - Clear messaging about “processing” vs “complete”.
 
 **Step B4 — Poll & complete**
+
 - Poll backend for swap state until completion.
 - Show same completion summary fields as Flow A.
 
@@ -156,6 +167,7 @@ All endpoints are namespaced by network:
 `{apiBaseUrl}/{networkKey}/...`
 
 Required endpoints (as implemented in the app today):
+
 - **Chain config**
   - `GET /config/chain` → `BridgeChainConfig`
 - **Liquidity**
@@ -174,6 +186,7 @@ Required endpoints (as implemented in the app today):
 ### Required config fields
 
 Backend must provide per-network `BridgeChainConfig`:
+
 - **common**: min/max swap amounts
 - **wccx**:
   - EVM chain id
@@ -190,6 +203,7 @@ Backend must provide per-network `BridgeChainConfig`:
 ## State model (implementation-facing)
 
 ### View state per swap session
+
 - **route params**: direction, networkKey
 - **remote state**:
   - chain config
@@ -209,6 +223,7 @@ Backend must provide per-network `BridgeChainConfig`:
   - status message / error
 
 ### Polling behavior
+
 - Poll every **10 seconds**
 - Stop on first `result === true`
 - Must be cancellable by navigating away / destroying page
@@ -256,6 +271,7 @@ Backend must provide per-network `BridgeChainConfig`:
 ## Observability (what we should log/measure)
 
 If/when analytics is added, track only minimal, privacy-preserving events:
+
 - `wallet_connect_clicked`, `wallet_connected`, `wallet_switch_requested`, `wallet_switch_success`, `wallet_switch_error`
 - `swap_started` (direction, network), `swap_step_completed` (step id)
 - `swap_completed` (direction, network), `swap_failed` (error category)
@@ -290,5 +306,3 @@ Avoid logging addresses, payment IDs, or emails to analytics by default.
 - **M3 — Supportability**
   - Add a “Help” panel that includes links to docs, explorers, and support contact.
   - Add non-invasive analytics (optional).
-
-

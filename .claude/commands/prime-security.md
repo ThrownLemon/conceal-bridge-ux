@@ -1,7 +1,9 @@
 # Context for — Security (Frontend + Hosting/CSP)
+
 > Purpose: load the minimum security context so changes don’t introduce fund-risk, secret leakage, or web security regressions (CSP/headers).
 
 ## Key rules (read this before coding)
+
 - **Never handle secrets** (no keys/seed phrases; no logging of sensitive objects/config).
 - **Backend-provided config is untrusted input** (validate addresses/chainId/confirmations before use).
 - **No unsafe DOM patterns**: do not introduce raw HTML rendering or bypass Angular sanitization.

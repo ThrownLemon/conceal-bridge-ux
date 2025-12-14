@@ -15,6 +15,7 @@ Deployment happens automatically when you push to the `main` branch.
 **Workflow:** `.github/workflows/deploy.yml`
 
 **How it works:**
+
 1. Push code to `main` branch
 2. GitHub Actions automatically runs:
    - Tests
@@ -23,6 +24,7 @@ Deployment happens automatically when you push to the `main` branch.
 3. Live site updates at https://thrownlemon.github.io/conceal-bridge-ux/
 
 **Monitor deployment:**
+
 - Go to your repository's **Actions** tab
 - View workflow runs and logs
 
@@ -36,7 +38,7 @@ We use the official `actions/deploy-pages@v4` instead of third-party tools becau
 ✅ **Official** - Maintained by GitHub  
 ✅ **Integrated** - Works seamlessly with GitHub Pages settings  
 ✅ **Simple** - No additional npm packages required  
-✅ **Reliable** - Direct integration with GitHub infrastructure  
+✅ **Reliable** - Direct integration with GitHub infrastructure
 
 **Previous approach (deprecated):** We previously used `angular-cli-ghpages`, but it has a critical security vulnerability (CVE in `gh-pages` < 5.0.0 - prototype pollution). The native GitHub Actions approach is more secure.
 
@@ -45,6 +47,7 @@ We use the official `actions/deploy-pages@v4` instead of third-party tools becau
 There is **no manual deployment** with this setup. All deployments happen via GitHub Actions.
 
 If you need to deploy from a branch other than `main`:
+
 1. Go to **Actions** tab in GitHub
 2. Select **Deploy to GitHub Pages** workflow
 3. Click **Run workflow**
@@ -58,6 +61,7 @@ If you need to deploy from a branch other than `main`:
 The workflow (`.github/workflows/deploy.yml`) has two jobs:
 
 #### 1. Build Job
+
 - Checks out code
 - Sets up Node.js 20
 - Installs dependencies (`npm ci`)
@@ -66,6 +70,7 @@ The workflow (`.github/workflows/deploy.yml`) has two jobs:
 - Uploads build artifact to GitHub Pages
 
 #### 2. Deploy Job
+
 - Deploys the artifact using `actions/deploy-pages@v4`
 - Runs after build job completes
 - Uses `github-pages` environment
@@ -115,7 +120,9 @@ The native GitHub Actions deployment automatically handles SPA routing correctly
 GitHub Pages does **not** support custom HTTP headers. To provide basic security, we use a `<meta>` tag in `index.html`:
 
 ```html
-<meta http-equiv="Content-Security-Policy" content="
+<meta
+  http-equiv="Content-Security-Policy"
+  content="
   default-src 'self';
   script-src 'self' 'unsafe-eval';
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
@@ -125,10 +132,12 @@ GitHub Pages does **not** support custom HTTP headers. To provide basic security
   object-src 'none';
   base-uri 'self';
   form-action 'self';
-">
+"
+/>
 ```
 
 **Limitations:**
+
 - `<meta>` CSP is less secure than HTTP header CSP
 - Cannot set `Cache-Control` headers (GitHub Pages has default caching)
 - Cannot set other security headers like `X-Content-Type-Options`, `Strict-Transport-Security`, etc.
@@ -151,11 +160,13 @@ This ensures assets load correctly when the app is hosted under `/conceal-bridge
 **Symptom:** GitHub Actions workflow fails.
 
 **Common causes:**
+
 - Test failures
 - Build errors
 - Permissions issues
 
 **Solution:**
+
 1. Check the GitHub Actions logs in the **Actions** tab
 2. Look for errors in the "Run tests" or "Build production bundle" steps
 3. Run locally to reproduce: `npm ci && npm run test && npm run build`
@@ -167,6 +178,7 @@ This ensures assets load correctly when the app is hosted under `/conceal-bridge
 **Symptom:** Fonts or images return 404 errors.
 
 **Solution:**
+
 1. Verify the build includes the assets: check `dist/conceal-bridge-ux/` after building
 2. Ensure asset paths are relative (not absolute with leading `/`)
 3. Check that `angular.json` has `baseHref` set correctly
@@ -176,6 +188,7 @@ This ensures assets load correctly when the app is hosted under `/conceal-bridge
 **Symptom:** Refreshing a page like `/swap/ccx-to-evm/eth` returns a 404 error.
 
 **Solution:** This should be handled automatically by GitHub Actions deployment. If it's not working:
+
 1. Verify you're using `actions/deploy-pages@v4` in the workflow
 2. Check that GitHub Pages source is set to "GitHub Actions" (not "Deploy from a branch")
 3. Review the deployment logs in the Actions tab
@@ -185,6 +198,7 @@ This ensures assets load correctly when the app is hosted under `/conceal-bridge
 **Symptom:** Workflow fails with permissions error.
 
 **Solution:**
+
 1. Verify the workflow has the correct permissions:
    ```yaml
    permissions:
@@ -204,6 +218,7 @@ While GitHub Pages is the current configured target, the app can be deployed to 
 ### Netlify
 
 **Advantages:**
+
 - Custom HTTP headers support (CSP, caching, etc.)
 - Automatic HTTPS
 - Branch previews
@@ -247,6 +262,7 @@ Create a `netlify.toml` file:
 ```
 
 **Deploy:**
+
 1. Connect your GitHub repository to Netlify
 2. Set build command: `npm run build`
 3. Set publish directory: `dist/conceal-bridge-ux`
@@ -255,6 +271,7 @@ Create a `netlify.toml` file:
 ### Vercel
 
 **Advantages:**
+
 - Optimized for SPAs
 - Automatic HTTPS
 - Edge network
@@ -268,9 +285,7 @@ Create a `vercel.json` file:
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist/conceal-bridge-ux",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
     {
       "source": "/(.*)",
@@ -281,21 +296,18 @@ Create a `vercel.json` file:
     },
     {
       "source": "/(.*\\.js|.*\\.css)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     },
     {
       "source": "/index.html",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache" }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
     }
   ]
 }
 ```
 
 **Deploy:**
+
 1. Install Vercel CLI: `npm i -g vercel`
 2. Run: `vercel`
 3. Follow the prompts
@@ -303,6 +315,7 @@ Create a `vercel.json` file:
 ### AWS S3 + CloudFront
 
 **Advantages:**
+
 - Full control over infrastructure
 - Custom domain support
 - Advanced caching rules
@@ -311,6 +324,7 @@ Create a `vercel.json` file:
 **Steps:**
 
 1. **Build the app:**
+
    ```bash
    npm run build
    ```
@@ -355,10 +369,12 @@ This uses `src/environments/environment.development.ts` (testing backend URL).
 ### Deploying Different Environments
 
 **Option 1: Separate deployments**
+
 - Deploy production build to `bridge.conceal.network`
 - Deploy development build to `test-bridge.conceal.network`
 
 **Option 2: Runtime configuration** (not currently implemented)
+
 - See `ai_spec/runtime_config.md` for details on implementing runtime config
 - Deploy the same bundle to multiple environments
 - Vary only the `config.json` file per environment
@@ -396,6 +412,7 @@ Before deploying to production:
 ## Support
 
 For deployment issues:
+
 1. Check the troubleshooting section above
 2. Review GitHub Actions logs in the **Actions** tab
 3. Review the deployment spec: `ai_spec/deployment_static_hosting.md`

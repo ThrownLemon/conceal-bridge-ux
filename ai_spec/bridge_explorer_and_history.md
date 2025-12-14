@@ -45,10 +45,12 @@ Add an optional, privacy-preserving “Swap History / Explorer” feature so use
 Choose one approach:
 
 ### A) Backend-provided history (recommended for accuracy)
+
 - Backend exposes a read-only endpoint to fetch swap records by payment ID and/or by address (if feasible).
 - UI stores only a list of recent payment IDs locally for convenience.
 
 ### B) Client-local history (privacy-first, limited)
+
 - UI stores recent swap records in local storage:
   - paymentId
   - direction, network
@@ -67,6 +69,7 @@ Choose one approach:
   - provide a “Clear history” action
 
 Align with guidance in:
+
 - [`security.md`](conceal-bridge-ux/docs/security.md:1)
 
 ## Error Handling
@@ -74,7 +77,7 @@ Align with guidance in:
 - Use the established UI convention:
   - blocking error for page load failures
   - status messages for transient failures
-Align with:
+    Align with:
 - [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:30)
 
 ## Testing Plan
@@ -87,6 +90,7 @@ Align with:
   - search by payment ID
 
 See E2E approach:
+
 - [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1)
 
 ## Implementation Steps (Work Breakdown)

@@ -1,7 +1,10 @@
+
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+
 import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
+
 
 type Variant = 'header' | 'primary';
 
@@ -9,19 +12,14 @@ type Variant = 'header' | 'primary';
   selector: 'app-wallet-button',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
     @if (!wallet.isConnected()) {
-      <button
-        type="button"
-        [class]="buttonClass()"
-        (click)="open()"
-      >
-        Connect Wallet
-      </button>
+      <button type="button" [class]="buttonClass()" (click)="open()">Connect Wallet</button>
     } @else {
       @if (variant() === 'header') {
         <div class="relative flex items-center gap-2">
           @if (isNetworkMenuOpen() || isWalletMenuOpen()) {
-            <div class="fixed inset-0 z-40" (click)="closeHeaderMenus()" aria-hidden="true"></div>
+            <button type="button" class="fixed inset-0 z-40 w-full h-full cursor-default" (click)="closeHeaderMenus()" tabindex="-1" aria-hidden="true"></button>
           }
 
           <!-- Network pill -->
@@ -33,16 +31,28 @@ type Variant = 'header' | 'primary';
             [attr.aria-expanded]="isNetworkMenuOpen()"
           >
             @if (currentNetworkLogo(); as logo) {
-              <img class="h-5 w-5 rounded-full" [src]="logo" [alt]="currentNetworkName() + ' logo'" loading="lazy" decoding="async" />
+              <img
+                class="h-5 w-5 rounded-full"
+                [src]="logo"
+                [alt]="currentNetworkName() + ' logo'"
+                loading="lazy"
+                decoding="async"
+              />
             } @else {
-              <span class="h-5 w-5 rounded-full bg-[var(--cb-color-border)]" aria-hidden="true"></span>
+              <span
+                class="h-5 w-5 rounded-full bg-[var(--cb-color-border)]"
+                aria-hidden="true"
+              ></span>
             }
             <span class="hidden sm:inline">{{ currentNetworkName() }}</span>
             <span class="text-[var(--cb-color-text-secondary)]">▾</span>
           </button>
 
           @if (isNetworkMenuOpen()) {
-            <div class="absolute left-0 top-full z-50 mt-2 w-56 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-1 shadow-lg backdrop-blur" role="menu">
+            <div
+              class="absolute left-0 top-full z-50 mt-2 w-56 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-1 shadow-lg backdrop-blur"
+              role="menu"
+            >
               @for (opt of evmNetworkOptions(); track opt.key) {
                 <button
                   type="button"
@@ -51,12 +61,20 @@ type Variant = 'header' | 'primary';
                   (click)="switchNetwork(opt.key)"
                   [disabled]="isSwitchingNetwork()"
                 >
-                  <img class="h-5 w-5 rounded-full" [src]="opt.logo" [alt]="opt.label + ' logo'" loading="lazy" decoding="async" />
+                  <img
+                    class="h-5 w-5 rounded-full"
+                    [src]="opt.logo"
+                    [alt]="opt.label + ' logo'"
+                    loading="lazy"
+                    decoding="async"
+                  />
                   <span class="flex-1">{{ opt.label }}</span>
                 </button>
               }
               @if (networkStatus(); as s) {
-                <div class="px-3 py-2 text-[11px] text-[var(--cb-color-muted)]" aria-live="polite">{{ s }}</div>
+                <div class="px-3 py-2 text-[11px] text-[var(--cb-color-muted)]" aria-live="polite">
+                  {{ s }}
+                </div>
               }
             </div>
           }
@@ -70,16 +88,28 @@ type Variant = 'header' | 'primary';
             [attr.aria-expanded]="isWalletMenuOpen()"
           >
             @if (currentWalletLogo(); as wlogo) {
-              <img class="h-5 w-5 rounded-full bg-white" [src]="wlogo" alt="Wallet logo" loading="lazy" decoding="async" />
+              <img
+                class="h-5 w-5 rounded-full bg-white"
+                [src]="wlogo"
+                alt="Wallet logo"
+                loading="lazy"
+                decoding="async"
+              />
             } @else {
-              <span class="h-5 w-5 rounded-full bg-[var(--cb-color-border)]" aria-hidden="true"></span>
+              <span
+                class="h-5 w-5 rounded-full bg-[var(--cb-color-border)]"
+                aria-hidden="true"
+              ></span>
             }
             <span class="font-mono">{{ wallet.shortAddress() }}</span>
             <span class="text-[var(--cb-color-text-secondary)]">▾</span>
           </button>
 
           @if (isWalletMenuOpen()) {
-            <div class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-1 shadow-lg backdrop-blur" role="menu">
+            <div
+              class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-1 shadow-lg backdrop-blur"
+              role="menu"
+            >
               <button
                 type="button"
                 class="w-full rounded-lg px-3 py-2 text-left text-xs text-[var(--cb-color-text)] hover:bg-[var(--cb-color-text)]/5"
@@ -119,7 +149,10 @@ type Variant = 'header' | 'primary';
                 decoding="async"
               />
             } @else {
-              <span class="h-5 w-5 rounded-full bg-[var(--cb-color-border)]" aria-hidden="true"></span>
+              <span
+                class="h-5 w-5 rounded-full bg-[var(--cb-color-border)]"
+                aria-hidden="true"
+              ></span>
             }
             <span class="hidden sm:inline">{{ chain.name }}</span>
           }
@@ -155,9 +188,13 @@ type Variant = 'header' | 'primary';
     }
 
     @if (isModalOpen()) {
-      <div
+      <button
+        type="button"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         (click)="close()"
+        (keyup.escape)="close()"
+        (keyup.enter)="close()"
+        title="Close"
       >
         <div
           class="w-full max-w-md rounded-2xl bg-[var(--cb-color-surface)] p-6 text-[var(--cb-color-text)] shadow-xl"
@@ -179,7 +216,11 @@ type Variant = 'header' | 'primary';
                 </button>
               }
               <h2 class="text-xl font-semibold">
-                @if (activeConnector(); as c) { {{ connectorName(c) }} } @else { Connect Wallet }
+                @if (activeConnector(); as c) {
+                  {{ connectorName(c) }}
+                } @else {
+                  Connect Wallet
+                }
               </h2>
             </div>
             <button
@@ -194,7 +235,13 @@ type Variant = 'header' | 'primary';
 
           @if (activeConnector(); as c) {
             <div class="mt-6 grid place-items-center gap-4">
-              <img class="h-16 w-16" [src]="connectorLogo(c)" [alt]="connectorName(c) + ' logo'" loading="lazy" decoding="async" />
+              <img
+                class="h-16 w-16"
+                [src]="connectorLogo(c)"
+                [alt]="connectorName(c) + ' logo'"
+                loading="lazy"
+                decoding="async"
+              />
 
               @if (needsInstall()) {
                 <div class="text-center">
@@ -216,15 +263,21 @@ type Variant = 'header' | 'primary';
                 <div class="text-center">
                   @if (isConnecting()) {
                     <div class="text-lg font-semibold">Requesting Connection</div>
-                    <div class="mt-2 text-sm text-[var(--cb-color-muted)]">{{ connectorConnectingHint(c) }}</div>
+                    <div class="mt-2 text-sm text-[var(--cb-color-muted)]">
+                      {{ connectorConnectingHint(c) }}
+                    </div>
                   } @else {
                     <div class="text-lg font-semibold">Connect {{ connectorName(c) }}</div>
-                    <div class="mt-2 text-sm text-[var(--cb-color-muted)]">Click below to connect your wallet.</div>
+                    <div class="mt-2 text-sm text-[var(--cb-color-muted)]">
+                      Click below to connect your wallet.
+                    </div>
                   }
                 </div>
 
                 @if (error(); as err) {
-                  <div class="w-full rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                  <div
+                    class="w-full rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                  >
                     {{ err }}
                   </div>
                 }
@@ -235,7 +288,11 @@ type Variant = 'header' | 'primary';
                   [disabled]="isConnecting()"
                   (click)="connect(c)"
                 >
-                  @if (isConnecting()) { Connecting… } @else { Connect }
+                  @if (isConnecting()) {
+                    Connecting…
+                  } @else {
+                    Connect
+                  }
                 </button>
               }
             </div>
@@ -253,7 +310,13 @@ type Variant = 'header' | 'primary';
                 (click)="selectConnector('metamask')"
               >
                 <span class="flex items-center gap-3">
-                  <img class="h-7 w-7" src="images/wallets/metamask.png" alt="MetaMask logo" loading="lazy" decoding="async" />
+                  <img
+                    class="h-7 w-7"
+                    src="images/wallets/metamask.png"
+                    alt="MetaMask logo"
+                    loading="lazy"
+                    decoding="async"
+                  />
                   <span class="font-medium">MetaMask</span>
                 </span>
                 <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
@@ -265,7 +328,13 @@ type Variant = 'header' | 'primary';
                 (click)="selectConnector('trust')"
               >
                 <span class="flex items-center gap-3">
-                  <img class="h-7 w-7" src="images/wallets/trustwallet.png" alt="Trust Wallet logo" loading="lazy" decoding="async" />
+                  <img
+                    class="h-7 w-7"
+                    src="images/wallets/trustwallet.png"
+                    alt="Trust Wallet logo"
+                    loading="lazy"
+                    decoding="async"
+                  />
                   <span class="font-medium">Trust Wallet</span>
                 </span>
                 <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
@@ -277,17 +346,21 @@ type Variant = 'header' | 'primary';
                 (click)="selectConnector('binance')"
               >
                 <span class="flex items-center gap-3">
-                  <img class="h-7 w-7" src="images/wallets/binance.svg" alt="Binance logo" loading="lazy" decoding="async" />
+                  <img
+                    class="h-7 w-7"
+                    src="images/wallets/binance.svg"
+                    alt="Binance logo"
+                    loading="lazy"
+                    decoding="async"
+                  />
                   <span class="font-medium">Binance Wallet</span>
                 </span>
                 <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
               </button>
-
-
             </div>
           }
         </div>
-      </div>
+      </button>
     }
   `,
 })
@@ -296,6 +369,7 @@ export class WalletButtonComponent {
 
   readonly wallet = inject(EvmWalletService);
   readonly #chains = inject(EvmChainMetadataService);
+
 
   readonly isModalOpen = signal(false);
   readonly isMenuOpen = signal(false);
@@ -337,9 +411,24 @@ export class WalletButtonComponent {
   });
 
   readonly evmNetworkOptions = computed(() => [
-    { key: 'eth' as const, label: 'Ethereum', logo: 'images/branding/eth.png', chain: EVM_NETWORKS.eth.chain },
-    { key: 'bsc' as const, label: 'BNB Smart Chain', logo: 'images/branding/bsc.png', chain: EVM_NETWORKS.bsc.chain },
-    { key: 'plg' as const, label: 'Polygon', logo: 'images/branding/plg.png', chain: EVM_NETWORKS.plg.chain },
+    {
+      key: 'eth' as const,
+      label: 'Ethereum',
+      logo: 'images/branding/eth.png',
+      chain: EVM_NETWORKS.eth.chain,
+    },
+    {
+      key: 'bsc' as const,
+      label: 'BNB Smart Chain',
+      logo: 'images/branding/bsc.png',
+      chain: EVM_NETWORKS.bsc.chain,
+    },
+    {
+      key: 'plg' as const,
+      label: 'Polygon',
+      logo: 'images/branding/plg.png',
+      chain: EVM_NETWORKS.plg.chain,
+    },
   ]);
 
   readonly buttonClass = computed(() => {
@@ -390,13 +479,16 @@ export class WalletButtonComponent {
     this.isSwitchingNetwork.set(true);
     try {
       await this.wallet.ensureChain(EVM_NETWORKS[key].chain);
-      this.networkStatus.set(`Switched to ${this.evmNetworkOptions().find((o) => o.key === key)?.label ?? 'network'}.`);
+      this.networkStatus.set(
+        `Switched to ${this.evmNetworkOptions().find((o) => o.key === key)?.label ?? 'network'}.`,
+      );
       // close after a short moment so user sees status
       setTimeout(() => this.closeHeaderMenus(), 600);
     } catch (e: unknown) {
       const code = (e as { code?: number }).code;
       if (code === 4001) this.networkStatus.set('Network switch cancelled in wallet.');
-      else if (code === -32002) this.networkStatus.set('A wallet request is already pending. Open your wallet.');
+      else if (code === -32002)
+        this.networkStatus.set('A wallet request is already pending. Open your wallet.');
       else this.networkStatus.set(e instanceof Error ? e.message : 'Failed to switch network.');
     } finally {
       this.isSwitchingNetwork.set(false);
@@ -439,7 +531,7 @@ export class WalletButtonComponent {
       await this.wallet.refreshChainId();
       this.isModalOpen.set(false);
     } catch (e: unknown) {
-      this.error.set(this.friendlyError(e, connector));
+      this.error.set(this.friendlyError(e));
       // If we failed due to missing wallet, show install view.
       const maybeMissing = this.error()?.toLowerCase().includes('not detected') ?? false;
       if (maybeMissing) this.needsInstall.set(true);
@@ -448,16 +540,17 @@ export class WalletButtonComponent {
     }
   }
 
-  friendlyError(e: unknown, connector: WalletConnectorId): string {
+  friendlyError(e: unknown): string {
     const code = (e as { code?: number }).code;
     if (code === 4001) return 'Connection request was cancelled in your wallet.';
-    if (code === -32002) return 'A wallet request is already pending. Please open your wallet extension.';
-
-
+    if (code === -32002)
+      return 'A wallet request is already pending. Please open your wallet extension.';
 
     const raw = e instanceof Error ? e.message : 'Failed to connect wallet.';
-    if (raw.includes('No injected EVM wallet')) return 'No wallet extension detected in this browser.';
-    if (raw.includes('No injected EVM wallet detected')) return 'No wallet extension detected in this browser.';
+    if (raw.includes('No injected EVM wallet'))
+      return 'No wallet extension detected in this browser.';
+    if (raw.includes('No injected EVM wallet detected'))
+      return 'No wallet extension detected in this browser.';
     return raw;
   }
 
@@ -483,7 +576,6 @@ export class WalletButtonComponent {
   }
 
   connectorConnectingHint(connector: WalletConnectorId): string {
-
     return `Open the ${this.connectorName(connector)} browser extension to connect your wallet.`;
   }
 
@@ -503,6 +595,3 @@ export class WalletButtonComponent {
     }
   }
 }
-
-
-

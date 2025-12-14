@@ -1,7 +1,9 @@
 # Context for — UI / Style Guide (Tailwind v4, Dark-first)
+
 > Purpose: load the minimum context to make UI changes that match the existing Conceal Bridge look-and-feel (Angular 21 + Tailwind v4).
 
 ## Key rules (read this before coding)
+
 - **Tailwind-first**: default to utility classes in templates; add custom CSS only when reuse is high.
 - **Dark-first UI**: keep surfaces dark (`slate` palette); avoid light panels.
 - **Amber/yellow is reserved for primary CTAs + focus** (don’t use yellow for errors).

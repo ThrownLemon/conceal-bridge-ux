@@ -50,9 +50,11 @@ After `npm run build` (script in [`package.json`](conceal-bridge-ux/package.json
 Because this is an SPA using Angular Router (see [`provideRouter(routes)`](conceal-bridge-ux/src/app/app.config.ts:11)), hosting must rewrite unknown paths to `index.html`.
 
 **Generic rule:**
+
 - If request path is not a real file, serve `/index.html`.
 
 Examples:
+
 - `/swap/ccx-to-evm/eth` should serve `index.html` and let Angular route it.
 - Legacy redirects like `/eth` are handled by Angular router config in [`app.routes.ts`](conceal-bridge-ux/src/app/app.routes.ts:21).
 
@@ -61,30 +63,37 @@ Examples:
 ### 1) Hashed assets (JS/CSS/images built with hashes)
 
 For files like:
+
 - `/*.js`
 - `/*.css`
 - hashed chunks under the build output
 
 Set:
+
 - `Cache-Control: public, max-age=31536000, immutable`
 
 Rationale:
+
 - hashes change when content changes.
 
 ### 2) `index.html`
 
 Set:
+
 - `Cache-Control: no-cache`
 
 Rationale:
+
 - ensures clients fetch latest HTML that references new bundle hashes.
 
 ### 3) Runtime config file (if adopted)
 
 If you implement [`runtime_config.md`](conceal-bridge-ux/ai_spec/runtime_config.md:1) and serve:
+
 - [`/config.json`](conceal-bridge-ux/public/config.json:1)
 
 Set:
+
 - `Cache-Control: no-cache`
 
 So ops can update config without redeploying assets.
@@ -104,6 +113,7 @@ Also configure the host rewrite rules to rewrite under that subpath.
 When environment files are introduced (per [`environment_configuration.md`](conceal-bridge-ux/ai_spec/environment_configuration.md:1)), builds produce different bundles per env.
 
 Recommended:
+
 - production bundle deployed to production host
 - development/testing bundle deployed to testing host
 
@@ -114,9 +124,11 @@ If you deploy the same bundle to multiple envs, adopt runtime config (per [`runt
 ## Security Headers Integration
 
 Apply at the CDN/host level:
+
 - CSP + other headers in [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1)
 
 At minimum:
+
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `Content-Security-Policy` (start report-only)

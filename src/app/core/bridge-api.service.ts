@@ -36,7 +36,9 @@ export class BridgeApiService {
   }
 
   getGasPrice(network: EvmNetworkKey) {
-    return this.#http.get<{ result: boolean; gas: number }>(this.#url(network, '/api/ccx/wccx/getGasPrice'));
+    return this.#http.get<{ result: boolean; gas: number }>(
+      this.#url(network, '/api/ccx/wccx/getGasPrice'),
+    );
   }
 
   getCcxSwapBalance(network: EvmNetworkKey) {
@@ -90,8 +92,7 @@ export class BridgeApiService {
   }
 
   checkSwapState(network: EvmNetworkKey, direction: 'wccx' | 'ccx', paymentId: string) {
-    const path =
-      direction === 'wccx' ? '/api/ccx/wccx/tx' : '/api/wccx/ccx/tx';
+    const path = direction === 'wccx' ? '/api/ccx/wccx/tx' : '/api/wccx/ccx/tx';
     return this.#http.post<BridgeSwapStateResponse>(
       this.#url(network, path),
       { paymentId },
@@ -99,5 +100,3 @@ export class BridgeApiService {
     );
   }
 }
-
-

@@ -25,14 +25,18 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
   imports: [ReactiveFormsModule, WalletButtonComponent],
   template: `
     <section class="mx-auto max-w-3xl">
-      <h1 class="text-balance text-3xl font-semibold tracking-tight text-[var(--cb-color-text)] sm:text-4xl">
+      <h1
+        class="text-balance text-3xl font-semibold tracking-tight text-[var(--cb-color-text)] sm:text-4xl"
+      >
         Conceal Bridge
       </h1>
       <p class="mt-3 text-pretty text-[var(--cb-color-muted)]">
         Swap between Conceal (CCX) and wrapped CCX (wCCX) on Ethereum, BSC, or Polygon.
       </p>
 
-      <div class="mt-8 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)]/50 p-5 shadow-sm backdrop-blur">
+      <div
+        class="mt-8 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)]/50 p-5 shadow-sm backdrop-blur"
+      >
         <form class="grid gap-5" [formGroup]="form" (ngSubmit)="go()">
           <fieldset class="grid gap-3">
             <legend class="text-sm font-medium text-[var(--cb-color-text)]">Networks</legend>
@@ -53,10 +57,20 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
                     [attr.aria-expanded]="isFromMenuOpen()"
                   >
                     @if (fromDisplay(); as n) {
-                      <img class="h-7 w-7 rounded-full" [src]="n.logoUri" [alt]="n.label + ' logo'" loading="lazy" decoding="async" />
+                      <img
+                        class="h-7 w-7 rounded-full"
+                        [src]="n.logoUri"
+                        [alt]="n.label + ' logo'"
+                        loading="lazy"
+                        decoding="async"
+                      />
                       <div class="min-w-0 flex-1">
-                        <div class="truncate text-sm font-semibold text-[var(--cb-color-text)]">{{ n.label }}</div>
-                        <div class="truncate text-xs text-[var(--cb-color-muted)]">{{ n.subtitle }}</div>
+                        <div class="truncate text-sm font-semibold text-[var(--cb-color-text)]">
+                          {{ n.label }}
+                        </div>
+                        <div class="truncate text-xs text-[var(--cb-color-muted)]">
+                          {{ n.subtitle }}
+                        </div>
                       </div>
                     }
                     <span class="text-[var(--cb-color-text-secondary)]">▾</span>
@@ -74,8 +88,15 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
                           class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-[var(--cb-color-text)] hover:bg-black/5 dark:hover:bg-white/5"
                           (click)="setFromNetwork(o.key)"
                           role="option"
+                          [attr.aria-selected]="fromKey() === o.key"
                         >
-                          <img class="h-6 w-6 rounded-full" [src]="o.logoUri" [alt]="o.label + ' logo'" loading="lazy" decoding="async" />
+                          <img
+                            class="h-6 w-6 rounded-full"
+                            [src]="o.logoUri"
+                            [alt]="o.label + ' logo'"
+                            loading="lazy"
+                            decoding="async"
+                          />
                           <span class="flex-1">{{ o.label }}</span>
                         </button>
                       }
@@ -106,10 +127,20 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
                     [attr.aria-expanded]="isToMenuOpen()"
                   >
                     @if (toDisplay(); as n) {
-                      <img class="h-7 w-7 rounded-full" [src]="n.logoUri" [alt]="n.label + ' logo'" loading="lazy" decoding="async" />
+                      <img
+                        class="h-7 w-7 rounded-full"
+                        [src]="n.logoUri"
+                        [alt]="n.label + ' logo'"
+                        loading="lazy"
+                        decoding="async"
+                      />
                       <div class="min-w-0 flex-1">
-                        <div class="truncate text-sm font-semibold text-[var(--cb-color-text)]">{{ n.label }}</div>
-                        <div class="truncate text-xs text-[var(--cb-color-muted)]">{{ n.subtitle }}</div>
+                        <div class="truncate text-sm font-semibold text-[var(--cb-color-text)]">
+                          {{ n.label }}
+                        </div>
+                        <div class="truncate text-xs text-[var(--cb-color-muted)]">
+                          {{ n.subtitle }}
+                        </div>
                       </div>
                     }
                     <span class="text-[var(--cb-color-text-secondary)]">▾</span>
@@ -127,8 +158,15 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
                           class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-[var(--cb-color-text)] hover:bg-[var(--cb-color-text)]/5"
                           (click)="setToNetwork(o.key)"
                           role="option"
+                          [attr.aria-selected]="toKey() === o.key"
                         >
-                          <img class="h-6 w-6 rounded-full" [src]="o.logoUri" [alt]="o.label + ' logo'" loading="lazy" decoding="async" />
+                          <img
+                            class="h-6 w-6 rounded-full"
+                            [src]="o.logoUri"
+                            [alt]="o.label + ' logo'"
+                            loading="lazy"
+                            decoding="async"
+                          />
                           <span class="flex-1">{{ o.label }}</span>
                         </button>
                       }
@@ -139,7 +177,8 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
             </div>
 
             <p class="text-xs text-[var(--cb-color-muted)]">
-              One side must be Conceal (CCX). Logos/names are loaded from a public chain metadata API.
+              One side must be Conceal (CCX). Logos/names are loaded from a public chain metadata
+              API.
             </p>
             @if (networkSwitchStatus(); as status) {
               <p class="text-xs text-amber-200" aria-live="polite">{{ status }}</p>
@@ -173,7 +212,9 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
           rel="noopener"
         >
           <div class="font-medium text-[var(--cb-color-text)]">User guide</div>
-          <div class="mt-1 text-[var(--cb-color-muted)]">How the bridge works and how to complete swaps safely.</div>
+          <div class="mt-1 text-[var(--cb-color-muted)]">
+            How the bridge works and how to complete swaps safely.
+          </div>
         </a>
 
         <a
@@ -183,7 +224,9 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
           rel="noopener"
         >
           <div class="font-medium text-[var(--cb-color-text)]">Get MetaMask</div>
-          <div class="mt-1 text-[var(--cb-color-muted)]">You’ll need an EVM wallet to send gas fees or wCCX.</div>
+          <div class="mt-1 text-[var(--cb-color-muted)]">
+            You’ll need an EVM wallet to send gas fees or wCCX.
+          </div>
         </a>
       </div>
     </section>
@@ -214,7 +257,9 @@ export class HomePage {
   );
 
   readonly fromKey = toSignal(
-    this.form.controls.fromNetwork.valueChanges.pipe(startWith(this.form.controls.fromNetwork.value)),
+    this.form.controls.fromNetwork.valueChanges.pipe(
+      startWith(this.form.controls.fromNetwork.value),
+    ),
     { initialValue: this.form.controls.fromNetwork.value },
   );
 
@@ -390,7 +435,9 @@ export class HomePage {
 
     const direction = this.form.controls.direction.value;
     const candidate =
-      direction === 'ccx-to-evm' ? this.form.controls.toNetwork.value : this.form.controls.fromNetwork.value;
+      direction === 'ccx-to-evm'
+        ? this.form.controls.toNetwork.value
+        : this.form.controls.fromNetwork.value;
     if (candidate === 'ccx') {
       this.networkSwitchStatus.set('Select an EVM network to switch your wallet.');
       return;
@@ -413,7 +460,9 @@ export class HomePage {
       if (code === 4001) {
         this.networkSwitchStatus.set('Network switch was cancelled in your wallet.');
       } else if (code === -32002) {
-        this.networkSwitchStatus.set('A wallet request is already pending. Please open your wallet.');
+        this.networkSwitchStatus.set(
+          'A wallet request is already pending. Please open your wallet.',
+        );
       } else {
         this.networkSwitchStatus.set(e instanceof Error ? e.message : 'Network switch failed.');
       }
@@ -433,7 +482,9 @@ export class HomePage {
       return;
     }
     if (from !== 'ccx' && to !== 'ccx') {
-      this.networkSwitchStatus.set('Direct EVM-to-EVM swaps are not supported yet. Choose Conceal on one side.');
+      this.networkSwitchStatus.set(
+        'Direct EVM-to-EVM swaps are not supported yet. Choose Conceal on one side.',
+      );
       return;
     }
     if (from === 'ccx' && to === 'ccx') {
@@ -445,5 +496,3 @@ export class HomePage {
     void this.#router.navigate(['/swap', direction, network]);
   }
 }
-
-

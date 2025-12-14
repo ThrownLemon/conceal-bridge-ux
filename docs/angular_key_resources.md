@@ -25,7 +25,7 @@ Angular — Deliver web apps with confidence 🚀
 - [Binding text, properties and attributes](https://angular.dev/guide/templates/binding)
 - [Control Flow](https://angular.dev/guide/templates/control-flow)
 - [Template variable declaration](https://angular.dev/guide/templates/variables)
-- [Deferred loading of components](https://angular.dev/guide/templates/defer) 
+- [Deferred loading of components](https://angular.dev/guide/templates/defer)
 - [Expression syntax](https://angular.dev/guide/templates/expression-syntax)
 
 ## Directives
@@ -36,7 +36,7 @@ Angular — Deliver web apps with confidence 🚀
 - [Directive composition](https://angular.dev/guide/directives/directive-composition-api)
 - [Optimizing images](https://angular.dev/guide/image-optimization)
 
-## Signals 
+## Signals
 
 - [Signals overview](https://angular.dev/guide/signals)
 - [Dependent state with linkedSignal](https://angular.dev/guide/signals/linked-signal)
@@ -52,7 +52,7 @@ Angular — Deliver web apps with confidence 🚀
 - [Hierarchical injectors](https://angular.dev/guide/di/hierarchical-dependency-injection)
 - [Optimizing Injection tokens](https://angular.dev/guide/di/lightweight-injection-tokens)
 
-## RxJS 
+## RxJS
 
 - [RxJS interop with Angular signals](https://angular.dev/ecosystem/rxjs-interop)
 - [Component output interop](https://angular.dev/ecosystem/rxjs-interop/output-interop)
@@ -66,6 +66,7 @@ Angular — Deliver web apps with confidence 🚀
 - [Testing](https://angular.dev/guide/http/testing)
 
 ## Forms
+
 - [Forms overview](https://angular.dev/guide/forms)
 - [Reactive Forms](https://angular.dev/guide/forms/reactive-forms)
 - [Strictly types forms](https://angular.dev/guide/forms/typed-forms)
@@ -74,6 +75,7 @@ Angular — Deliver web apps with confidence 🚀
 - [Building dynamic forms](https://angular.dev/guide/forms/dynamic-forms)
 
 ## Routing
+
 - [Routing overview](https://angular.dev/guide/routing)
 - [Define routes](https://angular.dev/guide/routing/define-routes)
 - [Show routes with outlets](https://angular.dev/guide/routing/show-routes-with-outlets)
@@ -91,7 +93,8 @@ Angular — Deliver web apps with confidence 🚀
 - [Hydration](https://angular.dev/guide/hydration)
 - [Incremental Hydration](https://angular.dev/guide/incremental-hydration)
 
-# CLI 
+# CLI
+
 [Angular CLI Overview](https://angular.dev/tools/cli)
 
 ## Testing
@@ -110,14 +113,15 @@ Angular — Deliver web apps with confidence 🚀
 - [Creating a component harness for your components](https://angular.dev/guide/testing/creating-component-harnesses)
 
 ## Animations
+
 - [Animations your content](https://angular.dev/guide/animations/css)
 - [Route transition animation](https://angular.dev/guide/routing/route-transition-animations)
 - [Migrating to native CSS animations](https://next.angular.dev/guide/animations/migration)
 
 ## APIs
+
 - [API reference](https://angular.dev/api)
 - [CLI command reference](https://angular.dev/cli)
-
 
 ## Others
 

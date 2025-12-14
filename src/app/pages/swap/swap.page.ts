@@ -1,15 +1,27 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, filter, map, of, switchMap, take, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { firstValueFrom } from 'rxjs';
-import { isAddress, parseEther, parseUnits, type Address, type Chain, type Hash } from 'viem';
+import { isAddress, parseEther, parseUnits, type Hash } from 'viem';
 
 import { BridgeApiService } from '../../core/bridge-api.service';
-import type { BridgeChainConfig, BridgeSwapStateResponse, EvmNetworkKey, SwapDirection } from '../../core/bridge-types';
+import type {
+  BridgeChainConfig,
+  BridgeSwapStateResponse,
+  EvmNetworkKey,
+  SwapDirection,
+} from '../../core/bridge-types';
 import { EVM_NETWORK_KEYS } from '../../core/bridge-types';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 import { EvmWalletService } from '../../core/evm-wallet.service';
@@ -62,19 +74,33 @@ const erc20Abi = [
   imports: [ReactiveFormsModule, RouterLink, QrCodeComponent, WalletButtonComponent],
   template: `
     <div class="mx-auto max-w-3xl">
-      <a routerLink="/" class="text-sm font-medium text-[var(--cb-color-text-secondary)] hover:text-[var(--cb-color-text)]">← Back</a>
+      <a
+        routerLink="/"
+        class="text-sm font-medium text-[var(--cb-color-text-secondary)] hover:text-[var(--cb-color-text)]"
+        >← Back</a
+      >
 
       <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div class="grid gap-1">
-          <h1 class="text-center text-3xl font-bold tracking-tight text-[var(--cb-color-text)] sm:text-4xl">
+          <h1
+            class="text-center text-3xl font-bold tracking-tight text-[var(--cb-color-text)] sm:text-4xl"
+          >
             @if (direction(); as d) {
-              @if (d === 'ccx-to-evm') { CCX → wCCX } @else { wCCX → CCX }
+              @if (d === 'ccx-to-evm') {
+                CCX → wCCX
+              } @else {
+                wCCX → CCX
+              }
             } @else {
               Swap
             }
           </h1>
           <div class="text-sm text-[var(--cb-color-muted)]">
-            @if (networkInfo(); as info) { Network: {{ info.label }} } @else { Unknown network }
+            @if (networkInfo(); as info) {
+              Network: {{ info.label }}
+            } @else {
+              Unknown network
+            }
           </div>
         </div>
 
@@ -84,13 +110,17 @@ const erc20Abi = [
       </div>
 
       @if (pageError(); as err) {
-        <div class="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
+        <div
+          class="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200"
+        >
           {{ err }}
         </div>
       }
 
       @if (statusMessage(); as msg) {
-        <div class="mt-6 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-4 text-sm text-[var(--cb-color-text)]">
+        <div
+          class="mt-6 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-4 text-sm text-[var(--cb-color-text)]"
+        >
           {{ msg }}
         </div>
       }
@@ -99,15 +129,22 @@ const erc20Abi = [
         @if (d === 'ccx-to-evm') {
           <ng-container [formGroup]="ccxToEvmForm">
             @if (step() === 0) {
-              <div class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5">
-                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">Step 1 — Pay gas &amp; initialize</h2>
+              <div
+                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              >
+                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">
+                  Step 1 — Pay gas &amp; initialize
+                </h2>
                 <p class="mt-1 text-sm text-[var(--cb-color-text-secondary)]">
-                  We’ll estimate the required gas fee for your selected network and ask your wallet to send it.
+                  We’ll estimate the required gas fee for your selected network and ask your wallet
+                  to send it.
                 </p>
 
                 <div class="mt-5 grid gap-4">
                   <div class="grid gap-2">
-                    <label class="text-sm font-medium text-[var(--cb-color-text)]" for="ccxFrom">Your CCX address</label>
+                    <label class="text-sm font-medium text-[var(--cb-color-text)]" for="ccxFrom"
+                      >Your CCX address</label
+                    >
                     <input
                       id="ccxFrom"
                       class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 font-mono text-sm text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
@@ -116,11 +153,15 @@ const erc20Abi = [
                       autocomplete="off"
                       spellcheck="false"
                     />
-                    <p class="text-xs text-[var(--cb-color-muted)]">Used by the backend to associate the payment ID to your swap.</p>
+                    <p class="text-xs text-[var(--cb-color-muted)]">
+                      Used by the backend to associate the payment ID to your swap.
+                    </p>
                   </div>
 
                   <div class="grid gap-2">
-                    <label class="text-sm font-medium text-[var(--cb-color-text)]" for="evmTo">Your EVM address</label>
+                    <label class="text-sm font-medium text-[var(--cb-color-text)]" for="evmTo"
+                      >Your EVM address</label
+                    >
                     <input
                       id="evmTo"
                       class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 font-mono text-sm text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
@@ -151,7 +192,9 @@ const erc20Abi = [
 
                   <div class="grid gap-2 sm:grid-cols-2">
                     <div class="grid gap-2">
-                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="amount1">Amount</label>
+                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="amount1"
+                        >Amount</label
+                      >
                       <input
                         id="amount1"
                         class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-3 py-2 text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
@@ -165,12 +208,16 @@ const erc20Abi = [
                         </p>
                       }
                       @if (wccxSwapBalance() !== null) {
-                        <p class="text-xs text-[var(--cb-color-muted)]">Available wCCX liquidity: {{ wccxSwapBalance() }}</p>
+                        <p class="text-xs text-[var(--cb-color-muted)]">
+                          Available wCCX liquidity: {{ wccxSwapBalance() }}
+                        </p>
                       }
                     </div>
 
                     <div class="grid gap-2">
-                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="email1">Email (optional)</label>
+                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="email1"
+                        >Email (optional)</label
+                      >
                       <input
                         id="email1"
                         class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-3 py-2 text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
@@ -178,7 +225,9 @@ const erc20Abi = [
                         placeholder="you@example.com"
                         autocomplete="email"
                       />
-                      <p class="text-xs text-[var(--cb-color-muted)]">Used only for notifications/support.</p>
+                      <p class="text-xs text-[var(--cb-color-muted)]">
+                        Used only for notifications/support.
+                      </p>
                     </div>
                   </div>
 
@@ -193,17 +242,26 @@ const erc20Abi = [
                 </div>
               </div>
             } @else if (step() === 1) {
-              <div class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5">
-                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">Step 2 — Send CCX with payment ID</h2>
+              <div
+                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              >
+                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">
+                  Step 2 — Send CCX with payment ID
+                </h2>
                 <p class="mt-1 text-sm text-[var(--cb-color-text-secondary)]">
-                  Send your CCX to the bridge address and include the payment ID shown below. We’ll keep checking until it’s received.
+                  Send your CCX to the bridge address and include the payment ID shown below. We’ll
+                  keep checking until it’s received.
                 </p>
 
                 <div class="mt-6 grid gap-6 sm:grid-cols-2">
                   <div class="grid gap-3">
-                    <div class="text-sm font-medium text-[var(--cb-color-text)]">CCX deposit address</div>
+                    <div class="text-sm font-medium text-[var(--cb-color-text)]">
+                      CCX deposit address
+                    </div>
                     @if (config(); as cfg) {
-                      <div class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 font-mono text-xs text-[var(--cb-color-text)]">
+                      <div
+                        class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 font-mono text-xs text-[var(--cb-color-text)]"
+                      >
                         {{ cfg.ccx.accountAddress }}
                       </div>
                       <button
@@ -221,7 +279,9 @@ const erc20Abi = [
 
                   <div class="grid gap-3">
                     <div class="text-sm font-medium text-[var(--cb-color-text)]">Payment ID</div>
-                    <div class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 font-mono text-xs text-[var(--cb-color-text)]">
+                    <div
+                      class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 font-mono text-xs text-[var(--cb-color-text)]"
+                    >
                       {{ paymentId() }}
                     </div>
                     <button
@@ -248,15 +308,36 @@ const erc20Abi = [
                 </div>
               </div>
             } @else {
-              <div class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5">
+              <div
+                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              >
                 <h2 class="text-base font-semibold text-[var(--cb-color-text)]">Complete</h2>
-                <p class="mt-1 text-sm text-[var(--cb-color-muted)]">Your swap has been processed.</p>
+                <p class="mt-1 text-sm text-[var(--cb-color-muted)]">
+                  Your swap has been processed.
+                </p>
                 @if (swapState(); as s) {
                   <div class="mt-5 grid gap-3 text-sm text-[var(--cb-color-text)]">
-                    <div>Swapped: <span class="font-semibold">{{ s.txdata?.swaped }}</span></div>
-                    <div>Recipient: <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{ s.txdata?.address }}</span></div>
-                    <div>Swap TX: <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{ s.txdata?.swapHash }}</span></div>
-                    <div>Deposit TX: <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{ s.txdata?.depositHash }}</span></div>
+                    <div>
+                      Swapped: <span class="font-semibold">{{ s.txdata?.swaped }}</span>
+                    </div>
+                    <div>
+                      Recipient:
+                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                        s.txdata?.address
+                      }}</span>
+                    </div>
+                    <div>
+                      Swap TX:
+                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                        s.txdata?.swapHash
+                      }}</span>
+                    </div>
+                    <div>
+                      Deposit TX:
+                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                        s.txdata?.depositHash
+                      }}</span>
+                    </div>
                   </div>
                 }
                 <div class="mt-6">
@@ -274,15 +355,21 @@ const erc20Abi = [
         } @else {
           <ng-container [formGroup]="evmToCcxForm">
             @if (step() === 0) {
-              <div class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5">
-                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">Step 1 — Send wCCX</h2>
+              <div
+                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              >
+                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">
+                  Step 1 — Send wCCX
+                </h2>
                 <p class="mt-1 text-sm text-[var(--cb-color-muted)]">
                   You’ll send wCCX from your connected wallet to the bridge address.
                 </p>
 
                 <div class="mt-5 grid gap-4">
                   <div class="grid gap-2">
-                    <label class="text-sm font-medium text-[var(--cb-color-text)]" for="ccxTo">Your CCX address</label>
+                    <label class="text-sm font-medium text-[var(--cb-color-text)]" for="ccxTo"
+                      >Your CCX address</label
+                    >
                     <input
                       id="ccxTo"
                       class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 font-mono text-sm text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
@@ -295,7 +382,9 @@ const erc20Abi = [
 
                   <div class="grid gap-2 sm:grid-cols-2">
                     <div class="grid gap-2">
-                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="amount2">Amount</label>
+                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="amount2"
+                        >Amount</label
+                      >
                       <input
                         id="amount2"
                         class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-3 py-2 text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
@@ -309,12 +398,16 @@ const erc20Abi = [
                         </p>
                       }
                       @if (ccxSwapBalance() !== null) {
-                        <p class="text-xs text-[var(--cb-color-muted)]">Available CCX liquidity: {{ ccxSwapBalance() }}</p>
+                        <p class="text-xs text-[var(--cb-color-muted)]">
+                          Available CCX liquidity: {{ ccxSwapBalance() }}
+                        </p>
                       }
                     </div>
 
                     <div class="grid gap-2">
-                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="email2">Email (optional)</label>
+                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="email2"
+                        >Email (optional)</label
+                      >
                       <input
                         id="email2"
                         class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-3 py-2 text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
@@ -347,14 +440,26 @@ const erc20Abi = [
                 </div>
               </div>
             } @else if (step() === 1) {
-              <div class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5">
+              <div
+                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              >
                 <h2 class="text-base font-semibold text-[var(--cb-color-text)]">Processing</h2>
                 <p class="mt-1 text-sm text-[var(--cb-color-muted)]">
                   Deposit accepted. We’re processing your swap.
                 </p>
                 <div class="mt-4 grid gap-3 text-sm text-[var(--cb-color-text)]">
-                  <div>Payment ID: <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{ paymentId() }}</span></div>
-                  <div>EVM TX: <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{ evmTxHash() }}</span></div>
+                  <div>
+                    Payment ID:
+                    <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                      paymentId()
+                    }}</span>
+                  </div>
+                  <div>
+                    EVM TX:
+                    <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                      evmTxHash()
+                    }}</span>
+                  </div>
                 </div>
 
                 <div class="mt-6 flex flex-wrap gap-2">
@@ -369,15 +474,36 @@ const erc20Abi = [
                 </div>
               </div>
             } @else {
-              <div class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5">
+              <div
+                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              >
                 <h2 class="text-base font-semibold text-[var(--cb-color-text)]">Complete</h2>
-                <p class="mt-1 text-sm text-[var(--cb-color-muted)]">Your swap has been processed.</p>
+                <p class="mt-1 text-sm text-[var(--cb-color-muted)]">
+                  Your swap has been processed.
+                </p>
                 @if (swapState(); as s) {
                   <div class="mt-5 grid gap-3 text-sm text-[var(--cb-color-text)]">
-                    <div>Swapped: <span class="font-semibold">{{ s.txdata?.swaped }}</span></div>
-                    <div>Recipient: <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{ s.txdata?.address }}</span></div>
-                    <div>Swap TX: <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{ s.txdata?.swapHash }}</span></div>
-                    <div>Deposit TX: <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{ s.txdata?.depositHash }}</span></div>
+                    <div>
+                      Swapped: <span class="font-semibold">{{ s.txdata?.swaped }}</span>
+                    </div>
+                    <div>
+                      Recipient:
+                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                        s.txdata?.address
+                      }}</span>
+                    </div>
+                    <div>
+                      Swap TX:
+                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                        s.txdata?.swapHash
+                      }}</span>
+                    </div>
+                    <div>
+                      Deposit TX:
+                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                        s.txdata?.depositHash
+                      }}</span>
+                    </div>
                   </div>
                 }
                 <div class="mt-6">
@@ -400,21 +526,18 @@ const erc20Abi = [
 export class SwapPage {
   readonly #destroyRef = inject(DestroyRef);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
   readonly #fb = inject(NonNullableFormBuilder);
 
   readonly api = inject(BridgeApiService);
   readonly wallet = inject(EvmWalletService);
 
-  readonly #directionParam = toSignal(
-    this.#route.paramMap.pipe(map((pm) => pm.get('direction'))),
-    { initialValue: null },
-  );
+  readonly #directionParam = toSignal(this.#route.paramMap.pipe(map((pm) => pm.get('direction'))), {
+    initialValue: null,
+  });
 
-  readonly #networkParam = toSignal(
-    this.#route.paramMap.pipe(map((pm) => pm.get('network'))),
-    { initialValue: null },
-  );
+  readonly #networkParam = toSignal(this.#route.paramMap.pipe(map((pm) => pm.get('network'))), {
+    initialValue: null,
+  });
 
   readonly direction = computed<SwapDirection | null>(() => {
     const d = this.#directionParam();
@@ -446,30 +569,15 @@ export class SwapPage {
   readonly statusMessage = signal<string | null>(null);
 
   readonly ccxToEvmForm = this.#fb.group({
-    ccxFromAddress: this.#fb.control('', [
-      Validators.required,
-      Validators.pattern(CCX_ADDRESS_RE),
-    ]),
-    evmToAddress: this.#fb.control('', [
-      Validators.required,
-      Validators.pattern(EVM_ADDRESS_RE),
-    ]),
-    amount: this.#fb.control('', [
-      Validators.required,
-      Validators.pattern(/^[0-9]+\.?[0-9]*$/),
-    ]),
+    ccxFromAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
+    evmToAddress: this.#fb.control('', [Validators.required, Validators.pattern(EVM_ADDRESS_RE)]),
+    amount: this.#fb.control('', [Validators.required, Validators.pattern(/^[0-9]+\.?[0-9]*$/)]),
     email: this.#fb.control('', [Validators.email]),
   });
 
   readonly evmToCcxForm = this.#fb.group({
-    ccxToAddress: this.#fb.control('', [
-      Validators.required,
-      Validators.pattern(CCX_ADDRESS_RE),
-    ]),
-    amount: this.#fb.control('', [
-      Validators.required,
-      Validators.pattern(/^[0-9]+\.?[0-9]*$/),
-    ]),
+    ccxToAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
+    amount: this.#fb.control('', [Validators.required, Validators.pattern(/^[0-9]+\.?[0-9]*$/)]),
     email: this.#fb.control('', [Validators.email]),
   });
 
@@ -569,9 +677,9 @@ export class SwapPage {
       if (code === -32603 || /not supported/i.test(msg)) {
         this.statusMessage.set(
           `Your wallet doesn’t support adding tokens automatically on this network. Add wCCX manually:\n` +
-          `Contract: ${cfg.wccx.contractAddress}\n` +
-          `Symbol: wCCX\n` +
-          `Decimals: ${decimals}`,
+            `Contract: ${cfg.wccx.contractAddress}\n` +
+            `Symbol: wCCX\n` +
+            `Decimals: ${decimals}`,
         );
         return;
       }
@@ -622,7 +730,9 @@ export class SwapPage {
     }
 
     if (amount < cfg.common.minSwapAmount || amount > cfg.common.maxSwapAmount) {
-      this.statusMessage.set(`Amount must be between ${cfg.common.minSwapAmount} and ${cfg.common.maxSwapAmount}.`);
+      this.statusMessage.set(
+        `Amount must be between ${cfg.common.minSwapAmount} and ${cfg.common.maxSwapAmount}.`,
+      );
       return;
     }
 
@@ -744,7 +854,9 @@ export class SwapPage {
     }
 
     if (amount < cfg.common.minSwapAmount || amount > cfg.common.maxSwapAmount) {
-      this.statusMessage.set(`Amount must be between ${cfg.common.minSwapAmount} and ${cfg.common.maxSwapAmount}.`);
+      this.statusMessage.set(
+        `Amount must be between ${cfg.common.minSwapAmount} and ${cfg.common.maxSwapAmount}.`,
+      );
       return;
     }
 
@@ -826,7 +938,9 @@ export class SwapPage {
       this.paymentId.set(init.paymentId);
 
       this.statusMessage.set('Executing swap…');
-      const exec = await firstValueFrom(this.api.execWccxToCcxSwap(network, { paymentId: init.paymentId, email }));
+      const exec = await firstValueFrom(
+        this.api.execWccxToCcxSwap(network, { paymentId: init.paymentId, email }),
+      );
       if (!exec.success) {
         throw new Error(exec.error || 'Swap execution failed.');
       }
@@ -846,9 +960,9 @@ export class SwapPage {
     timer(0, 10_000)
       .pipe(
         switchMap(() =>
-          this.api.checkSwapState(network, direction, paymentId).pipe(
-            catchError(() => of({ result: false } as BridgeSwapStateResponse)),
-          ),
+          this.api
+            .checkSwapState(network, direction, paymentId)
+            .pipe(catchError(() => of({ result: false } as BridgeSwapStateResponse))),
         ),
         filter((r) => r.result === true),
         take(1),
@@ -876,5 +990,3 @@ export class SwapPage {
     }
   }
 }
-
-

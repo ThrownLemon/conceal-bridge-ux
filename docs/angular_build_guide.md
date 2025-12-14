@@ -5,18 +5,21 @@
 **Project Name:** conceal Bridge UX (workspace project: [`conceal-bridge-ux`](conceal-bridge-ux/package.json:1))
 
 **Purpose:** A web UI for bridging (swapping) between **Conceal (CCX)** and **wrapped CCX (wCCX)** on EVM networks (**Ethereum**, **BNB Smart Chain**, **Polygon**). The UI:
+
 - connects to an EVM wallet (injected providers),
 - calls the bridge backend API to initialize/execute swaps,
 - sends native gas-fee transactions or ERC-20 transfers (wCCX),
 - polls backend state until the swap completes.
 
-**Angular Version:** Angular **21.0.x** (CLI **21.0.x**)  
+**Angular Version:** Angular **21.0.x** (CLI **21.0.x**)
+
 - Dependencies pinned in [`conceal-bridge-ux/package.json`](conceal-bridge-ux/package.json:1)
 - CLI version referenced in [`conceal-bridge-ux/README.md`](conceal-bridge-ux/README.md:1)
 
 **Target Platform:** Web SPA (responsive), static build output suitable for typical static hosting.
 
 **Key Features:**
+
 - Standalone app bootstrapped via [`bootstrapApplication()`](conceal-bridge-ux/src/main.ts:1)
 - Route-level lazy loading with [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:3)
 - Wallet UX: MetaMask / Trust / Binance Wallet via [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:33)
@@ -49,6 +52,7 @@ conceal-bridge-ux/
 ```
 
 **Key locations:**
+
 - Entry point: [`conceal-bridge-ux/src/main.ts`](conceal-bridge-ux/src/main.ts:1)
 - App root component: [`conceal-bridge-ux/src/app/app.ts`](conceal-bridge-ux/src/app/app.ts:1)
 - App providers: [`conceal-bridge-ux/src/app/app.config.ts`](conceal-bridge-ux/src/app/app.config.ts:1)
@@ -80,6 +84,7 @@ conceal-bridge-ux/
   - Example: [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13)
 
 **State Management Pattern (Project-specific):**
+
 - UI state lives locally in components as `signal()`s (e.g., busy flags, step state, error/status messages).
 - Derived state uses `computed()`.
 - Router params + form streams are converted using [`toSignal()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:409) to integrate RxJS with signals.
@@ -117,6 +122,7 @@ From [`conceal-bridge-ux/tsconfig.json`](conceal-bridge-ux/tsconfig.json:1):
 - **No Implicit Any:** Enabled via `"strict": true`
 
 Notable compiler options:
+
 - `"target": "ES2022"` ([`tsconfig.json`](conceal-bridge-ux/tsconfig.json:15))
 - `"module": "preserve"` ([`tsconfig.json`](conceal-bridge-ux/tsconfig.json:16))
 - `"isolatedModules": true` ([`tsconfig.json`](conceal-bridge-ux/tsconfig.json:12))
@@ -124,6 +130,7 @@ Notable compiler options:
 ### RxJS Patterns
 
 **Subscription Management:**
+
 - Prefer `takeUntilDestroyed()` to auto-cleanup subscriptions in components:
   - Example: [`takeUntilDestroyed()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:6) used when subscribing to network changes.
 - Prefer `toSignal()` for router params / form streams:
@@ -132,9 +139,11 @@ Notable compiler options:
   - Example: [`firstValueFrom()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:8)
 
 **Preferred Operators (observed):**
+
 - `switchMap`, `catchError`, `filter`, `map`, `take`, `timer` (see imports in [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:5))
 
 **Avoid (project anti-patterns):**
+
 - Leaking subscriptions (use `takeUntilDestroyed()` when manually subscribing)
 - Storing async state in mutable fields without signals/observables
 
@@ -277,6 +286,7 @@ ng build --configuration production
 - **SPA Routing:** Handled automatically by GitHub Actions deployment
 
 **Why native GitHub Actions?**
+
 - ✅ Secure (no third-party dependencies with vulnerabilities)
 - ✅ Official GitHub solution
 - ✅ No manual deployment needed
@@ -285,13 +295,13 @@ ng build --configuration production
 Build artifacts are static and can be deployed to any static hosting (S3/CloudFront, Netlify, Vercel static, Nginx, etc.), but GitHub Pages via GitHub Actions is the current configured target.
 
 For deployment details, see:
+
 - [`.github/workflows/deploy.yml`](conceal-bridge-ux/.github/workflows/deploy.yml)
 - [`docs/deployment.md`](conceal-bridge-ux/docs/deployment.md)
 - [`docs/ci_cd.md`](conceal-bridge-ux/docs/ci_cd.md)
 - [`README.md`](conceal-bridge-ux/README.md) (Deployment section)
 
 ### CI/CD Pipeline
-
 
 **GitHub Actions** (configured for automated deployment)
 
@@ -310,9 +320,9 @@ The workflow automatically deploys to GitHub Pages whenever changes are pushed t
 **Manual trigger:** You can also trigger the workflow manually from the GitHub Actions tab in your repository.
 
 For CI/CD details and alternative configurations, see:
+
 - [`ai_spec/ci_cd_pipeline.md`](conceal-bridge-ux/ai_spec/ci_cd_pipeline.md)
 - [`.github/workflows/deploy.yml`](conceal-bridge-ux/.github/workflows/deploy.yml)
-
 
 ---
 
@@ -413,6 +423,7 @@ This repo does not include branch/commit conventions in this project folder. If 
 ### Lazy Loading
 
 Route-level component lazy loading is used for all main pages:
+
 - Home: [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:6)
 - Swap: [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:16)
 - Not found: [`loadComponent`](conceal-bridge-ux/src/app/app.routes.ts:28)
@@ -426,6 +437,7 @@ Route-level component lazy loading is used for all main pages:
 ### Bundle Optimization
 
 Production build has budgets configured:
+
 - Initial bundle warning at 500kB and error at 1MB:
   - [`budgets`](conceal-bridge-ux/angular.json:36)
 - Component style budgets:
@@ -434,8 +446,6 @@ Production build has budgets configured:
 ---
 
 ## Common Pitfalls & Gotchas (Project-specific)
-
-
 
 3. **CommonJS dependency warnings**
    - **Cause:** `qrcode` is CommonJS.

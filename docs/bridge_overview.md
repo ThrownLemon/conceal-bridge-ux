@@ -20,16 +20,19 @@ Wrapped Conceal ($wCCX) is a tokenized representation of ₡CCX on bridged block
 The Conceal Bridge currently supports three blockchain ecosystems:
 
 ### Ethereum
+
 - **Maximum Supply:** 500,000 $wCCX
 - **Token Contract:** `0x21686f8ce003a95c99acd297e302faacf742f7d4`
 - **Explorer:** https://etherscan.io/token/0x21686f8ce003a95c99acd297e302faacf742f7d4
 
 ### Binance Smart Chain (BSC)
+
 - **Maximum Supply:** 350,000 $wCCX
 - **Token Contract:** `0x988c11625472340b7B36FF1534893780E0d8d841`
 - **Explorer:** https://bscscan.com/token/0x988c11625472340b7B36FF1534893780E0d8d841
 
 ### Polygon (Matic)
+
 - **Maximum Supply:** 500,000 $wCCX
 - **Token Contract:** `0x137Ee749f0F8c2eD34cA00dE33BB59E3dafA494A`
 - **Explorer:** https://explorer-mainnet.maticvigil.com/tokens/0x137Ee749f0F8c2eD34cA00dE33BB59E3dafA494A/token-transfers
@@ -58,17 +61,20 @@ The Conceal Bridge currently supports three blockchain ecosystems:
 ## Use Cases for $wCCX
 
 ### DeFi Integration
+
 - Trade on decentralized exchanges (Uniswap, SushiSwap, PancakeSwap)
 - Provide liquidity to liquidity pools and earn trading fees
 - Participate in yield farming opportunities
 - Use as collateral for lending/borrowing protocols
 
 ### Privacy Gateway
+
 - **Untraceable Entry/Exit:** Move from traceable ecosystem tokens to untraceable ₡CCX
 - First Cryptonote coin to bridge multiple networks
 - Maintain privacy while accessing DeFi opportunities
 
 ### Enhanced Liquidity
+
 - Access to millions of users across Ethereum, BSC, and Polygon
 - Increased trading volume and market stability
 - Broader exposure for the Conceal Network ecosystem
@@ -91,12 +97,15 @@ To ensure transparency and trust, you can verify the ₡CCX reserves backing $wC
 To use $wCCX, you'll need to configure MetaMask for the appropriate network:
 
 **For Binance Smart Chain:**
+
 - Guide: https://medium.com/stakingbits/setting-up-metamask-for-binance-smart-chain-bsc-921d9a2625fd
 
 **For Polygon:**
+
 - Guide: https://medium.com/stakingbits/setting-up-metamask-for-polygon-matic-network-838058f6d844
 
 **For Ethereum:**
+
 - MetaMask is configured for Ethereum by default
 
 ### Adding $wCCX Token to MetaMask
@@ -114,16 +123,19 @@ After setting up the correct network:
 ### Core Principles
 
 **1:1 Backing**
+
 - Every $wCCX is fully backed by native ₡CCX held in reserve
 - Reserves are auditable on the Conceal Network blockchain
 - No $wCCX can exist without corresponding ₡CCX in custody
 
 **Custodial Security**
+
 - Industry-standard security practices protect bridge reserves
 - Multi-signature controls for custodial wallets
 - Regular security audits
 
 **Transparency**
+
 - All transactions are publicly verifiable on respective blockchains
 - Real-time reserve verification available
 - Open and auditable process
@@ -148,9 +160,11 @@ After setting up the correct network:
 ## Additional Resources
 
 **Official Documentation:**
+
 - The Anatomy of Wrapped CCX: https://concealnetwork.medium.com/the-anatomy-of-wrapped-ccx-97b2a8c008d9
 
 **Official Links:**
+
 - Conceal Network Bridge: https://bridge.conceal.network
 - Explorer: https://explorer.conceal.network
 

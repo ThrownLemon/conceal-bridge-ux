@@ -42,6 +42,7 @@ Define a consistent, best-practice HTTP/error-handling approach for this Angular
 ### A) Introduce an HTTP Interceptor Layer
 
 Add one interceptor for:
+
 - request correlation (optional request ID)
 - default headers if needed
 - centralized error mapping
@@ -58,11 +59,13 @@ Create a helper that converts an error into:
 - `status` (optional)
 
 Proposed location:
+
 - [`conceal-bridge-ux/src/app/core/api-error.ts`](conceal-bridge-ux/src/app/core/api-error.ts:1)
 
 ### C) Apply strict retry rules
 
 Rules:
+
 - `GET` requests: retry on network/5xx with exponential backoff (small max attempts)
 - `POST` requests:
   - **do not retry** swap-init endpoints (they may not be idempotent)
@@ -71,27 +74,32 @@ Rules:
 ### D) Establish timeouts
 
 Define per-endpoint timeouts (examples):
+
 - config endpoints: 10s
 - balance endpoints: 10s
 - swap init/exec: 20–30s
 - polling call: 10s
 
 Implementation choices:
+
 - in interceptor (global default) with overrides via custom header
 - or in service methods using RxJS `timeout()` operator
 
 This spec recommends:
+
 - global default timeout in interceptor, and allow overrides for long calls.
 
 ### E) UI messaging conventions
 
 Standardize messages:
+
 - “Could not reach server. Check your connection.”
 - “The server is taking too long to respond.”
 - “Swap initialization failed. Please try again.”
 - etc.
 
 Keep using signals in pages and set messages consistently:
+
 - `pageError` for route-blocking errors (e.g. missing config)
 - `statusMessage` for step-level status and transient notifications
 

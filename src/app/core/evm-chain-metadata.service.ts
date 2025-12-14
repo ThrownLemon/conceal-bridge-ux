@@ -8,12 +8,12 @@ export interface EvmChainMetadata {
   logoUri: string | null;
 }
 
-type LifiChain = {
+interface LifiChain {
   id: number;
   name: string;
   logoURI?: string;
   chainType?: string;
-};
+}
 
 /**
  * Lightweight public chain metadata (name + logo).
@@ -41,9 +41,7 @@ export class EvmChainMetadataService {
   #load(): void {
     this.#http
       .get<{ chains: LifiChain[] }>('https://li.quest/v1/chains')
-      .pipe(
-        catchError(() => of({ chains: [] as LifiChain[] })),
-      )
+      .pipe(catchError(() => of({ chains: [] as LifiChain[] })))
       .subscribe(({ chains }) => {
         const next = new Map<number, EvmChainMetadata>();
         for (const c of chains) {
@@ -62,6 +60,3 @@ export class EvmChainMetadataService {
       });
   }
 }
-
-
-

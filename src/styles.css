@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   /* Default to Light Mode values in :root (triggered when no .dark class is present) */
@@ -44,11 +44,11 @@
   --cb-color-surface: #101010;
   --cb-color-border: #808080;
   --cb-color-text: #ffffff;
-  --cb-color-muted: #9CA3AF;
+  --cb-color-muted: #9ca3af;
   --cb-color-text-secondary: #cbd5e1;
   --cb-color-accent: #f59e0b;
   /* amber-500 */
-  --cb-color-accent-2: #00F0FF;
+  --cb-color-accent-2: #00f0ff;
   /* cyan */
 }
 
@@ -118,7 +118,6 @@
   font-weight: 400;
   font-display: swap;
   src: url('../public/fonts/Lora-Italic.woff2') format('woff2');
-
 }
 
 @theme {

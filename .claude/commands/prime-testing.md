@@ -1,7 +1,9 @@
 # Context for — Testing (Unit + Future E2E)
+
 > Purpose: load the minimum testing context to add/change tests safely (Angular 21 + Vitest + web3 mocking constraints).
 
 ## Key rules (read this before coding)
+
 - Tests must be **deterministic**: no real HTTP, no real wallets, no real chain RPC.
 - Prefer mocking at service boundaries:
   - stub [`BridgeApiService`](src/app/core/bridge-api.service.ts:1)

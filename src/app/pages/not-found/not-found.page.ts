@@ -6,7 +6,9 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink],
   template: `
-    <div class="mx-auto max-w-2xl rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-6">
+    <div
+      class="mx-auto max-w-2xl rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-6"
+    >
       <h1 class="text-xl font-semibold text-[var(--cb-color-text)]">Page not found</h1>
       <p class="mt-2 text-sm text-[var(--cb-color-muted)]">
         The page you’re looking for doesn’t exist.
@@ -20,6 +22,4 @@ import { RouterLink } from '@angular/router';
     </div>
   `,
 })
-export class NotFoundPage { }
-
-
+export class NotFoundPage {}

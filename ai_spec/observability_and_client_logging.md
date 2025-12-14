@@ -53,9 +53,11 @@ Introduce a consistent, low-friction observability layer so we can:
 ### A) Add a `LoggerService` abstraction
 
 Create a core service:
+
 - [`conceal-bridge-ux/src/app/core/logger.service.ts`](conceal-bridge-ux/src/app/core/logger.service.ts:1)
 
 Responsibilities:
+
 - Provide methods `debug()`, `info()`, `warn()`, `error()`.
 - Attach base context:
   - app version (from build-time environment if available)
@@ -67,11 +69,13 @@ Responsibilities:
 ### B) Add an `ErrorReporter` adapter (optional)
 
 A small interface that can be implemented by:
+
 - console reporter (default)
 - Sentry (optional future)
 - custom backend endpoint (optional future)
 
 Proposed location:
+
 - [`conceal-bridge-ux/src/app/core/error-reporter.ts`](conceal-bridge-ux/src/app/core/error-reporter.ts:1)
 
 ### C) Wire global error capture into the logger
@@ -81,6 +85,7 @@ Leverage the fact we already register browser listeners via [`provideBrowserGlob
 - Add a global handler that forwards uncaught errors to `LoggerService.error()` and `ErrorReporter`.
 
 Notes:
+
 - User-facing UX should still use the per-page patterns (e.g. [`statusMessage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:446)). Logging is not a replacement for UX.
 
 ### D) Correlation ID strategy
@@ -89,6 +94,7 @@ Notes:
 - Generate a `requestId` per HTTP request.
 
 If/when HTTP interceptors are implemented (per [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:42)):
+
 - Add header: `X-Request-Id: <uuid>` and `X-Session-Id: <uuid>` (names can be adjusted to backend conventions).
 
 ### E) Event taxonomy (recommendation)

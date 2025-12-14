@@ -5,11 +5,13 @@
 This guide provides comprehensive instructions for integrating Web3 functionality using Viem in our Angular 21 bridge service. Viem is a TypeScript interface for Ethereum that provides low-level stateless primitives for interacting with Ethereum.
 
 **Key Dependencies:**
+
 - `viem@^2.41.2` - Core Web3 functionality
 
 ## Why Viem?
 
 Viem was chosen over ethers.js or web3.js for the following reasons:
+
 - **TypeScript-first:** Superior type safety and developer experience
 - **Lightweight:** Smaller bundle size (~30% smaller than ethers.js)
 - **Modern:** Built for modern Ethereum standards
@@ -67,7 +69,7 @@ import { mainnet, bsc, polygon, avalanche } from 'viem/chains';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ViemService {
   private publicClients: Map<number, PublicClient> = new Map();
@@ -82,13 +84,13 @@ export class ViemService {
    */
   private initializeClients(): void {
     const chains = [mainnet, bsc, polygon, avalanche];
-    
-    chains.forEach(chain => {
+
+    chains.forEach((chain) => {
       const client = createPublicClient({
         chain,
-        transport: http() // Can add RPC URL: http('https://your-rpc-url')
+        transport: http(), // Can add RPC URL: http('https://your-rpc-url')
       });
-      
+
       this.publicClients.set(chain.id, client);
     });
   }
@@ -131,18 +133,12 @@ export class ViemService {
 
 ```typescript
 import { Injectable } from '@angular/core';
-import { 
-  createWalletClient, 
-  custom, 
-  WalletClient,
-  type Account,
-  type Chain
-} from 'viem';
+import { createWalletClient, custom, WalletClient, type Account, type Chain } from 'viem';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WalletType, WalletConnection } from '@/models/wallet.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WalletService {
   private walletClient$ = new BehaviorSubject<WalletClient | null>(null);
@@ -160,9 +156,9 @@ export class WalletService {
       }
 
       // Request accounts
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts'
-      }) as string[];
+      const accounts = (await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      })) as string[];
 
       if (!accounts || accounts.length === 0) {
         throw new Error('No accounts found');
@@ -172,7 +168,7 @@ export class WalletService {
       const client = createWalletClient({
         chain,
         transport: custom(window.ethereum),
-        account: accounts[0] as `0x${string}`
+        account: accounts[0] as `0x${string}`,
       });
 
       this.walletClient$.next(client);
@@ -187,7 +183,7 @@ export class WalletService {
       return {
         address: accounts[0],
         chainId: chain.id,
-        walletType: WalletType.MetaMask
+        walletType: WalletType.MetaMask,
       };
     } catch (error) {
       console.error('Failed to connect wallet:', error);
@@ -252,9 +248,9 @@ export class WalletService {
         // Update account
         const client = this.walletClient$.value;
         if (client) {
-          this.connectedAccount$.next({ 
+          this.connectedAccount$.next({
             address: accounts[0] as `0x${string}`,
-            type: 'json-rpc'
+            type: 'json-rpc',
           });
         }
       }
@@ -290,35 +286,31 @@ declare global {
 
 ```typescript
 import { Injectable } from '@angular/core';
-import { 
-  getContract, 
+import {
+  getContract,
   type Address,
   type PublicClient,
   type WalletClient,
   formatUnits,
-  parseUnits
+  parseUnits,
 } from 'viem';
 import { ViemService } from './viem.service';
 import { WalletService } from './wallet.service';
 import { BRIDGE_CONTRACT_ABI } from '@/config/contracts.config';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContractService {
   constructor(
     private viemService: ViemService,
-    private walletService: WalletService
+    private walletService: WalletService,
   ) {}
 
   /**
    * Get contract instance for reading
    */
-  getReadContract(
-    address: Address,
-    abi: any,
-    chainId: number
-  ) {
+  getReadContract(address: Address, abi: any, chainId: number) {
     const publicClient = this.viemService.getPublicClient(chainId);
     if (!publicClient) {
       throw new Error(`No public client for chain ${chainId}`);
@@ -327,18 +319,14 @@ export class ContractService {
     return getContract({
       address,
       abi,
-      client: publicClient
+      client: publicClient,
     });
   }
 
   /**
    * Get contract instance for writing
    */
-  getWriteContract(
-    address: Address,
-    abi: any,
-    chainId: number
-  ) {
+  getWriteContract(address: Address, abi: any, chainId: number) {
     const walletClient = this.walletService.getWalletClient();
     const publicClient = this.viemService.getPublicClient(chainId);
 
@@ -352,7 +340,7 @@ export class ContractService {
     return getContract({
       address,
       abi,
-      client: { public: publicClient, wallet: walletClient }
+      client: { public: publicClient, wallet: walletClient },
     });
   }
 
@@ -364,9 +352,9 @@ export class ContractService {
     abi: any,
     functionName: string,
     args: any[] = [],
-    chainId?: number
+    chainId?: number,
   ): Promise<T> {
-    const publicClient = chainId 
+    const publicClient = chainId
       ? this.viemService.getPublicClient(chainId)
       : this.viemService.getCurrentPublicClient();
 
@@ -379,7 +367,7 @@ export class ContractService {
         address,
         abi,
         functionName,
-        args
+        args,
       });
 
       return data as T;
@@ -397,7 +385,7 @@ export class ContractService {
     abi: any,
     functionName: string,
     args: any[] = [],
-    value?: bigint
+    value?: bigint,
   ): Promise<`0x${string}`> {
     const walletClient = this.walletService.getWalletClient();
     const account = this.walletService.getConnectedAccount();
@@ -413,7 +401,7 @@ export class ContractService {
         functionName,
         args,
         account,
-        ...(value && { value })
+        ...(value && { value }),
       });
 
       const hash = await walletClient.writeContract(request);
@@ -448,18 +436,14 @@ export class ContractService {
 
 ```typescript
 import { Injectable } from '@angular/core';
-import { 
-  type Hash,
-  type TransactionReceipt,
-  type PublicClient
-} from 'viem';
+import { type Hash, type TransactionReceipt, type PublicClient } from 'viem';
 import { ViemService } from './viem.service';
 import { BehaviorSubject, interval, takeWhile, switchMap, from } from 'rxjs';
 
 export enum TransactionStatus {
   Pending = 'pending',
   Confirmed = 'confirmed',
-  Failed = 'failed'
+  Failed = 'failed',
 }
 
 export interface TrackedTransaction {
@@ -471,12 +455,10 @@ export interface TrackedTransaction {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TransactionService {
-  private trackedTransactions$ = new BehaviorSubject<Map<Hash, TrackedTransaction>>(
-    new Map()
-  );
+  private trackedTransactions$ = new BehaviorSubject<Map<Hash, TrackedTransaction>>(new Map());
 
   constructor(private viemService: ViemService) {}
 
@@ -486,7 +468,7 @@ export class TransactionService {
   async waitForTransaction(
     hash: Hash,
     chainId: number,
-    confirmations: number = 1
+    confirmations: number = 1,
   ): Promise<TransactionReceipt> {
     const publicClient = this.viemService.getPublicClient(chainId);
     if (!publicClient) {
@@ -496,7 +478,7 @@ export class TransactionService {
     try {
       const receipt = await publicClient.waitForTransactionReceipt({
         hash,
-        confirmations
+        confirmations,
       });
 
       return receipt;
@@ -513,7 +495,7 @@ export class TransactionService {
     const tracked: TrackedTransaction = {
       hash,
       status: TransactionStatus.Pending,
-      confirmations: 0
+      confirmations: 0,
     };
 
     const transactions = this.trackedTransactions$.value;
@@ -527,7 +509,7 @@ export class TransactionService {
           const tx = this.trackedTransactions$.value.get(hash);
           return tx?.status === TransactionStatus.Pending;
         }),
-        switchMap(() => from(this.checkTransactionStatus(hash, chainId)))
+        switchMap(() => from(this.checkTransactionStatus(hash, chainId))),
       )
       .subscribe({
         next: (receipt) => {
@@ -537,7 +519,7 @@ export class TransactionService {
         },
         error: (error) => {
           this.updateTransactionError(hash, error.message);
-        }
+        },
       });
   }
 
@@ -546,7 +528,7 @@ export class TransactionService {
    */
   private async checkTransactionStatus(
     hash: Hash,
-    chainId: number
+    chainId: number,
   ): Promise<TransactionReceipt | null> {
     const publicClient = this.viemService.getPublicClient(chainId);
     if (!publicClient) return null;
@@ -567,9 +549,8 @@ export class TransactionService {
     const tracked = transactions.get(hash);
 
     if (tracked) {
-      tracked.status = receipt.status === 'success' 
-        ? TransactionStatus.Confirmed 
-        : TransactionStatus.Failed;
+      tracked.status =
+        receipt.status === 'success' ? TransactionStatus.Confirmed : TransactionStatus.Failed;
       tracked.receipt = receipt;
       transactions.set(hash, tracked);
       this.trackedTransactions$.next(new Map(transactions));
@@ -608,10 +589,7 @@ export class TransactionService {
   /**
    * Estimate gas for transaction
    */
-  async estimateGas(
-    chainId: number,
-    transaction: any
-  ): Promise<bigint> {
+  async estimateGas(chainId: number, transaction: any): Promise<bigint> {
     const publicClient = this.viemService.getPublicClient(chainId);
     if (!publicClient) {
       throw new Error(`No public client for chain ${chainId}`);
@@ -668,29 +646,29 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     rpcUrl: 'https://eth.llamarpc.com', // Or your preferred RPC
     blockExplorer: 'https://etherscan.io',
     nativeCurrency: mainnet.nativeCurrency,
-    bridgeContract: '0x...' // Your bridge contract address
+    bridgeContract: '0x...', // Your bridge contract address
   },
   [bsc.id]: {
     chain: bsc,
     rpcUrl: 'https://bsc-dataseed.binance.org',
     blockExplorer: 'https://bscscan.com',
     nativeCurrency: bsc.nativeCurrency,
-    bridgeContract: '0x...' // Your bridge contract address
+    bridgeContract: '0x...', // Your bridge contract address
   },
   [polygon.id]: {
     chain: polygon,
     rpcUrl: 'https://polygon-rpc.com',
     blockExplorer: 'https://polygonscan.com',
     nativeCurrency: polygon.nativeCurrency,
-    bridgeContract: '0x...' // Your bridge contract address
+    bridgeContract: '0x...', // Your bridge contract address
   },
   [avalanche.id]: {
     chain: avalanche,
     rpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
     blockExplorer: 'https://snowtrace.io',
     nativeCurrency: avalanche.nativeCurrency,
-    bridgeContract: '0x...' // Your bridge contract address
-  }
+    bridgeContract: '0x...', // Your bridge contract address
+  },
 };
 
 export const DEFAULT_CHAIN_ID = mainnet.id;
@@ -712,19 +690,13 @@ export function getSupportedChainIds(): number[] {
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { type Chain } from 'viem';
-import { 
-  SUPPORTED_CHAINS, 
-  DEFAULT_CHAIN_ID,
-  type ChainConfig 
-} from '@/config/chains.config';
+import { SUPPORTED_CHAINS, DEFAULT_CHAIN_ID, type ChainConfig } from '@/config/chains.config';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ChainService {
-  private currentChain$ = new BehaviorSubject<ChainConfig>(
-    SUPPORTED_CHAINS[DEFAULT_CHAIN_ID]
-  );
+  private currentChain$ = new BehaviorSubject<ChainConfig>(SUPPORTED_CHAINS[DEFAULT_CHAIN_ID]);
 
   /**
    * Get current chain observable
@@ -757,7 +729,7 @@ export class ChainService {
       // Try to switch to the chain
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: `0x${chainId.toString(16)}` }]
+        params: [{ chainId: `0x${chainId.toString(16)}` }],
       });
 
       this.currentChain$.next(chainConfig);
@@ -782,13 +754,15 @@ export class ChainService {
 
     await window.ethereum.request({
       method: 'wallet_addEthereumChain',
-      params: [{
-        chainId: `0x${chainConfig.chain.id.toString(16)}`,
-        chainName: chainConfig.chain.name,
-        nativeCurrency: chainConfig.nativeCurrency,
-        rpcUrls: [chainConfig.rpcUrl],
-        blockExplorerUrls: [chainConfig.blockExplorer]
-      }]
+      params: [
+        {
+          chainId: `0x${chainConfig.chain.id.toString(16)}`,
+          chainName: chainConfig.chain.name,
+          nativeCurrency: chainConfig.nativeCurrency,
+          rpcUrls: [chainConfig.rpcUrl],
+          blockExplorerUrls: [chainConfig.blockExplorer],
+        },
+      ],
     });
   }
 
@@ -827,7 +801,7 @@ export enum Web3ErrorType {
   ContractError = 'CONTRACT_ERROR',
   InvalidAddress = 'INVALID_ADDRESS',
   TransactionFailed = 'TRANSACTION_FAILED',
-  UnknownError = 'UNKNOWN_ERROR'
+  UnknownError = 'UNKNOWN_ERROR',
 }
 
 export interface Web3Error {
@@ -842,7 +816,7 @@ export function parseWeb3Error(error: any): Web3Error {
     return {
       type: Web3ErrorType.UserRejected,
       message: 'Transaction was rejected by user',
-      originalError: error
+      originalError: error,
     };
   }
 
@@ -851,7 +825,7 @@ export function parseWeb3Error(error: any): Web3Error {
     return {
       type: Web3ErrorType.InsufficientFunds,
       message: 'Insufficient funds for transaction',
-      originalError: error
+      originalError: error,
     };
   }
 
@@ -860,7 +834,7 @@ export function parseWeb3Error(error: any): Web3Error {
     return {
       type: Web3ErrorType.NetworkError,
       message: 'Network connection error. Please check your connection.',
-      originalError: error
+      originalError: error,
     };
   }
 
@@ -869,7 +843,7 @@ export function parseWeb3Error(error: any): Web3Error {
     return {
       type: Web3ErrorType.ContractError,
       message: 'Contract execution failed. Please check transaction parameters.',
-      originalError: error
+      originalError: error,
     };
   }
 
@@ -878,7 +852,7 @@ export function parseWeb3Error(error: any): Web3Error {
     return {
       type: Web3ErrorType.InvalidAddress,
       message: 'Invalid Ethereum address provided',
-      originalError: error
+      originalError: error,
     };
   }
 
@@ -886,7 +860,7 @@ export function parseWeb3Error(error: any): Web3Error {
   return {
     type: Web3ErrorType.UnknownError,
     message: error.message || 'An unknown error occurred',
-    originalError: error
+    originalError: error,
   };
 }
 ```
@@ -947,6 +921,7 @@ async getEIP1559Fees(chainId: number) {
 ## Best Practices
 
 ### 1. Always Use Try-Catch Blocks
+
 ```typescript
 try {
   const result = await contractService.writeContract(...);
@@ -958,6 +933,7 @@ try {
 ```
 
 ### 2. Validate Addresses
+
 ```typescript
 import { isAddress } from 'viem';
 
@@ -967,6 +943,7 @@ function validateAddress(address: string): boolean {
 ```
 
 ### 3. Use Type-Safe Contract Interactions
+
 ```typescript
 // Generate types from ABI using wagmi CLI or manually define
 import { BridgeABI } from '@/config/contracts.config';
@@ -975,11 +952,12 @@ const result = await contractService.readContract<bigint>(
   contractAddress,
   BridgeABI,
   'getBalance',
-  [userAddress]
+  [userAddress],
 );
 ```
 
 ### 4. Handle Account and Chain Changes
+
 ```typescript
 // Always listen for these events
 window.ethereum?.on('accountsChanged', handleAccountsChanged);
@@ -993,13 +971,14 @@ ngOnDestroy() {
 ```
 
 ### 5. Simulate Before Writing
+
 ```typescript
 // Always simulate contract calls before executing
 const { request } = await walletClient.simulateContract({
   address,
   abi,
   functionName,
-  args
+  args,
 });
 
 // Only proceed if simulation succeeds
@@ -1017,21 +996,13 @@ import { ContractService } from './contract.service';
 describe('ContractService', () => {
   it('should read contract successfully', async () => {
     const mockPublicClient = {
-      readContract: vi.fn().mockResolvedValue(BigInt(1000))
+      readContract: vi.fn().mockResolvedValue(BigInt(1000)),
     };
 
     // Inject mock client
-    const service = new ContractService(
-      mockViemService,
-      mockWalletService
-    );
+    const service = new ContractService(mockViemService, mockWalletService);
 
-    const result = await service.readContract(
-      '0x123...',
-      [],
-      'balanceOf',
-      ['0xabc...']
-    );
+    const result = await service.readContract('0x123...', [], 'balanceOf', ['0xabc...']);
 
     expect(result).toBe(BigInt(1000));
   });
@@ -1041,44 +1012,36 @@ describe('ContractService', () => {
 ## Common Patterns
 
 ### Pattern 1: Read-Write-Wait
+
 ```typescript
 // 1. Read current state
-const currentBalance = await contractService.readContract(
-  contractAddress,
-  ABI,
-  'balanceOf',
-  [userAddress]
-);
+const currentBalance = await contractService.readContract(contractAddress, ABI, 'balanceOf', [
+  userAddress,
+]);
 
 // 2. Write transaction
-const hash = await contractService.writeContract(
-  contractAddress,
-  ABI,
-  'transfer',
-  [recipientAddress, amount]
-);
+const hash = await contractService.writeContract(contractAddress, ABI, 'transfer', [
+  recipientAddress,
+  amount,
+]);
 
 // 3. Wait for confirmation
 const receipt = await transactionService.waitForTransaction(hash, chainId);
 
 // 4. Verify new state
-const newBalance = await contractService.readContract(
-  contractAddress,
-  ABI,
-  'balanceOf',
-  [userAddress]
-);
+const newBalance = await contractService.readContract(contractAddress, ABI, 'balanceOf', [
+  userAddress,
+]);
 ```
 
 ### Pattern 2: Approve-Then-Transfer (ERC20)
+
 ```typescript
 // 1. Approve spending
-const approveHash = await contractService.writeContract(
-  tokenAddress,
-  ERC20_ABI,
-  'approve',
-  [spenderAddress, amount]
-);
+const approveHash = await contractService.writeContract(tokenAddress, ERC20_ABI, 'approve', [
+  spenderAddress,
+  amount,
+]);
 
 await transactionService.waitForTransaction(approveHash, chainId);
 
@@ -1087,7 +1050,7 @@ const transferHash = await contractService.writeContract(
   spenderAddress,
   SPENDER_ABI,
   'transferFrom',
-  [ownerAddress, recipientAddress, amount]
+  [ownerAddress, recipientAddress, amount],
 );
 
 await transactionService.waitForTransaction(transferHash, chainId);
@@ -1096,11 +1059,13 @@ await transactionService.waitForTransaction(transferHash, chainId);
 ## Security Considerations
 
 ### 1. Never Expose Private Keys
+
 - Private keys should never be stored in the application
 - Always use wallet providers (MetaMask, etc.)
 - Never log sensitive information
 
 ### 2. Validate All Inputs
+
 ```typescript
 // Validate addresses
 if (!isAddress(address)) {
@@ -1120,15 +1085,18 @@ if (balance < amount) {
 ```
 
 ### 3. Use Proper Gas Limits
+
 - Always estimate gas before transactions
 - Add buffer for gas price fluctuations
 - Handle out-of-gas errors gracefully
 
 ### 4. Implement Rate Limiting
+
 - Limit transaction frequency to prevent spam
 - Implement cooldown periods for sensitive operations
 
 ### 5. Verify Contract Addresses
+
 - Store contract addresses in configuration
 - Verify addresses match expected values
 - Use checksummed addresses
@@ -1156,7 +1124,7 @@ export function toChecksumAddress(address: string): `0x${string}` {
 export function shortenAddress(
   address: string,
   startChars: number = 6,
-  endChars: number = 4
+  endChars: number = 4,
 ): string {
   if (!isAddress(address)) return address;
   return `${address.slice(0, startChars)}...${address.slice(-endChars)}`;
@@ -1182,7 +1150,7 @@ import { formatUnits, parseUnits, formatEther, parseEther } from 'viem';
 export function formatTokenAmount(
   amount: bigint,
   decimals: number = 18,
-  maxDecimals: number = 4
+  maxDecimals: number = 4,
 ): string {
   const formatted = formatUnits(amount, decimals);
   const number = parseFloat(formatted);
@@ -1192,10 +1160,7 @@ export function formatTokenAmount(
 /**
  * Format Ether with proper decimals
  */
-export function formatEtherAmount(
-  amount: bigint,
-  maxDecimals: number = 4
-): string {
+export function formatEtherAmount(amount: bigint, maxDecimals: number = 4): string {
   const formatted = formatEther(amount);
   const number = parseFloat(formatted);
   return number.toFixed(maxDecimals).replace(/\.?0+$/, '');
@@ -1204,10 +1169,7 @@ export function formatEtherAmount(
 /**
  * Parse user input to Wei
  */
-export function parseUserInput(
-  input: string,
-  decimals: number = 18
-): bigint {
+export function parseUserInput(input: string, decimals: number = 18): bigint {
   try {
     return parseUnits(input, decimals);
   } catch (error) {
@@ -1253,6 +1215,7 @@ async checkBalancesAcrossChains(
 ## Performance Optimization
 
 ### 1. Batch Multiple Reads
+
 ```typescript
 import { multicall } from 'viem';
 
@@ -1269,6 +1232,7 @@ async batchReadContracts(calls: any[]) {
 ```
 
 ### 2. Cache Frequently Accessed Data
+
 ```typescript
 private balanceCache = new Map<string, { balance: bigint; timestamp: number }>();
 private readonly CACHE_DURATION = 30000; // 30 seconds
@@ -1288,13 +1252,14 @@ async getCachedBalance(address: string): Promise<bigint> {
 ```
 
 ### 3. Use WebSocket for Real-Time Updates
+
 ```typescript
 import { createPublicClient, webSocket } from 'viem';
 
 // Create WebSocket client for real-time events
 const wsClient = createPublicClient({
   chain: mainnet,
-  transport: webSocket('wss://eth-mainnet.g.alchemy.com/v2/your-api-key')
+  transport: webSocket('wss://eth-mainnet.g.alchemy.com/v2/your-api-key'),
 });
 
 // Watch for events
@@ -1302,33 +1267,39 @@ const unwatch = wsClient.watchContractEvent({
   address: contractAddress,
   abi: CONTRACT_ABI,
   eventName: 'Transfer',
-  onLogs: logs => console.log(logs)
+  onLogs: (logs) => console.log(logs),
 });
 ```
 
 ## Troubleshooting Common Issues
 
 ### Issue 1: Transaction Stuck in Pending
+
 **Solution:** Increase gas price or use "speed up" functionality
+
 ```typescript
 // Speed up transaction by increasing gas
 const newHash = await walletClient.sendTransaction({
   ...originalTx,
   nonce: originalTx.nonce, // Same nonce
-  maxFeePerGas: originalTx.maxFeePerGas * 2n // Double the fee
+  maxFeePerGas: originalTx.maxFeePerGas * 2n, // Double the fee
 });
 ```
 
 ### Issue 2: "Nonce Too Low" Error
+
 **Solution:** Get current nonce and retry
+
 ```typescript
 const nonce = await publicClient.getTransactionCount({
-  address: account.address
+  address: account.address,
 });
 ```
 
 ### Issue 3: Contract Execution Reverted
+
 **Solution:** Check contract requirements and simulate before sending
+
 ```typescript
 // Always simulate first
 try {
@@ -1336,7 +1307,7 @@ try {
     address,
     abi,
     functionName,
-    args
+    args,
   });
 } catch (error) {
   // Handle simulation error before sending transaction

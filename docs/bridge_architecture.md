@@ -5,6 +5,7 @@
 The Conceal Bridge Service is a two-way bridge enabling swaps between native ₡CCX (Conceal Network) and wrapped $wCCX (on Ethereum, BSC, Polygon, Avalanche). The architecture consists of an API backend and an Angular 21 frontend that communicates with it.
 
 **Bridge Direction:**
+
 - **CCX → wCCX:** Wrap native CCX into ERC-20 wCCX tokens
 - **wCCX → CCX:** Unwrap wCCX tokens back to native CCX
 
@@ -132,70 +133,78 @@ export const API_CONFIG = {
     ccxToWccx: {
       init: '/api/ccx/wccx/swap/init',
       estimateGas: '/api/ccx/wccx/estimateGas',
-      status: '/api/ccx/wccx/tx'
+      status: '/api/ccx/wccx/tx',
     },
     // wCCX → CCX
     wccxToCcx: {
       init: '/api/wccx/ccx/swap/init',
       exec: '/api/wccx/ccx/swap/exec',
-      status: '/api/wccx/ccx/tx'
+      status: '/api/wccx/ccx/tx',
     },
     // Balances
     balance: {
       ccx: '/api/balance/ccx',
-      wccx: '/api/balance/wccx'
-    }
-  }
+      wccx: '/api/balance/wccx',
+    },
+  },
 };
 ```
 
 ### CCX → wCCX Endpoints
 
 #### 1. Initialize Swap
+
 **Endpoint:** `POST /api/ccx/wccx/swap/init`
 
 **Request Payload:**
+
 ```typescript
 interface CCXToWCCXInitRequest {
-  email?: string;           // Optional: Email for status updates
-  amount: string;           // Amount of CCX to swap
-  toAddress: string;        // wCCX destination address
-  fromAddress: string;      // CCX source address
-  txfeehash: string;        // ETH/BSC/Polygon gas fee transaction hash
+  email?: string; // Optional: Email for status updates
+  amount: string; // Amount of CCX to swap
+  toAddress: string; // wCCX destination address
+  fromAddress: string; // CCX source address
+  txfeehash: string; // ETH/BSC/Polygon gas fee transaction hash
 }
 ```
 
 **Response:**
+
 ```typescript
 interface CCXToWCCXInitResponse {
   success: boolean;
-  paymentId: string;        // Unique payment ID for tracking
+  paymentId: string; // Unique payment ID for tracking
 }
 ```
 
 #### 2. Estimate Gas
+
 **Endpoint:** `POST /api/ccx/wccx/estimateGas`
 
 **Request Payload:**
+
 ```typescript
 interface EstimateGasRequest {
-  amount: string;           // Amount of CCX to swap
-  address: string;          // wCCX smart contract address
+  amount: string; // Amount of CCX to swap
+  address: string; // wCCX smart contract address
 }
 ```
 
 **Response:**
+
 ```typescript
 interface EstimateGasResponse {
   result: boolean;
-  gas: string;              // Gas amount in wei
+  gas: string; // Gas amount in wei
 }
 ```
 
 #### 3. Get Transaction Status
+
 **Endpoint:** `POST /api/ccx/wccx/tx`
 
 **Request Payload:**
+
 ```typescript
 interface GetTxStatusRequest {
   paymentId: string;
@@ -203,72 +212,83 @@ interface GetTxStatusRequest {
 ```
 
 **Response:**
+
 ```typescript
 interface CCXToWCCXTxResponse {
-  swapped: string;          // Amount swapped
-  address: string;          // Destination address
-  swapHash: string;         // ETH/BSC/Polygon transaction hash
-  depositHash: string;      // CCX blockchain transaction hash
+  swapped: string; // Amount swapped
+  address: string; // Destination address
+  swapHash: string; // ETH/BSC/Polygon transaction hash
+  depositHash: string; // CCX blockchain transaction hash
 }
 ```
 
 #### 4. Get CCX Balance
+
 **Endpoint:** `GET /api/balance/ccx`
 
 **Response:**
+
 ```typescript
 interface BalanceResponse {
   result: boolean;
-  balance: string;          // Available CCX in swap wallet
+  balance: string; // Available CCX in swap wallet
 }
 ```
 
 ### wCCX → CCX Endpoints
 
 #### 1. Initialize Swap
+
 **Endpoint:** `POST /api/wccx/ccx/swap/init`
 
 **Request Payload:**
+
 ```typescript
 interface WCCXToCCXInitRequest {
-  email?: string;           // Optional: Email for status updates
-  toAddress: string;        // CCX destination address
-  fromAddress: string;      // wCCX source address
-  txHash: string;           // ETH/BSC/Polygon deposit transaction hash
+  email?: string; // Optional: Email for status updates
+  toAddress: string; // CCX destination address
+  fromAddress: string; // wCCX source address
+  txHash: string; // ETH/BSC/Polygon deposit transaction hash
 }
 ```
 
 **Response:**
+
 ```typescript
 interface WCCXToCCXInitResponse {
   success: boolean;
-  paymentId: string;        // Unique payment ID for tracking
+  paymentId: string; // Unique payment ID for tracking
 }
 ```
 
 #### 2. Execute Swap
+
 **Endpoint:** `POST /api/wccx/ccx/swap/exec`
 
 **Request Payload:**
+
 ```typescript
 interface ExecuteSwapRequest {
-  email?: string;           // Optional: Email for status updates
-  paymentId: string;        // Payment ID from init
+  email?: string; // Optional: Email for status updates
+  paymentId: string; // Payment ID from init
 }
 ```
 
 **Response:**
+
 ```typescript
 interface ExecuteSwapResponse {
   success: boolean;
-  swapData: SwapData;       // Swap transaction details
+  swapData: SwapData; // Swap transaction details
 }
 ```
 
 #### 3. Get Transaction Status
+
 **Endpoint:** `POST /api/wccx/ccx/tx`
 
 **Request Payload:**
+
 ```typescript
 interface GetTxStatusRequest {
   paymentId: string;
@@ -276,29 +296,32 @@ interface GetTxStatusRequest {
 ```
 
 **Response:**
+
 ```typescript
 interface WCCXToCCXTxResponse {
-  hasRecord: boolean;       // Payment ID found in database
-  result: boolean;          // Transaction finished
-  swapped: string;          // Amount swapped
-  hasExpired: boolean;      // Swap period expired
+  hasRecord: boolean; // Payment ID found in database
+  result: boolean; // Transaction finished
+  swapped: string; // Amount swapped
+  hasExpired: boolean; // Swap period expired
   txdata: {
     swapped: string;
-    address: string;        // CCX destination address
-    swapHash: string;       // CCX blockchain transaction hash
-    depositHash: string;    // ETH/BSC/Polygon transaction hash
+    address: string; // CCX destination address
+    swapHash: string; // CCX blockchain transaction hash
+    depositHash: string; // ETH/BSC/Polygon transaction hash
   };
 }
 ```
 
 #### 4. Get wCCX Balance
+
 **Endpoint:** `GET /api/balance/wccx`
 
 **Response:**
+
 ```typescript
 interface BalanceResponse {
   result: boolean;
-  balance: string;          // Available wCCX in swap wallet
+  balance: string; // Available wCCX in swap wallet
 }
 ```
 
@@ -325,11 +348,11 @@ import {
   WCCXToCCXTxResponse,
   ExecuteSwapRequest,
   ExecuteSwapResponse,
-  BalanceResponse
+  BalanceResponse,
 } from '@/models/api-response.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BridgeApiService {
   private baseUrl = API_CONFIG.baseUrl;
@@ -344,7 +367,7 @@ export class BridgeApiService {
   initCCXToWCCXSwap(request: CCXToWCCXInitRequest): Observable<CCXToWCCXInitResponse> {
     return this.http.post<CCXToWCCXInitResponse>(
       `${this.baseUrl}${API_CONFIG.endpoints.ccxToWccx.init}`,
-      request
+      request,
     );
   }
 
@@ -354,7 +377,7 @@ export class BridgeApiService {
   estimateGas(request: EstimateGasRequest): Observable<EstimateGasResponse> {
     return this.http.post<EstimateGasResponse>(
       `${this.baseUrl}${API_CONFIG.endpoints.ccxToWccx.estimateGas}`,
-      request
+      request,
     );
   }
 
@@ -364,7 +387,7 @@ export class BridgeApiService {
   getCCXToWCCXStatus(paymentId: string): Observable<CCXToWCCXTxResponse> {
     return this.http.post<CCXToWCCXTxResponse>(
       `${this.baseUrl}${API_CONFIG.endpoints.ccxToWccx.status}`,
-      { paymentId }
+      { paymentId },
     );
   }
 
@@ -372,9 +395,7 @@ export class BridgeApiService {
    * Get CCX swap wallet balance
    */
   getCCXBalance(): Observable<BalanceResponse> {
-    return this.http.get<BalanceResponse>(
-      `${this.baseUrl}${API_CONFIG.endpoints.balance.ccx}`
-    );
+    return this.http.get<BalanceResponse>(`${this.baseUrl}${API_CONFIG.endpoints.balance.ccx}`);
   }
 
   // ========== wCCX → CCX APIs ==========
@@ -385,7 +406,7 @@ export class BridgeApiService {
   initWCCXToCCXSwap(request: WCCXToCCXInitRequest): Observable<WCCXToCCXInitResponse> {
     return this.http.post<WCCXToCCXInitResponse>(
       `${this.baseUrl}${API_CONFIG.endpoints.wccxToCcx.init}`,
-      request
+      request,
     );
   }
 
@@ -395,7 +416,7 @@ export class BridgeApiService {
   executeWCCXToCCXSwap(request: ExecuteSwapRequest): Observable<ExecuteSwapResponse> {
     return this.http.post<ExecuteSwapResponse>(
       `${this.baseUrl}${API_CONFIG.endpoints.wccxToCcx.exec}`,
-      request
+      request,
     );
   }
 
@@ -405,7 +426,7 @@ export class BridgeApiService {
   getWCCXToCCXStatus(paymentId: string): Observable<WCCXToCCXTxResponse> {
     return this.http.post<WCCXToCCXTxResponse>(
       `${this.baseUrl}${API_CONFIG.endpoints.wccxToCcx.status}`,
-      { paymentId }
+      { paymentId },
     );
   }
 
@@ -413,9 +434,7 @@ export class BridgeApiService {
    * Get wCCX swap wallet balance
    */
   getWCCXBalance(): Observable<BalanceResponse> {
-    return this.http.get<BalanceResponse>(
-      `${this.baseUrl}${API_CONFIG.endpoints.balance.wccx}`
-    );
+    return this.http.get<BalanceResponse>(`${this.baseUrl}${API_CONFIG.endpoints.balance.wccx}`);
   }
 }
 ```
@@ -431,22 +450,18 @@ import { BridgeApiService } from './bridge-api.service';
 import { BridgeStateService } from './bridge-state.service';
 import { WalletService } from '../web3/wallet.service';
 import { ContractService } from '../web3/contract.service';
-import { 
-  SwapDirection, 
-  SwapTransaction,
-  SwapStatus 
-} from '@/models/swap.model';
+import { SwapDirection, SwapTransaction, SwapStatus } from '@/models/swap.model';
 import { parseEther } from 'viem';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BridgeService {
   constructor(
     private apiService: BridgeApiService,
     private stateService: BridgeStateService,
     private walletService: WalletService,
-    private contractService: ContractService
+    private contractService: ContractService,
   ) {}
 
   /**
@@ -456,7 +471,7 @@ export class BridgeService {
     amount: string,
     fromAddress: string,
     toAddress: string,
-    email?: string
+    email?: string,
   ): Promise<SwapTransaction> {
     try {
       // 1. Validate inputs
@@ -477,7 +492,7 @@ export class BridgeService {
         fromAddress,
         toAddress,
         txfeehash: gasFeeHash,
-        email
+        email,
       });
 
       // 6. Create swap transaction record
@@ -489,7 +504,7 @@ export class BridgeService {
         toAddress,
         status: SwapStatus.Initialized,
         gasFeeHash,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       // 7. Save to state
@@ -509,7 +524,7 @@ export class BridgeService {
     amount: string,
     fromAddress: string,
     toAddress: string,
-    email?: string
+    email?: string,
   ): Promise<SwapTransaction> {
     try {
       // 1. Validate inputs
@@ -526,7 +541,7 @@ export class BridgeService {
         toAddress,
         fromAddress,
         txHash: depositHash,
-        email
+        email,
       });
 
       // 5. Create swap transaction record
@@ -538,7 +553,7 @@ export class BridgeService {
         toAddress,
         status: SwapStatus.Initialized,
         depositHash,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       // 6. Save to state
@@ -558,14 +573,13 @@ export class BridgeService {
   /**
    * Estimate gas for wrapping
    */
-  private async estimateWrapGas(
-    amount: string,
-    contractAddress: string
-  ): Promise<string> {
-    const response = await this.apiService.estimateGas({
-      amount,
-      address: contractAddress
-    }).toPromise();
+  private async estimateWrapGas(amount: string, contractAddress: string): Promise<string> {
+    const response = await this.apiService
+      .estimateGas({
+        amount,
+        address: contractAddress,
+      })
+      .toPromise();
 
     if (!response?.result) {
       throw new Error('Failed to estimate gas');
@@ -589,7 +603,7 @@ export class BridgeService {
     const hash = await walletClient.sendTransaction({
       account,
       to: this.getBridgeGasAddress(),
-      value: BigInt(gasAmount)
+      value: BigInt(gasAmount),
     });
 
     return hash;
@@ -601,13 +615,13 @@ export class BridgeService {
   private async depositWCCX(amount: string): Promise<string> {
     const amountInWei = parseEther(amount);
     const bridgeContract = this.getBridgeContractAddress();
-    
+
     // Transfer wCCX to bridge contract
     const hash = await this.contractService.writeContract(
       this.getWCCXContractAddress(),
       this.getWCCXABI(),
       'transfer',
-      [bridgeContract, amountInWei]
+      [bridgeContract, amountInWei],
     );
 
     return hash;
@@ -630,7 +644,7 @@ export class BridgeService {
       this.getWCCXContractAddress(),
       this.getWCCXABI(),
       'allowance',
-      [account.address, bridgeContract]
+      [account.address, bridgeContract],
     );
 
     // Approve if needed
@@ -639,7 +653,7 @@ export class BridgeService {
         this.getWCCXContractAddress(),
         this.getWCCXABI(),
         'approve',
-        [bridgeContract, amountInWei]
+        [bridgeContract, amountInWei],
       );
     }
   }
@@ -662,29 +676,25 @@ export class BridgeService {
    * Execute wCCX to CCX swap
    */
   async executeSwap(paymentId: string, email?: string): Promise<void> {
-    const response = await this.apiService.executeWCCXToCCXSwap({
-      paymentId,
-      email
-    }).toPromise();
+    const response = await this.apiService
+      .executeWCCXToCCXSwap({
+        paymentId,
+        email,
+      })
+      .toPromise();
 
     if (!response?.success) {
       throw new Error('Failed to execute swap');
     }
 
     // Update transaction status
-    this.stateService.updateTransactionStatus(
-      paymentId,
-      SwapStatus.Executing
-    );
+    this.stateService.updateTransactionStatus(paymentId, SwapStatus.Executing);
   }
 
   /**
    * Get transaction status (polling)
    */
-  getTransactionStatus(
-    paymentId: string,
-    direction: SwapDirection
-  ): Observable<any> {
+  getTransactionStatus(paymentId: string, direction: SwapDirection): Observable<any> {
     if (direction === SwapDirection.CCXToWCCX) {
       return this.apiService.getCCXToWCCXStatus(paymentId);
     } else {
@@ -714,22 +724,14 @@ export class BridgeService {
     return []; // ERC-20 ABI
   }
 
-  private validateWrapInputs(
-    amount: string,
-    fromAddress: string,
-    toAddress: string
-  ): void {
+  private validateWrapInputs(amount: string, fromAddress: string, toAddress: string): void {
     if (!amount || parseFloat(amount) <= 0) {
       throw new Error('Invalid amount');
     }
     // Add more validation
   }
 
-  private validateUnwrapInputs(
-    amount: string,
-    fromAddress: string,
-    toAddress: string
-  ): void {
+  private validateUnwrapInputs(amount: string, fromAddress: string, toAddress: string): void {
     if (!amount || parseFloat(amount) <= 0) {
       throw new Error('Invalid amount');
     }
@@ -748,12 +750,10 @@ import { BehaviorSubject, Observable, interval } from 'rxjs';
 import { SwapTransaction, SwapStatus } from '@/models/swap.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BridgeStateService {
-  private transactions$ = new BehaviorSubject<Map<string, SwapTransaction>>(
-    new Map()
-  );
+  private transactions$ = new BehaviorSubject<Map<string, SwapTransaction>>(new Map());
   private activeTransaction$ = new BehaviorSubject<SwapTransaction | null>(null);
 
   /**
@@ -803,11 +803,7 @@ export class BridgeStateService {
   /**
    * Update transaction with hashes
    */
-  updateTransactionHashes(
-    paymentId: string,
-    depositHash?: string,
-    swapHash?: string
-  ): void {
+  updateTransactionHashes(paymentId: string, depositHash?: string, swapHash?: string): void {
     const transactions = this.transactions$.value;
     const transaction = transactions.get(paymentId);
 
@@ -846,7 +842,7 @@ export class BridgeStateService {
 ```typescript
 export enum SwapDirection {
   CCXToWCCX = 'CCX_TO_WCCX',
-  WCCXToCCX = 'WCCX_TO_CCX'
+  WCCXToCCX = 'WCCX_TO_CCX',
 }
 
 export enum SwapStatus {
@@ -856,7 +852,7 @@ export enum SwapStatus {
   Executing = 'executing',
   Completed = 'completed',
   Failed = 'failed',
-  Expired = 'expired'
+  Expired = 'expired',
 }
 
 export interface SwapTransaction {
@@ -890,7 +886,7 @@ import { BridgeStateService } from './bridge-state.service';
 import { SwapDirection, SwapStatus } from '@/models/swap.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BridgeTransactionService {
   private pollingInterval = 5000; // 5 seconds
@@ -898,7 +894,7 @@ export class BridgeTransactionService {
 
   constructor(
     private apiService: BridgeApiService,
-    private stateService: BridgeStateService
+    private stateService: BridgeStateService,
   ) {}
 
   /**
@@ -912,7 +908,7 @@ export class BridgeTransactionService {
         takeWhile(() => {
           const transaction = this.stateService.getTransaction(paymentId);
           const elapsed = Date.now() - startTime;
-          
+
           // Stop if completed, failed, or max duration exceeded
           return (
             transaction?.status !== SwapStatus.Completed &&
@@ -927,18 +923,15 @@ export class BridgeTransactionService {
             return this.apiService.getWCCXToCCXStatus(paymentId);
           }
         }),
-        tap(response => {
+        tap((response) => {
           this.updateTransactionFromResponse(paymentId, response, direction);
-        })
+        }),
       )
       .subscribe({
         error: (error) => {
           console.error('Polling error:', error);
-          this.stateService.updateTransactionStatus(
-            paymentId,
-            SwapStatus.Failed
-          );
-        }
+          this.stateService.updateTransactionStatus(paymentId, SwapStatus.Failed);
+        },
       });
   }
 
@@ -948,7 +941,7 @@ export class BridgeTransactionService {
   private updateTransactionFromResponse(
     paymentId: string,
     response: any,
-    direction: SwapDirection
+    direction: SwapDirection,
   ): void {
     if (direction === SwapDirection.CCXToWCCX) {
       // CCX to wCCX response
@@ -956,20 +949,14 @@ export class BridgeTransactionService {
         this.stateService.updateTransactionHashes(
           paymentId,
           response.depositHash,
-          response.swapHash
+          response.swapHash,
         );
-        this.stateService.updateTransactionStatus(
-          paymentId,
-          SwapStatus.Completed
-        );
+        this.stateService.updateTransactionStatus(paymentId, SwapStatus.Completed);
       }
     } else {
       // wCCX to CCX response
       if (response.hasExpired) {
-        this.stateService.updateTransactionStatus(
-          paymentId,
-          SwapStatus.Expired
-        );
+        this.stateService.updateTransactionStatus(paymentId, SwapStatus.Expired);
       } else if (response.result && response.txdata) {
         // ...update local state from response.txdata...
       }

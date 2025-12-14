@@ -51,5 +51,3 @@ export interface BridgeSwapStateResponse {
     depositHash: string;
   };
 }
-
-

@@ -60,6 +60,7 @@ This spec assumes (1) initially because it aligns with the current architecture 
 > Exact naming may differ; the goal is to define the minimum needed primitives.
 
 ### A) Quote endpoint
+
 - `POST /{network}/api/evm/evm/quote`
 - Request:
   - `fromChainId`, `toChainId`
@@ -75,6 +76,7 @@ This spec assumes (1) initially because it aligns with the current architecture 
   - optional: transaction request template (to be signed)
 
 ### B) Execute endpoint
+
 - `POST /{network}/api/evm/evm/exec`
 - Request:
   - `quoteId`
@@ -85,6 +87,7 @@ This spec assumes (1) initially because it aligns with the current architecture 
   - `paymentId` (or similar stable tracking id)
 
 ### C) Status endpoint (polling)
+
 - `POST /{network}/api/evm/evm/tx`
 - Request:
   - `paymentId`

@@ -3,6 +3,7 @@
 This guide defines **how the AI agent should handle and present errors** across the conceal Bridge UX application, based on the project’s current architecture and patterns.
 
 Core code references:
+
 - HTTP service: [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13)
 - Wallet/EVM integration: [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:34)
 - Main swap flow + UI error signals: [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:400)
@@ -30,6 +31,7 @@ When an error happens, the app must:
 ## 2) Current UI conventions in this project
 
 ### 2.1 Route-blocking vs step-level messages
+
 The swap page uses two message channels:
 
 - **Blocking, page-wide error**: [`pageError`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:445)
@@ -42,11 +44,14 @@ The swap page uses two message channels:
 **Rule:** prefer `pageError` only when the user cannot proceed at all. For everything else, use `statusMessage`.
 
 ### 2.2 Busy state rules
+
 Swap flows gate actions via [`isBusy`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:439). When an error happens:
+
 - Always set busy to false (see [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:715) and [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:840)).
 - Do not advance [`step`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:438) unless the step completed successfully.
 
 ### 2.3 Polling is cancelable and should remain so
+
 Polling is implemented with [`rxjs.timer()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:846) and stops on navigation via [`takeUntilDestroyed()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:855).
 
 **Rule:** never introduce polling that cannot be canceled (must keep a `DestroyRef`-bound cancellation path like [`takeUntilDestroyed()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:855)).
@@ -73,6 +78,7 @@ This project has **three major error planes**:
    - Example messages: “Invalid amount.” / “Invalid EVM address.” in [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:618)
 
 Additionally, this project includes “soft failures” that should not hard-fail the app:
+
 - Wallet hydration ignores failures (see swallowing errors in [`EvmWalletService.hydrate()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:114))
 - Chain metadata loads ignore failures (see [`rxjs.catchError()`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:44))
 
@@ -81,6 +87,7 @@ Additionally, this project includes “soft failures” that should not hard-fai
 ## 4) User-facing message guidelines (copy + tone)
 
 ### 4.1 General rules
+
 - **Be specific and actionable**:
   - “Could not reach the bridge server. Check your connection and try again.”
   - “Wallet request already pending. Open your wallet and complete or reject the request.”
@@ -92,6 +99,7 @@ Additionally, this project includes “soft failures” that should not hard-fai
   - Never echo private keys, seeds, walletconnect secrets, etc. (project has `walletConnectProjectId` in [`APP_CONFIG`](conceal-bridge-ux/src/app/core/app-config.ts:17); still treat runtime config as potentially sensitive in logs).
 
 ### 4.2 Message placement rules
+
 - Use [`pageError`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:445) only for:
   - missing/invalid route params (“Unknown swap direction.” exists already in [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:533))
   - config load failure that makes swap unusable (current pattern in [`rxjs.catchError()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:490))
@@ -104,27 +112,33 @@ Additionally, this project includes “soft failures” that should not hard-fai
 ## 5) Wallet/provider error handling (EVM)
 
 ### 5.1 Canonical provider error codes to recognize
+
 These appear in the current codebase and should remain consistent:
 
-| Scenario | Code / detection | What to show | Where it appears |
-|---|---:|---|---|
-| User rejected a wallet request | `code === 4001` | “Request was cancelled in your wallet.” | [`SwapPage.addTokenToWallet()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:560), [`WalletButtonComponent.friendlyError()`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466) |
-| Wallet request already pending | `code === -32002` | “A wallet request is already pending. Please open your wallet.” | [`HomePage.switchWalletToSelectedNetwork()`](conceal-bridge-ux/src/app/pages/home/home.page.ts:411), [`WalletButtonComponent.friendlyError()`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466) |
-| Chain not added to wallet (MetaMask common) | `code === 4902` | Automatically add chain and retry switch | [`EvmWalletService.ensureChain()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:213) |
+| Scenario                                    |  Code / detection | What to show                                                    | Where it appears                                                                                                                                                                                                       |
+| ------------------------------------------- | ----------------: | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| User rejected a wallet request              |   `code === 4001` | “Request was cancelled in your wallet.”                         | [`SwapPage.addTokenToWallet()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:560), [`WalletButtonComponent.friendlyError()`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466)              |
+| Wallet request already pending              | `code === -32002` | “A wallet request is already pending. Please open your wallet.” | [`HomePage.switchWalletToSelectedNetwork()`](conceal-bridge-ux/src/app/pages/home/home.page.ts:411), [`WalletButtonComponent.friendlyError()`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466) |
+| Chain not added to wallet (MetaMask common) |   `code === 4902` | Automatically add chain and retry switch                        | [`EvmWalletService.ensureChain()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:213)                                                                                                                           |
 
 ### 5.2 Wallet connect UX rules
+
 Wallet connect UI uses a local error signal [`WalletButtonComponent.error`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:317) and maps errors with [`WalletButtonComponent.friendlyError()`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466).
 
 **Rules for agent changes:**
+
 - Reuse and extend [`WalletButtonComponent.friendlyError()`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466) rather than inventing new wording in multiple places.
 - Treat `4001` as **non-fatal** (user canceled): show a calm message and keep UI usable.
 
 ### 5.3 Transaction submission + confirmation rules
+
 Swap flows use:
+
 - sending native tx: [`EvmWalletService.sendNativeTransaction()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:245)
 - waiting for confirmations: [`EvmWalletService.waitForReceipt()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:265)
 
 **Rules:**
+
 - If send fails:
   - show a wallet-focused message (“Transaction rejected”, “Insufficient funds for gas”, etc.)
   - do not proceed to backend init
@@ -137,13 +151,16 @@ Swap flows use:
 ## 6) Backend/API error handling (HTTP + payload)
 
 ### 6.1 Know the two layers of “success”
+
 Backend calls can fail in two ways:
 
-1) **HTTP-level failure** (network issues, 5xx, 4xx)
+1. **HTTP-level failure** (network issues, 5xx, 4xx)
+
 - Calls are made via [`HttpClient`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:1)
 - There is no interceptor today (see [`provideHttpClient()`](conceal-bridge-ux/src/app/app.config.ts:10)), so pages often do local [`rxjs.catchError()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:490).
 
-2) **Payload-level failure** (HTTP 200 but success flag false)
+2. **Payload-level failure** (HTTP 200 but success flag false)
+
 - Example:
   - Init: check [`BridgeInitSwapResponse.success`](conceal-bridge-ux/src/app/core/bridge-types.ts:40) and use [`BridgeInitSwapResponse.error`](conceal-bridge-ux/src/app/core/bridge-types.ts:42)
   - In practice: swap init throws on `!init.success` in [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:704) and [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:822)
@@ -151,6 +168,7 @@ Backend calls can fail in two ways:
 **Rule:** always check payload success flags; do not assume HTTP 200 means “success”.
 
 ### 6.2 Retry policy (safety first)
+
 Follow the constraints in [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:63):
 
 - **Do retry** idempotent operations:
@@ -162,9 +180,11 @@ Follow the constraints in [`http_and_error_handling.md`](conceal-bridge-ux/ai_sp
 Reason: retrying non-idempotent actions can cause double processing.
 
 ### 6.3 Timeout policy
+
 There is no global timeout currently (no interceptors beyond [`provideHttpClient()`](conceal-bridge-ux/src/app/app.config.ts:10)).
 
 **Rule for agent changes:** if you add timeouts, keep them:
+
 - longer for init/exec
 - shorter for polling/status
 - consistent across the app (prefer centralizing per [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:71))
@@ -174,12 +194,14 @@ There is no global timeout currently (no interceptors beyond [`provideHttpClient
 ## 7) Polling & transient failures (swap state)
 
 Polling uses:
+
 - [`SwapPage.startPolling()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:845)
 - a 10s interval via [`rxjs.timer()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:846)
 - suppression of transient errors by converting them to `{ result: false }` via [`rxjs.catchError()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:850)
 - completion via [`rxjs.take(1)`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:854)
 
 **Rules:**
+
 - Transient polling failures should not flip the UI into a “failed” state immediately.
 - However, repeated failures should become visible to the user:
   - after N consecutive failed polls, set a gentle `statusMessage` like:
@@ -194,18 +216,23 @@ Polling uses:
 There are two distinct “insufficient funds” classes in this app:
 
 ### 8.1 Bridge liquidity shortage (backend-side/bridge-side)
+
 This is checked in the UI using balances fetched from backend:
+
 - CCX→EVM (needs wCCX liquidity): message in [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:629)
 - EVM→CCX (needs CCX liquidity): message in [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:751)
 
 **Rule:** keep this message user-friendly and not blame the user. It’s not their wallet balance.
 
 ### 8.2 User wallet/token shortage (user-side)
+
 For EVM→CCX, the app checks user’s wCCX balance using:
+
 - reading contract balance via [`publicClient.readContract()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:782)
 - and throws “Insufficient wCCX balance…” in [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:789)
 
 For CCX→EVM, the user must pay gas; “insufficient funds for gas” often comes from the wallet/provider error message. Prefer mapping to a friendly message:
+
 - “Not enough ETH/BNB/MATIC to pay gas fees on this network.”
 
 **Rule:** distinguish bridge liquidity vs user wallet balance in messaging, because the next action differs.

@@ -1,7 +1,9 @@
 # Context for — Smart Contracts / On-chain Verification (wCCX ERC-20)
+
 > Purpose: load the minimum context for changes involving wCCX contract interactions, tx validation rules, units/decimals, and chain/provider consistency.
 
 ## Key rules (read this before coding)
+
 - This bridge is **backend-orchestrated**; on-chain logic is a **standard ERC-20 (wCCX)** plus native transfers for fees.
 - **Do not hardcode contract addresses** in frontend logic; consume addresses via backend-provided chain config and validate them.
 - **Provider IDs must stay consistent** across backend config and frontend network keys.

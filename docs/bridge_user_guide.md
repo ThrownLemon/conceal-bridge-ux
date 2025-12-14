@@ -18,12 +18,14 @@ $wCCX is a tokenized version of $CCX on another blockchain. Its value is always 
 Before you begin, ensure you have the following:
 
 ### 1. MetaMask Wallet
+
 You must have the MetaMask browser extension installed and properly configured.
 
 - **Download MetaMask:** https://metamask.io/
 - For help with installation or DApp interactions, visit the MetaMask FAQ
 
 ### 2. Conceal Wallet
+
 You need a Conceal Wallet to hold your $CCX. Any official Conceal Wallet will work.
 
 - **Download a Conceal Wallet:** https://conceal.network/#wallets
@@ -33,6 +35,7 @@ You need a Conceal Wallet to hold your $CCX. Any official Conceal Wallet will wo
 **$CCX:** You must have the $CCX you wish to bridge in your Conceal Wallet
 
 **$ETH (or native gas token):** Your MetaMask wallet must contain enough of the native token to pay for network transaction fees (gas):
+
 - Ethereum: $ETH
 - Binance Smart Chain: $BNB
 - Polygon: $MATIC
@@ -43,9 +46,11 @@ You need a Conceal Wallet to hold your $CCX. Any official Conceal Wallet will wo
 For a smooth experience, configure your MetaMask wallet before you start.
 
 ### Step 1: Backup Your Wallet
+
 Upon installation, securely back up your MetaMask wallet using the provided Secret Recovery Phrase. This is critical for securing your funds.
 
 ### Step 2: Rename Your Account (Optional but Recommended)
+
 To easily identify your wallet, consider renaming it:
 
 1. Click the three dots next to your account name
@@ -54,6 +59,7 @@ To easily identify your wallet, consider renaming it:
 4. This helps distinguish it from other accounts you may use for different networks
 
 ### Step 3: Fund Your Wallet
+
 Purchase and transfer enough of the native gas token (ETH, BNB, MATIC, or AVAX) to your MetaMask wallet to cover gas fees for your transactions.
 
 ## How to Bridge $CCX to $wCCX
@@ -121,38 +127,47 @@ The process for converting your $wCCX back to native $CCX is nearly identical:
 ## Important Tips
 
 ### Transaction Processing Time
+
 - **Conceal Network confirmations:** 5-10 minutes
 - **Destination network confirmations:** Varies by network (typically 1-5 minutes)
 - Keep the browser window open during the process
 
 ### Gas Fees
+
 - Always ensure you have enough native tokens for gas fees
 - Gas fees vary based on network congestion
 - Budget extra for unexpected price fluctuations
 
 ### Do Not Speed Up Transactions
+
 Once you've confirmed a transaction in MetaMask, do not use the "speed up" feature, as this can cause the bridge transaction to fail.
 
 ### Verify Contract Addresses
+
 Always verify you're using the correct contract addresses:
+
 - **Ethereum:** `0x21686f8ce003a95c99acd297e302faacf742f7d4`
 - **BSC:** `0x988c11625472340b7B36FF1534893780E0d8d841`
 - **Polygon:** `0x137Ee749f0F8c2eD34cA00dE33BB59E3dafA494A`
 
 ### Payment ID is Required
+
 When sending $CCX to the bridge, always include the Payment ID provided by the bridge. Transactions without the correct Payment ID may be lost.
 
 ## Troubleshooting
 
 ### My $wCCX doesn't appear in MetaMask
+
 Make sure you've added the custom token using the correct contract address for your network.
 
 ### My transaction is taking longer than expected
+
 - Check the Conceal Network explorer to verify your transaction was sent with the correct Payment ID
 - Network congestion can cause delays on both the Conceal Network and destination network
 - Keep the bridge page open until confirmation
 
 ### I accidentally closed the bridge page
+
 - If you sent the $CCX with the correct Payment ID, the transaction should still process
 - Contact Conceal support with your transaction details if you have concerns
 

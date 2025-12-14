@@ -15,6 +15,7 @@ The project uses **GitHub Actions** for automated testing, building, and deploym
 ### Triggers
 
 The workflow runs automatically on:
+
 - **Push to `main` branch** — Automatically deploys to production
 - **Manual workflow dispatch** — Can be triggered manually from the GitHub Actions tab
 
@@ -23,6 +24,7 @@ The workflow runs automatically on:
 The workflow has two separate jobs for better organization and security:
 
 #### Job 1: Build
+
 1. **Checkout** - Uses `actions/checkout@v4` to check out the repository code
 2. **Setup Node.js** - Uses `actions/setup-node@v4` with Node.js 20 and npm caching
 3. **Install Dependencies** - Runs `npm ci` for deterministic builds
@@ -32,12 +34,14 @@ The workflow has two separate jobs for better organization and security:
 7. **Upload Artifact** - Uploads the build output using `actions/upload-pages-artifact@v3`
 
 #### Job 2: Deploy
+
 1. **Deploy to GitHub Pages** - Uses `actions/deploy-pages@v4` to deploy the artifact
    - Runs after the build job completes successfully
    - Uses the `github-pages` environment
    - Outputs the deployment URL
 
 This two-job structure provides:
+
 - ✅ Better separation of concerns
 - ✅ Clearer logs and debugging
 - ✅ Ability to retry deployment without rebuilding
@@ -46,6 +50,7 @@ This two-job structure provides:
 ### Permissions
 
 The workflow requires the following permissions:
+
 - `contents: read` — Read repository contents
 - `pages: write` — Write to GitHub Pages
 - `id-token: write` — Required for GitHub Pages deployment
@@ -54,7 +59,7 @@ The workflow requires the following permissions:
 
 ```yaml
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 ```
 
@@ -63,6 +68,7 @@ This ensures that only one deployment runs at a time, preventing race conditions
 ## Environment Variables
 
 The workflow uses:
+
 - `GITHUB_TOKEN` — Automatically provided by GitHub Actions for authentication
 
 No additional secrets are required for the current setup.
@@ -95,6 +101,7 @@ No additional secrets are required for the current setup.
 ### Build Status
 
 The workflow status is visible:
+
 - On the repository homepage (badge can be added)
 - In the Actions tab
 - In pull requests (if configured)
@@ -102,6 +109,7 @@ The workflow status is visible:
 ### Notifications
 
 GitHub sends notifications for:
+
 - Failed workflow runs (via email/GitHub notifications)
 - Successful deployments (optional, can be configured)
 
@@ -110,17 +118,20 @@ GitHub sends notifications for:
 ### Build Fails
 
 **Check:**
+
 1. Review the workflow logs in the Actions tab
 2. Look for test failures in the "Run tests" step
 3. Check for build errors in the "Build production bundle" step
 
 **Common causes:**
+
 - Test failures
 - TypeScript compilation errors
 - Missing dependencies
 
 **Solution:**
 Run locally to reproduce:
+
 ```bash
 npm ci
 npm run test
@@ -130,16 +141,19 @@ npm run build
 ### Deployment Fails
 
 **Check:**
+
 1. Review the "Deploy to GitHub Pages" step logs
 2. Verify GitHub Pages is enabled in repository settings
 3. Check that the `gh-pages` branch exists
 
 **Common causes:**
+
 - Insufficient permissions
 - GitHub Pages not enabled
 - Repository visibility (must be public for free GitHub Pages)
 
 **Solution:**
+
 1. Ensure repository **Settings > Pages** is configured
 2. Verify the workflow has `pages: write` permission
 3. Check that the repository is public (or you have GitHub Pro/Enterprise)
@@ -147,11 +161,13 @@ npm run build
 ### Tests Fail in CI but Pass Locally
 
 **Possible causes:**
+
 - Environment differences
 - Timing issues in tests
 - Missing environment variables
 
 **Solution:**
+
 1. Run tests with the same flags as CI: `npm run test -- --run`
 2. Check for hardcoded paths or environment-specific code
 3. Review test logs in the Actions tab
@@ -218,7 +234,7 @@ on:
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -271,6 +287,7 @@ This fails the build if high-severity vulnerabilities are found.
 ### GITHUB_TOKEN Permissions
 
 The workflow uses the automatically provided `GITHUB_TOKEN`. This token:
+
 - Has limited permissions (only what's specified in the workflow)
 - Expires after the workflow run
 - Cannot access other repositories
@@ -298,13 +315,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - # ... test steps
-  
+      -  # ... test steps
+
   build:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - # ... build and deploy steps
+      -  # ... build and deploy steps
 ```
 
 This runs tests and builds in sequence but allows for future parallelization.
@@ -314,6 +331,7 @@ This runs tests and builds in sequence but allows for future parallelization.
 ### Build Time
 
 Monitor workflow execution time in the Actions tab. Typical times:
+
 - Install dependencies: ~30-60 seconds (with cache)
 - Run tests: ~10-30 seconds
 - Build: ~20-40 seconds
@@ -324,6 +342,7 @@ Monitor workflow execution time in the Actions tab. Typical times:
 ### Success Rate
 
 Track deployment success rate over time. If failures increase:
+
 1. Review recent changes
 2. Check for flaky tests
 3. Verify external dependencies (npm registry, GitHub Pages)
@@ -349,6 +368,7 @@ Track deployment success rate over time. If failures increase:
 ### Alternative CI/CD Platforms
 
 While GitHub Actions is the current choice, the app can be deployed via:
+
 - **GitLab CI** (`.gitlab-ci.yml`)
 - **CircleCI** (`.circleci/config.yml`)
 - **Travis CI** (`.travis.yml`)

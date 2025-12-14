@@ -1,7 +1,9 @@
 # Context for — Wallets / Web3 (Viem + Injected)
+
 > Purpose: load the minimum context to safely change wallet connection UX, provider handling, chain switching, and on-chain tx flows.
 
 ## Key rules (read this before coding)
+
 - **Never handle secrets** (no private keys / seed phrases; never log them).
 - **Hydration must not prompt** (startup uses silent account/chain checks; do not add wallet permission prompts during hydration).
 - **Preserve disconnect semantics** (the “user disconnected” localStorage flag prevents surprise reconnects).

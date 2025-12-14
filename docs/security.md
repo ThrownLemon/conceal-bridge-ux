@@ -3,6 +3,7 @@
 This guide defines **security requirements and safe implementation rules** for the conceal Bridge UX frontend. It is written to inform AI-assisted changes so features remain safe-by-default.
 
 Core references in this repo:
+
 - Swap flow + validations: [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:400)
 - Wallet integration: [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:34)
 - Wallet UI: [`WalletButtonComponent`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:309)
@@ -22,6 +23,7 @@ The frontend must assume:
 - Backend data is **not inherently trustworthy** (it can be misconfigured or attacked). Treat it as untrusted input even if it’s “our” backend.
 
 We mainly defend user funds and user privacy by:
+
 - validating inputs
 - minimizing signing surface
 - preventing unsafe retries / double actions
@@ -53,14 +55,17 @@ We mainly defend user funds and user privacy by:
 ## 3) Input validation (addresses, amounts, config-derived values)
 
 ### 3.1 User-provided addresses
+
 Current patterns:
+
 - CCX address: validated via [`CCX_ADDRESS_RE`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:19) and [`Validators.pattern()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:449)
 - EVM address: validated via [`isAddress()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:9) and [`Validators.pattern()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:453)
 
 Rules:
+
 - Always validate addresses at **two layers**:
-  1) form validation (Angular validators) and
-  2) runtime checks before use (see runtime checks in [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:637) and [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:759)).
+  1. form validation (Angular validators) and
+  2. runtime checks before use (see runtime checks in [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:637) and [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:759)).
 - Never “auto-correct” CCX addresses. If invalid, fail with a clear message and require user correction.
 - For EVM addresses, prefer strict viem validation via [`isAddress()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:9) prior to:
   - backend init calls
@@ -68,24 +73,30 @@ Rules:
   - token watch/add operations
 
 ### 3.2 Amount validation (numeric parsing, bounds, decimals)
+
 Current rules already implemented:
+
 - numeric input is parsed and checked: [`Number.parseFloat()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:618)
 - bounds are enforced via backend config: [`BridgeChainConfig.common.minSwapAmount`](conceal-bridge-ux/src/app/core/bridge-types.ts:10) / [`BridgeChainConfig.common.maxSwapAmount`](conceal-bridge-ux/src/app/core/bridge-types.ts:10)
 - token decimals are inferred from config “units”: [`inferDecimalsFromUnits()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:30)
 
 Rules:
+
 - Keep min/max enforcement aligned to [`BridgeChainConfig.common`](conceal-bridge-ux/src/app/core/bridge-types.ts:9).
 - Do not accept NaN, infinity, negative, or zero.
 - When converting to on-chain units, always use config-derived decimals/units (example: [`parseUnits()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:779)).
 - Avoid floating-point arithmetic for on-chain values; only parse floats for UI input, then convert via [`parseUnits()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:779) or [`parseEther()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:9).
 
 ### 3.3 Config-derived values are untrusted input
+
 The frontend receives chain config from the backend via [`BridgeApiService.getChainConfig()`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:26). This config includes:
+
 - contract addresses: [`BridgeChainConfig.wccx.contractAddress`](conceal-bridge-ux/src/app/core/bridge-types.ts:18)
 - bridge recipient addresses: [`BridgeChainConfig.wccx.accountAddress`](conceal-bridge-ux/src/app/core/bridge-types.ts:15)
 - chainId: [`BridgeChainConfig.wccx.chainId`](conceal-bridge-ux/src/app/core/bridge-types.ts:16)
 
 Rules:
+
 - Before using config addresses in wallet operations, validate them with viem address checks:
   - Example of validating a config address already exists: [`isAddress()` check for `bridgeEvmAccount`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:672).
 - If config is missing or invalid, treat it as a page-blocking issue and fail safe (see how config load errors set [`pageError`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:445)).
@@ -95,11 +106,14 @@ Rules:
 ## 4) Transaction signing & on-chain interactions (EVM)
 
 ### 4.1 Never sign arbitrary data by default
+
 This app’s primary actions are:
+
 - send a native transfer for gas fee payment: [`EvmWalletService.sendNativeTransaction()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:245)
 - transfer ERC-20 wCCX: [`walletClient.writeContract()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:794)
 
 Rules:
+
 - Do not introduce “sign message” authentication or typed-data signing unless explicitly required and reviewed.
 - If you must add signing, scope it tightly and document:
   - exact message format
@@ -107,19 +121,25 @@ Rules:
   - how the backend verifies it
 
 ### 4.2 Chain safety (network switching)
+
 Before any transaction, ensure the wallet is on the correct chain:
+
 - the project uses [`EvmWalletService.ensureChain()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:205) in swap flows.
 
 Rules:
+
 - Always call [`EvmWalletService.ensureChain()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:205) using the chain from [`EVM_NETWORKS`](conceal-bridge-ux/src/app/core/evm-networks.ts:11) before sending txs or contract writes.
 - Handle chain-add behavior safely (MetaMask missing chain code `4902` is already handled in [`EvmWalletService.ensureChain()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:213)).
 
 ### 4.3 Confirmation and finality
+
 The swap uses confirmation waiting:
+
 - [`EvmWalletService.waitForReceipt()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:265)
 - configured confirmations: [`BridgeChainConfig.wccx.confirmations`](conceal-bridge-ux/src/app/core/bridge-types.ts:17)
 
 Rules:
+
 - Never treat “transaction hash returned” as final.
 - Wait for configured confirmations before calling backend init/exec endpoints (current pattern in [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:686) and [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:804)).
 
@@ -128,7 +148,9 @@ Rules:
 ## 5) Secrets & storage rules
 
 ### 5.1 Private keys / seed phrases
+
 Absolute rules:
+
 - Never ask for or accept seed phrases or private keys in UI or logs.
 - Never store secrets in:
   - local storage
@@ -139,20 +161,26 @@ Absolute rules:
 Wallet connection uses providers; any wallet secrets remain inside the wallet.
 
 ### 5.2 Local storage usage must remain non-sensitive
+
 The app stores a single non-sensitive flag:
+
 - [`EvmWalletService.DISCONNECTED_STORAGE_KEY`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:38)
 - reads via [`window.localStorage.getItem()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:392)
 - writes via [`window.localStorage.setItem()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:402)
 
 Rules:
+
 - Never store wallet addresses, tx hashes, payment IDs, emails, or amounts in storage unless there’s a strong product requirement and it’s reviewed.
 - Treat any persisted user data as potentially exfiltratable.
 
 ### 5.3 Don’t leak sensitive config in logs
+
 Runtime config includes:
+
 - backend base URL: [`AppConfig.apiBaseUrl`](conceal-bridge-ux/src/app/core/app-config.ts:8)
 
 Rules:
+
 - Avoid logging config values in production builds.
 - Never log full error objects that might include request URLs with tokens (if added in the future).
 
@@ -161,15 +189,20 @@ Rules:
 ## 6) Phishing prevention & safe UX
 
 ### 6.1 External links must not enable tab-nabbing
+
 External links in the UI already follow good practice:
+
 - `target="_blank"` + `rel="noopener"` as used in [`HomePage`](conceal-bridge-ux/src/app/pages/home/home.page.ts:169)
 
 Rules:
+
 - Any new external link must include the same protections as in [`HomePage`](conceal-bridge-ux/src/app/pages/home/home.page.ts:169).
 - Prefer linking to official wallet download pages used in [`WalletButtonComponent.connectorInstallUrl()`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:495).
 
 ### 6.2 Never ask users to “verify wallet” by sharing secrets
+
 Rules:
+
 - Never show instructions that request:
   - seed phrase
   - private key
@@ -180,16 +213,20 @@ Rules:
   - checking explorer links for tx hashes
 
 ### 6.3 Display critical transaction details for user verification
+
 In swap flows, the user should always be able to verify:
+
 - recipient addresses (bridge deposit address, recipient)
 - payment ID
 - transaction hash
 
 Current UI displays:
+
 - payment ID and QR code: [`paymentId`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:441)
 - CCX deposit address from config: [`BridgeChainConfig.ccx.accountAddress`](conceal-bridge-ux/src/app/core/bridge-types.ts:25)
 
 Rules:
+
 - Any new flow that triggers a wallet prompt must ensure the user can see what they are signing (network + destination + value).
 
 ---
@@ -197,10 +234,12 @@ Rules:
 ## 7) Contract verification requirements (wCCX interactions)
 
 The app interacts with:
+
 - token contract address from backend config: [`BridgeChainConfig.wccx.contractAddress`](conceal-bridge-ux/src/app/core/bridge-types.ts:18)
 - transfer call uses a minimal ERC-20 ABI: [`erc20Abi`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:39)
 
 Rules:
+
 - Validate contract address from config before:
   - adding token: [`SwapPage.addTokenToWallet()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:540)
   - reading balance: [`publicClient.readContract()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:782)
@@ -223,6 +262,7 @@ This bridge is not a DEX swap, so classic AMM slippage protection does not direc
   - EVM→CCX checks CCX liquidity: [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:751)
 
 Rules:
+
 - Never silently adjust user-entered amounts.
 - Never proceed when liquidity checks indicate insufficient bridge funds.
 
@@ -233,6 +273,7 @@ Rules:
 This app is a static Angular SPA (bootstrapped via [`bootstrapApplication()`](conceal-bridge-ux/src/main.ts:1)) and must rely on hosting/CDN headers for baseline hardening.
 
 Rules:
+
 - Follow the deployment spec in [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1).
 - Keep CSP tight and iterate using report-only rollout as described in [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:41).
 - Minimize external asset hosts:

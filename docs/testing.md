@@ -3,6 +3,7 @@
 This guide defines **how to test this project** (Angular 21 + Vitest + viem) and how the AI agent should structure tests so they are reliable in CI and do not depend on real wallets or real chains.
 
 Core references:
+
 - Unit test runner & scripts: [`package.json`](conceal-bridge-ux/package.json:4), Angular test builder: [`angular.json`](conceal-bridge-ux/angular.json:70)
 - Vitest globals typing: [`tsconfig.spec.json`](conceal-bridge-ux/tsconfig.spec.json:4)
 - Existing baseline test style: [`app.spec.ts`](conceal-bridge-ux/src/app/app.spec.ts:1)
@@ -20,6 +21,7 @@ Core references:
 - Current unit tests use Angular’s [`TestBed`](conceal-bridge-ux/src/app/app.spec.ts:1) and standard spec structure (see the suite in [`describe()`](conceal-bridge-ux/src/app/app.spec.ts:5)).
 
 **Rule:** keep unit tests **deterministic** and runnable without:
+
 - external HTTP
 - real wallet extensions
 - real chain RPC calls
@@ -29,14 +31,18 @@ Core references:
 ## 2) Test layers & what belongs where
 
 ### 2.1 “Pure” unit tests (fastest, most stable)
+
 Use for:
+
 - parsing helpers / validation helpers (e.g. address regex logic in [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:19))
 - any deterministic mapping/formatting you add
 
 **Rule:** these tests should not use DOM, Angular DI, or network.
 
 ### 2.2 Service tests (Angular DI, no DOM rendering)
+
 Use for:
+
 - [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13) URL building and request shapes
 - [`EvmChainMetadataService`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:23) behavior when remote metadata fails (it already swallows failures via [`catchError()`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:45))
 - [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:34) behavior around provider selection and error handling
@@ -44,16 +50,20 @@ Use for:
 **Rule:** do not hit real networks; use Angular HTTP testing utilities for HttpClient-based services and provider fakes for wallet integration.
 
 ### 2.3 Component tests (Angular rendering)
+
 Use for:
+
 - template + user interaction + signal state assertions
 - primary example is already in [`app.spec.ts`](conceal-bridge-ux/src/app/app.spec.ts:1)
 
 **Rule:** for component tests, mock dependencies at DI boundaries rather than trying to mock low-level viem internals.
 
 ### 2.4 E2E (browser-level, but fully mocked dependencies)
+
 This repo does not currently ship an E2E framework (see the “no E2E framework by default” note in [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:5)).
 
 **Rule:** E2E tests must:
+
 - inject a fake EIP-1193 provider (so wallet UI works without real extensions)
 - intercept backend requests from [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13)
 - validate flows and routing without real blockchain transactions
@@ -63,24 +73,30 @@ This repo does not currently ship an E2E framework (see the “no E2E framework 
 ## 3) Unit testing patterns for Web3-heavy UI (SwapPage & wallet UI)
 
 ### 3.1 Prefer “test the orchestration,” not the chain
+
 The goal is to test:
+
 - UI validation messages
 - step transitions
 - error handling (`isBusy`, `statusMessage`, `pageError`)
 - correct calls into service boundaries
 
 For the swap flow, the “public contract” is:
+
 - UI state signals like [`step`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:438), [`isBusy`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:439), [`statusMessage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:446)
 - the backend call sequencing in [`startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:598) and [`startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:720)
 
 **Rule:** for component tests, stub:
+
 - [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13) methods (returning Observables)
 - [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:34) methods like [`connect()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:134), [`ensureChain()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:205), [`waitForReceipt()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:265), and [`getClients()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:234)
 
 This avoids having to simulate actual viem behavior for most tests.
 
 ### 3.2 Pattern: build test data from real types
+
 Use real types/interfaces from:
+
 - [`BridgeChainConfig`](conceal-bridge-ux/src/app/core/bridge-types.ts:8)
 - swap responses like [`BridgeInitSwapResponse`](conceal-bridge-ux/src/app/core/bridge-types.ts:39)
 
@@ -91,15 +107,19 @@ Use real types/interfaces from:
 ## 4) Mocking viem clients (when you truly need to)
 
 ### 4.1 Default approach: mock at `EvmWalletService` boundary
+
 Most tests should not mock viem directly. Instead:
+
 - provide a fake [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:34) via Angular DI
 - have its [`getClients()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:234) return a fake `{ publicClient, walletClient }`
 
 This is typically sufficient to test:
+
 - “insufficient wCCX” branch (see the check in [`startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:789))
 - successful transfer branch (see contract write in [`startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:794))
 
 ### 4.2 If you must mock module-level viem helpers
+
 If you add new code that calls viem module functions directly and you need module-mocking, follow the Vitest mocking pattern already documented in [`web3_integrations.md`](conceal-bridge-ux/docs/web3_integrations.md:1014).
 
 **Rule:** keep module mocks narrow; prefer returning minimal fakes that cover only the methods you call.
@@ -109,24 +129,28 @@ If you add new code that calls viem module functions directly and you need modul
 ## 5) Testing wallet connections (in unit/component tests)
 
 ### 5.1 Understand what the app expects from the provider
+
 The wallet service expects an EIP-1193 provider shape:
+
 - `request({ method })` and event handlers (see the provider type and flags in [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:15))
 - it attaches listeners in [`#setProvider()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:359)
 
 The connect flow uses:
+
 - [`walletClient.requestAddresses()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:141) via viem wallet client
 - error conditions surfaced through the wallet UI helper [`friendlyError()`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:466)
 
 ### 5.2 Unit testing strategy options
+
 Pick one depending on what you are testing:
 
-1) **Testing UI components (recommended):**
+1. **Testing UI components (recommended):**
    - provide a stubbed wallet service that simulates:
      - connected state: [`isConnected`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:69)
      - address: [`address`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:41)
      - connector: [`connector`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:50)
 
-2) **Testing `EvmWalletService` itself (more involved):**
+2. **Testing `EvmWalletService` itself (more involved):**
    - inject a fake `window.ethereum` provider (and optionally `window.BinanceChain`) consistent with detection in [`hasInjectedProvider`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:55) / [`hasBinanceProvider`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:58)
    - implement enough provider behavior so calls from [`hydrate()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:114) and [`ensureChain()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:205) can execute deterministically
 
@@ -137,11 +161,14 @@ Pick one depending on what you are testing:
 ## 6) Testing smart contract interactions (without real chain RPC)
 
 The swap page performs two kinds of contract operations:
+
 - read: [`publicClient.readContract()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:782)
 - write: [`walletClient.writeContract()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:794)
 
 ### 6.1 Unit test what you control
+
 Focus tests on:
+
 - correct behavior when read returns “insufficient”
 - correct sequencing when write returns a hash and receipt confirms via [`waitForReceipt()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:265)
 
@@ -152,13 +179,16 @@ Focus tests on:
 ## 7) Component testing with Vitest + Angular TestBed
 
 ### 7.1 Use existing conventions
+
 Follow the pattern used in:
+
 - configuring test module: [`TestBed.configureTestingModule()`](conceal-bridge-ux/src/app/app.spec.ts:7)
 - creating a component: [`TestBed.createComponent()`](conceal-bridge-ux/src/app/app.spec.ts:14)
 - waiting for stabilization: [`fixture.whenStable()`](conceal-bridge-ux/src/app/app.spec.ts:21)
 - asserting DOM output: [`expect()`](conceal-bridge-ux/src/app/app.spec.ts:23)
 
 ### 7.2 Recommendations for new component tests
+
 - Prefer stubbing dependencies through DI rather than patching internals.
 - Avoid time-based waits. If you need to validate polling-related UI, structure the code under test so time can be controlled deterministically (see polling implementation in [`startPolling()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:845)).
 

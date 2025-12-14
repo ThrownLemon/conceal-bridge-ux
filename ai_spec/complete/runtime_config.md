@@ -78,6 +78,7 @@ Example contents (testing deployment):
 ```
 
 Notes:
+
 - This file is public and should not contain secrets.
 - Hosting should serve it with `Cache-Control: no-cache` (see [`deployment_static_hosting.md`](conceal-bridge-ux/ai_spec/deployment_static_hosting.md:1)).
 
@@ -96,14 +97,17 @@ export type RuntimeConfig = Partial<Pick<AppConfig, 'apiBaseUrl' | 'walletConnec
 ### 3) RuntimeConfigService
 
 Create a service responsible for:
+
 - fetching config
 - storing config
 - providing a `get()` accessor
 
 Proposed file:
+
 - [`conceal-bridge-ux/src/app/core/runtime-config.service.ts`](conceal-bridge-ux/src/app/core/runtime-config.service.ts:1)
 
 Implementation outline:
+
 - `load(): Promise<void>` fetches `/config.json`
 - validate keys and normalize `apiBaseUrl` (trim, remove trailing slashes)
 - store the parsed config in a private field / signal
@@ -113,6 +117,7 @@ Implementation outline:
 Update the app providers in [`app.config.ts`](conceal-bridge-ux/src/app/app.config.ts:7) to register an initializer.
 
 Because this app uses standalone config, the pattern is:
+
 - add a provider that calls `runtimeConfig.load()` during bootstrap
 
 Example outline:
@@ -134,14 +139,17 @@ If `RuntimeConfigService` has not loaded (should not happen if initializer works
 ### 6) Validation rules
 
 `apiBaseUrl`:
+
 - must be a string
 - must be a valid URL (or at least start with `http://` or `https://`)
 - must not end with `/` (normalize)
 
 `walletConnectProjectId`:
+
 - must be a non-empty string if present
 
 If validation fails:
+
 - log a warning (dev only) and ignore invalid fields
 
 ## Acceptance Criteria

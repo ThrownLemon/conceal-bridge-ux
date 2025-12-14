@@ -64,6 +64,7 @@ The backend base URL is provided via the `APP_CONFIG` injection token in:
 - `src/app/core/app-config.ts`
 
 **Configuration:** The app uses Angular environment files for configuration.
+
 - **Development (default):** Uses `src/environments/environment.development.ts` (Testing backend).
 - **Production (`npm run build`):** Uses `src/environments/environment.ts` (Production backend).
 
@@ -117,6 +118,7 @@ git push origin main
 ```
 
 The workflow will automatically:
+
 1. Run tests
 2. Build the production bundle
 3. Deploy to GitHub Pages
@@ -130,6 +132,7 @@ The workflow will automatically:
 **Workflow file:** `.github/workflows/deploy.yml`
 
 The workflow uses the native GitHub Actions deployment method (`actions/deploy-pages@v4`) which is:
+
 - ✅ Secure (no third-party dependencies with vulnerabilities)
 - ✅ Official GitHub solution
 - ✅ Automatically handles SPA routing
@@ -145,5 +148,6 @@ After pushing the workflow file:
 4. The deployment will happen automatically on the next push to `master`
 
 For detailed deployment information, see:
+
 - [docs/deployment.md](./docs/deployment.md)
 - [docs/ci_cd.md](./docs/ci_cd.md)

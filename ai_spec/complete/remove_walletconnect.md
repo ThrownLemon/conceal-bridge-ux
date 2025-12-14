@@ -4,18 +4,22 @@
 > **Status: Implemented**
 
 ## 1. Context & Rationale
+
 The project is experiencing build issues related to the `@walletconnect/ethereum-provider` dependency in the Angular environment. To ensure stability and simplify the maintenance burden, we will remove WalletConnect support entirely. The app will rely on injected providers (MetaMask, Trust Wallet, Binance Wallet, etc.) for EVM connectivity.
 
 ## 2. Architecture Changes
 
 ### A. Dependencies
+
 - **Remove** `@walletconnect/ethereum-provider` from `package.json`.
 
 ### B. Configuration (`AppConfig`)
+
 - **Remove** `walletConnectProjectId` from `AppConfig` interface and `APP_CONFIG` token factory in `src/app/core/app-config.ts`.
 - **Remove** any build-time replacement logic (if it exists) related to this key.
 
 ### C. Wallet Service (`EvmWalletService`)
+
 - **Remove** `walletconnect` from `WalletConnectorId` type.
 - **Remove** `walletConnectConfigured` computed signal.
 - **Remove** `#resolveProvider` case for `walletconnect` (and the dynamic import).
@@ -23,6 +27,7 @@ The project is experiencing build issues related to the `@walletconnect/ethereum
 - **Refactor** `isConnectorAvailable` to remove the WalletConnect check.
 
 ### D. UI Components (`WalletButtonComponent`)
+
 - **Remove** WalletConnect button/option from the "Connect Wallet" modal.
 - **Remove** WalletConnect-specific error mapping (`friendlyError`).
 - **Remove** QR code hint logic related to WalletConnect pairing.
@@ -30,6 +35,7 @@ The project is experiencing build issues related to the `@walletconnect/ethereum
 - **Remove** `connectorInstallUrl` check for WalletConnect.
 
 ### E. Documentation
+
 - **Update** `docs/wallets.md` to reflect that WalletConnect is no longer supported.
 - **Update** `docs/security.md` if it references WalletConnect project IDs or secrets.
 
@@ -40,6 +46,7 @@ The project is experiencing build issues related to the `@walletconnect/ethereum
 - **Code Size**: Significant reduction in bundle size by dropping the heavy WC provider.
 
 ## 4. Migration Steps
+
 1. Uninstall npm package.
 2. Strip config.
 3. Refactor Service (fix type errors).

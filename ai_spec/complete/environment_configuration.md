@@ -51,6 +51,7 @@ Use Angular’s standard environment file pattern:
 - Update [`APP_CONFIG`](conceal-bridge-ux/src/app/core/app-config.ts:17) to read values from `environment` instead of hardcoding.
 
 This leverages the existing:
+
 - `build.configurations.development` and `build.configurations.production` in [`angular.json`](conceal-bridge-ux/angular.json:34)
 - `serve.defaultConfiguration = development` in [`angular.json`](conceal-bridge-ux/angular.json:68)
 
@@ -85,6 +86,7 @@ export const environment = {
 ```
 
 Notes:
+
 - `walletConnectProjectId` is not a secret, but keep it environment-specific to support separate WC projects per env if desired.
 - `apiBaseUrl` must not include a trailing slash (consistent with comment in [`AppConfig.apiBaseUrl`](conceal-bridge-ux/src/app/core/app-config.ts:5)). Even if it does, [`BridgeApiService.#url()`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:20) normalizes.
 
@@ -110,6 +112,7 @@ export const APP_CONFIG = new InjectionToken<AppConfig>('APP_CONFIG', {
 ```
 
 This keeps all existing consumers working:
+
 - [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:16)
 - [`EvmWalletService.walletConnectConfigured`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:62)
 
@@ -127,11 +130,13 @@ In [`conceal-bridge-ux/angular.json`](conceal-bridge-ux/angular.json:1), for `bu
 ```
 
 Resulting behavior:
+
 - `ng serve` (development) → uses testing environment file
 - `ng build` (production default) → uses production environment file
 
 Optional extension:
-- Add a dedicated `testing` build configuration (distinct from `development`) if we want prod optimizations *but* testing backend:
+
+- Add a dedicated `testing` build configuration (distinct from `development`) if we want prod optimizations _but_ testing backend:
   - `ng build --configuration testing`
 
 ### 4) Update docs / scripts (optional but recommended)
@@ -162,7 +167,7 @@ In [`package.json`](conceal-bridge-ux/package.json:1) optionally add explicit sc
 ## Risks / Considerations
 
 - Environment files are public at runtime (compiled into JS). Do not store secrets.
-- If deployments require changing API base URL *without rebuilding*, consider the optional runtime config approach below.
+- If deployments require changing API base URL _without rebuilding_, consider the optional runtime config approach below.
 
 ## Optional Enhancement (Runtime Config)
 

@@ -61,6 +61,7 @@ Content-Security-Policy-Report-Only:
 ```
 
 Notes:
+
 - `style-src 'unsafe-inline'` is often needed if any inline styles are emitted by tooling or a CSS-in-JS dependency. Tighten later if feasible.
 - `connect-src https:` is permissive to reduce breakage during rollout; tighten to explicit hosts once the allowlist is known (see “Allowlist Derivation” below).
 
@@ -99,6 +100,7 @@ Content-Security-Policy:
 If using WalletConnect provider initialization in [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:298), the app may need `connect-src` permissions to WalletConnect infrastructure.
 
 Because WalletConnect endpoints can evolve, prefer:
+
 - allowlist the minimum set from WalletConnect docs
 - verify via CSP report logs and browser network logs
 
@@ -160,6 +162,7 @@ Validate with WalletConnect flows before enforcing broadly.
 ## Runtime Config Interaction
 
 If you adopt runtime config per [`runtime_config.md`](conceal-bridge-ux/ai_spec/runtime_config.md:1), ensure CSP allows:
+
 - fetching `/config.json` from self:
   - keep `connect-src 'self'`
 - any configured backend host(s) still fit within the allowlist

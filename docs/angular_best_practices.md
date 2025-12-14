@@ -3,6 +3,7 @@
 This document targets **Angular v21** and is intended to guide both humans and AI code generation.
 
 **Normative language**:
+
 - **MUST / MUST NOT**: hard requirements
 - **SHOULD / SHOULD NOT**: strong recommendations
 - **MAY**: optional guidance
@@ -12,6 +13,7 @@ This document targets **Angular v21** and is intended to guide both humans and A
 ## Angular (v21) Best Practices
 
 ### Standalone-first (NgModules are legacy)
+
 - MUST build new code using **standalone components / directives / pipes**.
 - MUST NOT set `standalone: true` in Angular decorators (standalone is the default).
 - MAY use `standalone: false` only when integrating legacy code that still depends on NgModules.
@@ -19,6 +21,7 @@ This document targets **Angular v21** and is intended to guide both humans and A
 - SHOULD keep each component’s `imports` list minimal and precise.
 
 ### Signals, change detection & reactivity
+
 - MUST set `changeDetection: ChangeDetectionStrategy.OnPush` for app components unless there is a concrete reason not to.
 - SHOULD treat **signals** as the default choice for local UI state.
 - SHOULD keep derived state in `computed()` and side-effects in `effect()`.
@@ -29,18 +32,21 @@ This document targets **Angular v21** and is intended to guide both humans and A
   - MUST use `set()` or `update()`.
 
 ### RxJS interop & subscription hygiene
+
 - SHOULD use the `async` pipe for Observables in templates.
 - SHOULD convert Observables to signals at the boundary when it improves clarity (for example, a view-model signal).
 - MUST NOT leave manual subscriptions unowned:
   - If you must subscribe imperatively, ensure unsubscription is tied to component destruction (for example via Angular-provided lifecycle helpers).
 
 ### Dependency Injection
+
 - SHOULD prefer the `inject()` function over constructor injection (especially for standalone and functional patterns).
 - SHOULD keep services focused and “flat” (avoid long service dependency chains).
 - MUST keep side-effects out of service constructors; prefer explicit `init()`/`start()` methods or effects in a higher-level orchestrator.
 - MUST avoid reaching for global objects directly (`window`, `document`, `localStorage`) in services/components. Prefer injected abstractions where possible.
 
 ### Routing, lazy loading & code splitting
+
 - MUST lazy-load feature routes.
   - Prefer route-level lazy-loading with `loadComponent` / `loadChildren`.
 - SHOULD use template-level deferred loading via `@defer` for expensive UI that is not immediately needed.
@@ -48,6 +54,7 @@ This document targets **Angular v21** and is intended to guide both humans and A
   - MUST include a good loading experience (use `@placeholder` / `@loading` / `@error` as appropriate).
 
 ### Templates
+
 - MUST prefer native control flow:
   - Use `@if`, `@for`, `@switch` instead of `*ngIf`, `*ngFor`, `*ngSwitch`.
 - MUST keep templates simple:
@@ -59,22 +66,26 @@ This document targets **Angular v21** and is intended to guide both humans and A
 - MUST NOT assume runtime-only globals in templates (compute values in TS and bind the result).
 
 ### Inputs / Outputs
+
 - MUST use `input()` and `output()` instead of `@Input()` and `@Output()`.
 - SHOULD keep inputs immutable and treat them as read-only.
 - SHOULD validate/coerce inputs at the boundary (for example, optional vs required inputs).
 - SHOULD expose semantic outputs (for example, `confirmed`, `cancelled`) instead of leaking DOM events.
 
 ### Host bindings/listeners
+
 - MUST NOT use `@HostBinding()` / `@HostListener()`.
 - MUST place host bindings/listeners inside the `host` object of `@Component` / `@Directive`.
 
 ### Images & assets
+
 - MUST use `NgOptimizedImage` for static images.
 - MUST remember: `NgOptimizedImage` does not work for inline base64 images.
 - SHOULD set explicit `width`/`height` for images to avoid layout shift.
 - SHOULD provide meaningful `alt` text (or `alt=""` for decorative images).
 
 ### Components
+
 - MUST keep components small and focused on a single responsibility.
 - SHOULD prefer “smart/container” components for orchestration and “dumb/presentational” components for UI.
 - SHOULD prefer inline templates for small components.
@@ -85,6 +96,7 @@ This document targets **Angular v21** and is intended to guide both humans and A
 - SHOULD avoid deep component trees that exist only to pass data through; consider composition and view-model signals.
 
 ### Forms (Angular v21)
+
 - SHOULD prefer **Signal Forms** for new form-heavy features where appropriate (Angular v21 introduces a signal-based forms model).
 - Otherwise, SHOULD prefer Reactive Forms over template-driven forms.
 - MUST ensure accessible form semantics:
@@ -94,12 +106,14 @@ This document targets **Angular v21** and is intended to guide both humans and A
 - SHOULD model form state as explicit UI states (idle / editing / submitting / success / error).
 
 ### SSR, hydration & browser-only APIs
+
 - If the app uses SSR/hydration:
   - MUST NOT access browser-only APIs during server rendering (for example, `window`, `document`, media queries).
   - SHOULD isolate browser-only logic behind guards and run it only in the browser.
   - SHOULD keep rendering deterministic (avoid time-based values like “now” unless passed in as data).
 
 ### Performance & bundle size
+
 - MUST lazy-load routes and SHOULD use `@defer` for non-critical UI.
 - SHOULD keep dependencies small; avoid importing large libraries for small tasks.
 - SHOULD avoid unnecessary change detection triggers by keeping state local and using signals/computed.

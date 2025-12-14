@@ -10,7 +10,6 @@
 
 - The UI is “dark-first” with Conceal branding applied.
 
-
 - The UI is already “dark-first”:
   - global preference: [`color-scheme`](conceal-bridge-ux/src/styles.css:6)
   - app shell uses dark neutrals: [`bg-slate-950`](conceal-bridge-ux/src/app/app.html:1)
@@ -34,6 +33,7 @@ Implement Conceal’s branding foundation in the frontend in a way that is:
 - minimal in external dependencies (prefer local assets)
 
 Specifically:
+
 - add official fonts (Poppins, Montserrat, Lora)
 - define design tokens (colors, typography scale) for stable reuse
 - optionally theme WalletConnect/AppKit UI to match Conceal branding (font family + accent color)
@@ -72,13 +72,16 @@ Specifically:
 ### A) Self-host fonts in `public/`
 
 Add fonts under:
+
 - [`conceal-bridge-ux/public/fonts/`](conceal-bridge-ux/public:1)
 
 Recommended formats:
+
 - `woff2` (primary)
 - optionally `woff` (fallback) if needed for legacy browsers
 
 Font files to include (example naming; align to license/source):
+
 - `Poppins-Regular.woff2`, `Poppins-SemiBold.woff2`
 - `Montserrat-SemiBold.woff2`
 - `Lora-Regular.woff2`, `Lora-Italic.woff2`
@@ -86,18 +89,22 @@ Font files to include (example naming; align to license/source):
 ### B) Define `@font-face` in global CSS
 
 Add `@font-face` blocks in:
+
 - [`styles.css`](conceal-bridge-ux/src/styles.css:1)
 
 Guidelines:
+
 - Use `font-display: swap` for perceived performance.
 - Keep weights minimal (avoid shipping the entire family unless needed).
 
 ### C) Define design tokens as CSS custom properties
 
 Define tokens in:
+
 - [`:root`](conceal-bridge-ux/src/styles.css:5)
 
 Recommended token set (names are examples; keep stable):
+
 - Colors:
   - `--cb-color-bg` (base background)
   - `--cb-color-surface` (panel background)
@@ -114,26 +121,32 @@ Recommended token set (names are examples; keep stable):
 ### D) Wire tokens into Tailwind v4’s CSS theme layer (optional but recommended)
 
 Tailwind v4 supports CSS-first theming via:
+
 - [`@theme`](conceal-bridge-ux/node_modules/tailwindcss/index.css:4)
 
 Proposed approach:
+
 - In [`styles.css`](conceal-bridge-ux/src/styles.css:1), add a small `@layer theme` / `@theme` block that sets:
   - the default font family to `--cb-font-ui`
   - optionally map accent colors to Tailwind variables if desired
 
 Notes:
+
 - This keeps templates using Tailwind utilities but lets the default typography align to brand.
 
 ### E) Optional: theme WalletConnect/AppKit UI
 
 WalletConnect’s UI stack (AppKit) supports theme variables like:
+
 - `--w3m-font-family`
 - `--w3m-accent`
 
 These variables appear in the dependency tree:
+
 - see `--w3m-font-family` references in [`@reown/appkit-ui`](conceal-bridge-ux/node_modules/@reown/appkit-ui/dist/esm/src/utils/ThemeHelperUtil.js:84)
 
 If feasible with the current integration path (WalletConnect provider initialized in [`#resolveProvider()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:298)), we should set the modal’s theme variables to:
+
 - match Poppins (font)
 - match Conceal deep yellow (accent)
 

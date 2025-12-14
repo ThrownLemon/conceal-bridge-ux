@@ -56,6 +56,7 @@ Add these dev dependencies (versions should be chosen to match Angular 21 and TS
 - `eslint-config-prettier`
 
 Optional (recommended if you want a `lint` target in Angular CLI):
+
 - `@angular-eslint/builder`
 
 ### 2) ESLint configuration file
@@ -65,6 +66,7 @@ Prefer the modern “flat config” file:
 - [`conceal-bridge-ux/eslint.config.js`](conceal-bridge-ux/eslint.config.js:1)
 
 Config must:
+
 - lint `*.ts` using TypeScript parser and `@typescript-eslint`
 - lint inline templates in TS where possible (Angular components)
 - lint `*.html` templates using `@angular-eslint/template-parser`
@@ -90,24 +92,29 @@ Add a `lint` target under the Angular project in [`angular.json`](conceal-bridge
 - Add `architect.lint` using `@angular-eslint/builder:lint` pointing to `src/**/*.ts` and `src/**/*.html`.
 
 This enables:
+
 - [`ng lint`](conceal-bridge-ux/package.json:5) (via `ng` binary) to behave as expected.
 
 ### 5) Rule set (recommended baseline)
 
 TypeScript rules:
+
 - no unused vars
 - no floating promises (careful: the project uses `async` flows in [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:598))
 - consistent type imports where useful
 
 Angular rules:
+
 - consistent component selectors (prefix `app` is set in [`angular.json`](conceal-bridge-ux/angular.json:14))
 - template accessibility linting where feasible
 - discourage `any`
 
 Project-specific rules:
+
 - allow `void` for intentionally ignored promises (pattern used in [`void this.wallet.hydrate()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:478))
 
 Prettier integration:
+
 - disable ESLint formatting rules with `eslint-config-prettier`
 - keep formatting controlled by the Prettier config in [`package.json`](conceal-bridge-ux/package.json:11)
 

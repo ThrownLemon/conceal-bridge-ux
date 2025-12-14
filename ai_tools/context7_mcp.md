@@ -9,6 +9,7 @@ This guide explains what Context7 is, when to use it, and how to use it effectiv
 Context7 is an on-demand documentation retrieval system. It lets an agent pull **up-to-date** library/framework docs (APIs, guides, examples) at generation time, instead of relying on potentially stale model memory.
 
 In practice, Context7 is best treated as your **source of truth** for:
+
 - Library-specific API details (method signatures, options, edge cases)
 - Current setup / configuration steps
 - Version-specific behavior changes
@@ -35,7 +36,7 @@ Use Context7 when the task depends on **external library knowledge** that is lik
 
 ### Default rule of thumb
 
-If a correct solution requires *knowing* an external library’s current API surface, **use Context7 before you write code**.
+If a correct solution requires _knowing_ an external library’s current API surface, **use Context7 before you write code**.
 
 ---
 
@@ -57,6 +58,7 @@ If you already know the exact library ID (format: `/owner/repo` or `/owner/repo/
 Use the MCP tool named `resolve-library-id` to map a human name like “Next.js” to an exact Context7 library ID.
 
 Selection guidance for an agent:
+
 - Prefer exact name matches.
 - Prefer results with more snippets / better coverage.
 - Prefer higher-reputation sources when ambiguous.
@@ -65,6 +67,7 @@ Selection guidance for an agent:
 ### 2) Fetch docs from the resolved ID
 
 Use the MCP tool named `get-library-docs` with:
+
 - `context7CompatibleLibraryID` (required)
 - `topic` (optional but recommended when you know what you need)
 - `mode`:
@@ -94,10 +97,12 @@ Use this quick flow to decide when and how to invoke Context7:
 
 Goal: implement a feature using a library but you don’t know the exact ID.
 
-1) Resolve:
+1. Resolve:
+
 - libraryName: “Supabase”
 
-2) Fetch:
+2. Fetch:
+
 - context7CompatibleLibraryID: “/supabase/supabase”
 - topic: “authentication” (or “jwt”, “sessions”, etc.)
 - mode: “code”
@@ -105,11 +110,13 @@ Goal: implement a feature using a library but you don’t know the exact ID.
 ### Use a specific library ID (skip resolution)
 
 If the user provides an ID (or you already know it), directly fetch docs:
+
 - context7CompatibleLibraryID: “/vercel/next.js/v15.1.0”
 - topic: “middleware”
 - page: 1
 
 Benefits:
+
 - Faster (no search step)
 - Less ambiguity
 - Version-precise
@@ -155,6 +162,7 @@ If outbound networking requires a proxy, set environment variables (case-insensi
 Or configure the MCP server with proxy env vars in your MCP settings.
 
 If connectivity is uncertain, validate outbound access before debugging the agent:
+
 - `curl https://mcp.context7.com/mcp/ping`
 
 ---
@@ -164,6 +172,7 @@ If connectivity is uncertain, validate outbound access before debugging the agen
 Context7 can ingest private repos (GitHub/GitLab/Bitbucket) on paid plans to make internal documentation available to the agent.
 
 Use this when:
+
 - Your organization maintains internal SDKs
 - You need docs that don’t exist publicly
 - You want “single source of truth” docs for proprietary APIs
@@ -179,11 +188,13 @@ If your agent runtime supports persistent rules, add an instruction equivalent t
 > Always use Context7 when I need code generation, setup steps, or library documentation. Automatically use Context7 MCP tools without me having to ask.
 
 Example rule locations (tooling-dependent):
+
 - Cursor rules
 - `.windsurfrules`
 - `CLAUDE.md`
 
 Customize the rule to your workflow, e.g.:
+
 - “Auto-invoke only for Next.js questions”
 - “Use Context7 when the prompt mentions API/docs/migration”
 
@@ -204,6 +215,7 @@ If Context7 results seem wrong or incomplete:
 ## Reference: finding library IDs
 
 To find an ID manually:
+
 1. Visit https://context7.com
 2. Search for your library
 3. Copy the ID shown in the format `/owner/repository` (optionally with `/version`)
