@@ -10,10 +10,10 @@
 
 ## Read the following files
 
-ai_docs/testing.md
-ai_docs/error_handling.md
-ai_docs/wallets.md
-ai_docs/backend_api.md
+docs/testing.md
+docs/error_handling.md
+docs/wallets.md
+docs/backend_api.md
 
 ai_spec/e2e_testing.md
 

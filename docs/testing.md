@@ -100,7 +100,7 @@ This is typically sufficient to test:
 - successful transfer branch (see contract write in [`startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:794))
 
 ### 4.2 If you must mock module-level viem helpers
-If you add new code that calls viem module functions directly and you need module-mocking, follow the Vitest mocking pattern already documented in [`web3_integrations.md`](conceal-bridge-ux/ai_docs/web3_integrations.md:1014).
+If you add new code that calls viem module functions directly and you need module-mocking, follow the Vitest mocking pattern already documented in [`web3_integrations.md`](conceal-bridge-ux/docs/web3_integrations.md:1014).
 
 **Rule:** keep module mocks narrow; prefer returning minimal fakes that cover only the methods you call.
 
@@ -179,7 +179,7 @@ Use the plan in [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1). 
 ## 9) AI agent checklist (before adding/adjusting tests)
 
 - Tests do not call real external endpoints (backend, LI.FI metadata, chain RPC).
-- Web3 tests mock at the boundary (`EvmWalletService` or provider) unless a smaller unit requires mocking viem (see [`web3_integrations.md`](conceal-bridge-ux/ai_docs/web3_integrations.md:1014)).
+- Web3 tests mock at the boundary (`EvmWalletService` or provider) unless a smaller unit requires mocking viem (see [`web3_integrations.md`](conceal-bridge-ux/docs/web3_integrations.md:1014)).
 - Test fixtures match actual interfaces (see [`bridge-types.ts`](conceal-bridge-ux/src/app/core/bridge-types.ts:1)).
 - Component tests follow current patterns in [`app.spec.ts`](conceal-bridge-ux/src/app/app.spec.ts:1).
 - E2E plan (if implemented) follows [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1).
@@ -188,10 +188,10 @@ Use the plan in [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1). 
 
 ## Related docs/specs in this repo
 
-- Error states to validate (busy gating, status messages, retries): [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:1)
-- Backend endpoints to mock and their real response shapes: [`backend_api.md`](conceal-bridge-ux/ai_docs/backend_api.md:1)
-- Wallet integration behaviors (connectors, chain switching, error codes): [`wallets.md`](conceal-bridge-ux/ai_docs/wallets.md:1)
-- Smart contract interaction/verification patterns (ERC-20, unit scaling): [`smart_conctracts.md`](conceal-bridge-ux/ai_docs/smart_conctracts.md:1)
+- Error states to validate (busy gating, status messages, retries): [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)
+- Backend endpoints to mock and their real response shapes: [`backend_api.md`](conceal-bridge-ux/docs/backend_api.md:1)
+- Wallet integration behaviors (connectors, chain switching, error codes): [`wallets.md`](conceal-bridge-ux/docs/wallets.md:1)
+- Smart contract interaction/verification patterns (ERC-20, unit scaling): [`smart_conctracts.md`](conceal-bridge-ux/docs/smart_conctracts.md:1)
 - E2E framework plan and mocks to implement: [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1)
 - HTTP behavior and retry/timeout guidance (for test realism): [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:1)
-- Security constraints that affect test doubles (no secrets, CSP assumptions): [`security.md`](conceal-bridge-ux/ai_docs/security.md:1)
+- Security constraints that affect test doubles (no secrets, CSP assumptions): [`security.md`](conceal-bridge-ux/docs/security.md:1)

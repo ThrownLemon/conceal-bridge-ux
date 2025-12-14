@@ -11,9 +11,9 @@
 
 ## Read the following files
 
-ai_docs/security.md
-ai_docs/error_handling.md
-ai_docs/wallets.md
+docs/security.md
+docs/error_handling.md
+docs/wallets.md
 
 ai_spec/security_headers_and_csp.md
 ai_spec/observability_and_client_logging.md

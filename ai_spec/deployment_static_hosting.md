@@ -6,7 +6,7 @@
 - Production build is the default configuration (`defaultConfiguration: "production"` in [`angular.json`](conceal-bridge-ux/angular.json:56)).
 - Production build enables `outputHashing: "all"` (see [`angular.json`](conceal-bridge-ux/angular.json:48)), which is good for long-term caching.
 - Static assets are served from [`public/`](conceal-bridge-ux/public:1) and included as build assets via [`assets.input = "public"`](conceal-bridge-ux/angular.json:24).
-- No deployment target is currently specified (noted in [`angular_build_guide.md`](conceal-bridge-ux/ai_docs/angular_build_guide.md:273)).
+- No deployment target is currently specified (noted in [`angular_build_guide.md`](conceal-bridge-ux/docs/angular_build_guide.md:273)).
 
 ## Goal
 

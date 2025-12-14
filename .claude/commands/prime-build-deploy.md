@@ -14,7 +14,7 @@ package.json
 angular.json
 tsconfig.json
 
-ai_docs/angular_build_guide.md
+docs/angular_build_guide.md
 
 ai_spec/runtime_config.md
 ai_spec/environment_configuration.md

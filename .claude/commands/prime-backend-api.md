@@ -2,7 +2,7 @@
 > Purpose: load the *minimum* context needed to safely change anything related to backend API calls, response handling, retries/timeouts, and swap-state polling.
 
 ## Key rules (read this before coding)
-- **Treat `ai_docs/backend_api.md` as the contract reference** (it documents the current backend endpoint shapes and legacy inconsistencies).
+- **Treat `docs/backend_api.md` as the contract reference** (it documents the current backend endpoint shapes and legacy inconsistencies).
 - **Always check payload-level success flags** (HTTP 200 does not imply success):
   - Init/exec style endpoints often use `success: boolean` + `err`
   - Query/polling style endpoints often use `result: boolean` + optional `err`
@@ -11,8 +11,8 @@
 
 ## Read the following files
 
-ai_docs/backend_api.md
-ai_docs/error_handling.md
+docs/backend_api.md
+docs/error_handling.md
 
 ai_spec/http_and_error_handling.md
 ai_spec/runtime_config.md

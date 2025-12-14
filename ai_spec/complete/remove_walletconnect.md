@@ -30,8 +30,8 @@ The project is experiencing build issues related to the `@walletconnect/ethereum
 - **Remove** `connectorInstallUrl` check for WalletConnect.
 
 ### E. Documentation
-- **Update** `ai_docs/wallets.md` to reflect that WalletConnect is no longer supported.
-- **Update** `ai_docs/security.md` if it references WalletConnect project IDs or secrets.
+- **Update** `docs/wallets.md` to reflect that WalletConnect is no longer supported.
+- **Update** `docs/security.md` if it references WalletConnect project IDs or secrets.
 
 ## 3. Impact Analysis
 

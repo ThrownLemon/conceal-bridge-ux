@@ -51,8 +51,8 @@ The existing dark tokens need semantic opposites for light mode.
 - Placed in `HeaderComponent` (or existing layout in `app.html`).
 
 ## Documentation Updates (Required)
-- `ai_docs/style_guide.md`: Update "Dark mode" section to reflect dual-mode support and explain the token mapping.
-- `ai_docs/angular_best_practices.md`: Update "State Management" example if we use a new service pattern? (Probably not needed).
+- `docs/style_guide.md`: Update "Dark mode" section to reflect dual-mode support and explain the token mapping.
+- `docs/angular_best_practices.md`: Update "State Management" example if we use a new service pattern? (Probably not needed).
 - `ai_spec/light_dark_mode.md`: This file, mark as Implemented when done.
 
 ## Risks

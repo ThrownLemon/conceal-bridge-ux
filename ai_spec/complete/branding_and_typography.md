@@ -20,7 +20,7 @@
   - minimal head in [`index.html`](conceal-bridge-ux/src/index.html:1)
   - minimal global CSS in [`styles.css`](conceal-bridge-ux/src/styles.css:1)
 - The style guide recommends adopting Conceal fonts (Poppins, Montserrat, Lora), but they are not implemented yet:
-  - see typography section in [`style_guide.md`](conceal-bridge-ux/ai_docs/style_guide.md:146)
+  - see typography section in [`style_guide.md`](conceal-bridge-ux/docs/style_guide.md:146)
 - Deployment security is expected to include strict CSP/headers, which will affect how fonts are hosted/loaded:
   - [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:41)
 

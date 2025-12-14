@@ -50,7 +50,7 @@ This spec assumes (1) initially because it aligns with the current architecture 
      - connect modal: [`WalletButtonComponent`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:309)
      - network switching: [`EvmWalletService.ensureChain()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:205)
 4. **Error-handling consistency**
-   - Follow existing conventions (`pageError` vs `statusMessage`) from [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:445) and guidance in [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:30).
+   - Follow existing conventions (`pageError` vs `statusMessage`) from [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:445) and guidance in [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:30).
 5. **Safety & clarity**
    - Must show from/to networks clearly at all times.
    - Must not allow double-submission / double-execution.
@@ -120,7 +120,7 @@ This spec assumes (1) initially because it aligns with the current architecture 
 - Must enforce:
   - min/max amounts per backend quote response (do not guess in UI).
   - slippage or “price protection” rules (separate spec if DEX-like).
-- Do not store sensitive swap details in localStorage (align with rules in [`security.md`](conceal-bridge-ux/ai_docs/security.md:1)).
+- Do not store sensitive swap details in localStorage (align with rules in [`security.md`](conceal-bridge-ux/docs/security.md:1)).
 
 ## Observability
 

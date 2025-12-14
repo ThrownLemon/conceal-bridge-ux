@@ -2,7 +2,7 @@
 
 ## Context / Current State
 
-- No CI configuration exists in this project folder (the build guide notes this gap in [`angular_build_guide.md`](conceal-bridge-ux/ai_docs/angular_build_guide.md:277)).
+- No CI configuration exists in this project folder (the build guide notes this gap in [`angular_build_guide.md`](conceal-bridge-ux/docs/angular_build_guide.md:277)).
 - The project has these key scripts in [`package.json`](conceal-bridge-ux/package.json:4):
   - `start`: `ng serve`
   - `build`: `ng build` (defaults to production config per [`angular.json`](conceal-bridge-ux/angular.json:56))

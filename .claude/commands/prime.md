@@ -61,10 +61,8 @@ Use for (or use equivalent built-in browser tools):
 2. angular.json       # Project architecture & build targets
 
 ## AI & Tooling Context
-1. ai_docs/angular_build_guide.md
-2. ai_docs/angular_best_practices.md
-3. ai_tools/angular_mcp.md
-4. ai_tools/context7_mcp.md
+1. docs/angular_build_guide.md
+2. docs/angular_best_practices.md
 
 ## Application Entry Points
 1. src/main.ts                  # App bootstrap
@@ -88,6 +86,6 @@ Use for (or use equivalent built-in browser tools):
    - **Browser Tool**: Use it to visually confirm UI changes, modal states, and interactions.
    - **Tests**: Run `ng test` and `npm run build` to ensure stability.
 8. **Update**:
-   - **Extensive Documentation Check**: At the end of every task, you MUST search for and update ALL relevant documentation. Don't just update the obvious file; `grep` for keywords to find hidden references in `ai_docs`, `.claude`, and `README` files.
+   - **Extensive Documentation Check**: At the end of every task, you MUST search for and update ALL relevant documentation. Don't just update the obvious file; `grep` for keywords to find hidden references in `docs`, `.claude`, and `README` files.
    - **Configuration Hygiene**: When removing dependencies, check `angular.json` (e.g., `allowedCommonJsDependencies`) and `tsconfig.json` for strict cleanup.
    - **Artifacts**: Ensure `task.md` and `walkthrough.md` are up to date.

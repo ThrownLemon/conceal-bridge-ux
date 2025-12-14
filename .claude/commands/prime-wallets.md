@@ -10,10 +10,10 @@
 
 ## Read the following files
 
-ai_docs/wallets.md
-ai_docs/security.md
-ai_docs/error_handling.md
-ai_docs/smart_conctracts.md
+docs/wallets.md
+docs/security.md
+docs/error_handling.md
+docs/smart_conctracts.md
 
 src/app/core/app-config.ts
 src/app/core/bridge-types.ts

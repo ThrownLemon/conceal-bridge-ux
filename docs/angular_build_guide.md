@@ -286,8 +286,8 @@ Build artifacts are static and can be deployed to any static hosting (S3/CloudFr
 
 For deployment details, see:
 - [`.github/workflows/deploy.yml`](conceal-bridge-ux/.github/workflows/deploy.yml)
-- [`ai_docs/deployment.md`](conceal-bridge-ux/ai_docs/deployment.md)
-- [`ai_docs/ci_cd.md`](conceal-bridge-ux/ai_docs/ci_cd.md)
+- [`docs/deployment.md`](conceal-bridge-ux/docs/deployment.md)
+- [`docs/ci_cd.md`](conceal-bridge-ux/docs/ci_cd.md)
 - [`README.md`](conceal-bridge-ux/README.md) (Deployment section)
 
 ### CI/CD Pipeline
@@ -446,16 +446,16 @@ Production build has budgets configured:
 ## Additional Resources
 
 - Project readme: [`conceal-bridge-ux/README.md`](conceal-bridge-ux/README.md:1)
-- Product/architecture docs live in [`conceal-bridge-ux/ai_docs/`](conceal-bridge-ux/ai_docs/angular_build_guide.md:1)
+- Product/architecture docs live in [`conceal-bridge-ux/docs/`](conceal-bridge-ux/docs/angular_build_guide.md:1)
 
 ---
 
 ## Related docs/specs in this repo
 
-- Angular coding conventions for this repo: [`angular_best_practices.md`](conceal-bridge-ux/ai_docs/angular_best_practices.md:1)
-- External Angular reference links: [`angular_key_resources.md`](conceal-bridge-ux/ai_docs/angular_key_resources.md:1)
-- UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](conceal-bridge-ux/ai_docs/style_guide.md:1)
-- Wallet integration and supported connectors: [`wallets.md`](conceal-bridge-ux/ai_docs/wallets.md:1)
-- Backend API contract (endpoints + response shapes): [`backend_api.md`](conceal-bridge-ux/ai_docs/backend_api.md:1)
-- Error handling conventions across the app: [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:1)
-- Testing strategy (unit/E2E plan + web3 mocking): [`testing.md`](conceal-bridge-ux/ai_docs/testing.md:1)
+- Angular coding conventions for this repo: [`angular_best_practices.md`](conceal-bridge-ux/docs/angular_best_practices.md:1)
+- External Angular reference links: [`angular_key_resources.md`](conceal-bridge-ux/docs/angular_key_resources.md:1)
+- UI conventions (Tailwind v4, dark-first, brand rules): [`style_guide.md`](conceal-bridge-ux/docs/style_guide.md:1)
+- Wallet integration and supported connectors: [`wallets.md`](conceal-bridge-ux/docs/wallets.md:1)
+- Backend API contract (endpoints + response shapes): [`backend_api.md`](conceal-bridge-ux/docs/backend_api.md:1)
+- Error handling conventions across the app: [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)
+- Testing strategy (unit/E2E plan + web3 mocking): [`testing.md`](conceal-bridge-ux/docs/testing.md:1)

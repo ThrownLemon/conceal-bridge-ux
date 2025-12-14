@@ -67,7 +67,7 @@ Choose one approach:
   - provide a “Clear history” action
 
 Align with guidance in:
-- [`security.md`](conceal-bridge-ux/ai_docs/security.md:1)
+- [`security.md`](conceal-bridge-ux/docs/security.md:1)
 
 ## Error Handling
 
@@ -75,7 +75,7 @@ Align with guidance in:
   - blocking error for page load failures
   - status messages for transient failures
 Align with:
-- [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:30)
+- [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:30)
 
 ## Testing Plan
 

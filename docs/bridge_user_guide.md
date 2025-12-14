@@ -173,13 +173,13 @@ Make sure you've added the custom token using the correct contract address for y
 
 ## Related docs/specs in this repo
 
-- [`ai_docs/bridge_overview.md`](./bridge_overview.md)
-- [`ai_docs/bridge_architecture.md`](./bridge_architecture.md)
-- [`ai_docs/wallets.md`](./wallets.md)
-- [`ai_docs/web3_integrations.md`](./web3_integrations.md)
-- [`ai_docs/backend_api.md`](./backend_api.md)
-- [`ai_docs/smart_conctracts.md`](./smart_conctracts.md)
-- [`ai_docs/error_handling.md`](./error_handling.md)
-- [`ai_docs/security.md`](./security.md)
+- [`docs/bridge_overview.md`](./bridge_overview.md)
+- [`docs/bridge_architecture.md`](./bridge_architecture.md)
+- [`docs/wallets.md`](./wallets.md)
+- [`docs/web3_integrations.md`](./web3_integrations.md)
+- [`docs/backend_api.md`](./backend_api.md)
+- [`docs/smart_conctracts.md`](./smart_conctracts.md)
+- [`docs/error_handling.md`](./error_handling.md)
+- [`docs/security.md`](./security.md)
 - [`ai_spec/http_and_error_handling.md`](../ai_spec/http_and_error_handling.md)
 - [`ai_spec/e2e_testing.md`](../ai_spec/e2e_testing.md)

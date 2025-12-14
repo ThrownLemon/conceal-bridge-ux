@@ -280,9 +280,9 @@ The app enables browser-level listeners via [`provideBrowserGlobalErrorListeners
 
 ## Related docs/specs in this repo
 
-- Backend API contracts and response shapes: [`backend_api.md`](conceal-bridge-ux/ai_docs/backend_api.md:1)
+- Backend API contracts and response shapes: [`backend_api.md`](conceal-bridge-ux/docs/backend_api.md:1)
 - HTTP and error-handling roadmap (retry rules, interceptor strategy): [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:1)
-- Wallet/provider error codes and mapping strategy: [`wallets.md`](conceal-bridge-ux/ai_docs/wallets.md:1)
-- Smart contract + tx verification patterns (wCCX ERC-20, calldata decoding): [`smart_conctracts.md`](conceal-bridge-ux/ai_docs/smart_conctracts.md:1)
-- Security constraints that affect error handling (no secrets in logs, safe UX): [`security.md`](conceal-bridge-ux/ai_docs/security.md:1)
-- Testing guidance for failure paths and polling behavior: [`testing.md`](conceal-bridge-ux/ai_docs/testing.md:1)
+- Wallet/provider error codes and mapping strategy: [`wallets.md`](conceal-bridge-ux/docs/wallets.md:1)
+- Smart contract + tx verification patterns (wCCX ERC-20, calldata decoding): [`smart_conctracts.md`](conceal-bridge-ux/docs/smart_conctracts.md:1)
+- Security constraints that affect error handling (no secrets in logs, safe UX): [`security.md`](conceal-bridge-ux/docs/security.md:1)
+- Testing guidance for failure paths and polling behavior: [`testing.md`](conceal-bridge-ux/docs/testing.md:1)

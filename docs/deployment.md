@@ -26,7 +26,7 @@ Deployment happens automatically when you push to the `main` branch.
 - Go to your repository's **Actions** tab
 - View workflow runs and logs
 
-For detailed CI/CD documentation, see [ai_docs/ci_cd.md](ci_cd.md).
+For detailed CI/CD documentation, see [docs/ci_cd.md](ci_cd.md).
 
 ### Why Native GitHub Actions?
 
@@ -384,11 +384,11 @@ Before deploying to production:
 
 ## Related Documentation
 
-- **CI/CD Pipeline:** `ai_docs/ci_cd.md`
+- **CI/CD Pipeline:** `docs/ci_cd.md`
 - **Deployment Spec:** `ai_spec/deployment_static_hosting.md`
 - **Security Headers:** `ai_spec/security_headers_and_csp.md`
 - **Environment Configuration:** `ai_spec/environment_configuration.md`
-- **Build Guide:** `ai_docs/angular_build_guide.md`
+- **Build Guide:** `docs/angular_build_guide.md`
 - **CI/CD Spec:** `ai_spec/ci_cd_pipeline.md`
 
 ---

@@ -257,10 +257,10 @@ Before finalizing any change that touches wallet, transactions, config, or exter
 
 ## Related docs/specs in this repo
 
-- Error taxonomy and safe user messaging: [`error_handling.md`](conceal-bridge-ux/ai_docs/error_handling.md:1)
-- Backend endpoint behavior and response shapes: [`backend_api.md`](conceal-bridge-ux/ai_docs/backend_api.md:1)
-- Wallet security constraints and provider behavior: [`wallets.md`](conceal-bridge-ux/ai_docs/wallets.md:1)
-- Smart contract (wCCX ERC-20) trust boundaries and tx verification: [`smart_conctracts.md`](conceal-bridge-ux/ai_docs/smart_conctracts.md:1)
+- Error taxonomy and safe user messaging: [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)
+- Backend endpoint behavior and response shapes: [`backend_api.md`](conceal-bridge-ux/docs/backend_api.md:1)
+- Wallet security constraints and provider behavior: [`wallets.md`](conceal-bridge-ux/docs/wallets.md:1)
+- Smart contract (wCCX ERC-20) trust boundaries and tx verification: [`smart_conctracts.md`](conceal-bridge-ux/docs/smart_conctracts.md:1)
 - HTTP error-handling roadmap (timeouts/retries/interceptor plan): [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:1)
 - CSP + security headers deployment plan: [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1)
-- Testing strategy for security- and wallet-sensitive flows: [`testing.md`](conceal-bridge-ux/ai_docs/testing.md:1)
+- Testing strategy for security- and wallet-sensitive flows: [`testing.md`](conceal-bridge-ux/docs/testing.md:1)

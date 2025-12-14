@@ -17,15 +17,15 @@ At a high level, the UI:
 
 High-level product + architecture docs:
 
-- Bridge overview / concept: [ai_docs/bridge_overview.md](./ai_docs/bridge_overview.md)
-- User guide: [ai_docs/bridge_user_guide.md](./ai_docs/bridge_user_guide.md)
-- Architecture: [ai_docs/bridge_architecture.md](./ai_docs/bridge_architecture.md)
-- Backend API contract (endpoints + shapes): [ai_docs/backend_api.md](./ai_docs/backend_api.md)
-- Wallets / Web3 integrations: [ai_docs/wallets.md](./ai_docs/wallets.md), [ai_docs/web3_integrations.md](./ai_docs/web3_integrations.md)
-- Security + error handling: [ai_docs/security.md](./ai_docs/security.md), [ai_docs/error_handling.md](./ai_docs/error_handling.md)
-- Build guide (repo-specific): [ai_docs/angular_build_guide.md](./ai_docs/angular_build_guide.md)
-- **Deployment guide:** [ai_docs/deployment.md](./ai_docs/deployment.md)
-- **CI/CD pipeline:** [ai_docs/ci_cd.md](./ai_docs/ci_cd.md)
+- Bridge overview / concept: [docs/bridge_overview.md](./docs/bridge_overview.md)
+- User guide: [docs/bridge_user_guide.md](./docs/bridge_user_guide.md)
+- Architecture: [docs/bridge_architecture.md](./docs/bridge_architecture.md)
+- Backend API contract (endpoints + shapes): [docs/backend_api.md](./docs/backend_api.md)
+- Wallets / Web3 integrations: [docs/wallets.md](./docs/wallets.md), [docs/web3_integrations.md](./docs/web3_integrations.md)
+- Security + error handling: [docs/security.md](./docs/security.md), [docs/error_handling.md](./docs/error_handling.md)
+- Build guide (repo-specific): [docs/angular_build_guide.md](./docs/angular_build_guide.md)
+- **Deployment guide:** [docs/deployment.md](./docs/deployment.md)
+- **CI/CD pipeline:** [docs/ci_cd.md](./docs/ci_cd.md)
 
 Specs (implementation-focused):
 
@@ -104,7 +104,7 @@ npm run test
 E2E is not configured in this workspace by default. If/when you add an E2E framework, document it in:
 
 - [ai_spec/e2e_testing.md](./ai_spec/e2e_testing.md)
-- [ai_docs/testing.md](./ai_docs/testing.md)
+- [docs/testing.md](./docs/testing.md)
 
 ## Deployment
 
@@ -145,5 +145,5 @@ After pushing the workflow file:
 4. The deployment will happen automatically on the next push to `master`
 
 For detailed deployment information, see:
-- [ai_docs/deployment.md](./ai_docs/deployment.md)
-- [ai_docs/ci_cd.md](./ai_docs/ci_cd.md)
+- [docs/deployment.md](./docs/deployment.md)
+- [docs/ci_cd.md](./docs/ci_cd.md)

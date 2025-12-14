@@ -12,9 +12,9 @@
 
 ## Read the following files
 
-ai_docs/smart_conctracts.md
-ai_docs/backend_api.md
-ai_docs/security.md
+docs/smart_conctracts.md
+docs/backend_api.md
+docs/security.md
 
 src/app/core/bridge-types.ts
 src/app/core/evm-networks.ts

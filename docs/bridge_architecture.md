@@ -980,13 +980,13 @@ export class BridgeTransactionService {
 
 ## Related docs/specs in this repo
 
-- [`ai_docs/bridge_overview.md`](./bridge_overview.md)
-- [`ai_docs/bridge_user_guide.md`](./bridge_user_guide.md)
-- [`ai_docs/backend_api.md`](./backend_api.md)
-- [`ai_docs/web3_integrations.md`](./web3_integrations.md)
-- [`ai_docs/wallets.md`](./wallets.md)
-- [`ai_docs/smart_conctracts.md`](./smart_conctracts.md)
-- [`ai_docs/error_handling.md`](./error_handling.md)
-- [`ai_docs/security.md`](./security.md)
-- [`ai_docs/testing.md`](./testing.md)
+- [`docs/bridge_overview.md`](./bridge_overview.md)
+- [`docs/bridge_user_guide.md`](./bridge_user_guide.md)
+- [`docs/backend_api.md`](./backend_api.md)
+- [`docs/web3_integrations.md`](./web3_integrations.md)
+- [`docs/wallets.md`](./wallets.md)
+- [`docs/smart_conctracts.md`](./smart_conctracts.md)
+- [`docs/error_handling.md`](./error_handling.md)
+- [`docs/security.md`](./security.md)
+- [`docs/testing.md`](./testing.md)
 - [`ai_spec/http_and_error_handling.md`](../ai_spec/http_and_error_handling.md)

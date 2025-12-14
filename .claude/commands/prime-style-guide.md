@@ -12,10 +12,10 @@
 
 ## Read the following files
 
-ai_docs/style_guide.md
-ai_docs/angular_best_practices.md
-ai_docs/error_handling.md
-ai_docs/security.md
+docs/style_guide.md
+docs/angular_best_practices.md
+docs/error_handling.md
+docs/security.md
 
 src/styles.css
 src/index.html
