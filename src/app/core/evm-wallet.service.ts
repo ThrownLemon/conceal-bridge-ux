@@ -118,7 +118,9 @@ export class EvmWalletService {
     if (!provider) return;
 
     try {
-      const { walletClient, publicClient } = this.getClients(mainnet, provider);
+      // Use mainnet as a fallback for walletClient.getAddresses() - it queries the provider directly
+      // so the chain parameter is mainly for type checking
+      const { walletClient } = this.getClients(mainnet, provider);
       // If user explicitly disconnected in-app, don't re-hydrate accounts on reload.
       // Many injected wallets keep `eth_accounts` authorized until the user removes the site connection in the wallet.
       if (!this.#disconnectedByUser()) {
@@ -127,7 +129,8 @@ export class EvmWalletService {
       } else {
         this.#address.set(null);
       }
-      this.#chainId.set(await publicClient.getChainId());
+      // Use refreshChainId() to avoid hardcoding mainnet and get the actual chain ID
+      await this.refreshChainId();
     } catch {
       // Ignore – hydration should never hard-fail the app.
     }
@@ -281,8 +284,13 @@ export class EvmWalletService {
     try {
       const provider = this.#provider() ?? this.#injectedProvider();
       if (!provider) return;
-      const { publicClient } = this.getClients(mainnet, provider);
-      this.#chainId.set(await publicClient.getChainId());
+      // Query chain ID directly from provider to avoid hardcoding mainnet
+      // This works regardless of which chain the user is actually connected to
+      const chainIdHex = (await provider.request({ method: 'eth_chainId' })) as string;
+      const chainId = Number.parseInt(chainIdHex, 16);
+      if (Number.isFinite(chainId) && chainId > 0) {
+        this.#chainId.set(chainId);
+      }
     } catch {
       // Ignore – wallet might not be available yet.
     }

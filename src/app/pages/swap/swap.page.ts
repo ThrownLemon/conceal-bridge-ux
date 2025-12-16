@@ -9,7 +9,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, filter, map, of, switchMap, take, timer } from 'rxjs';
+import { catchError, filter, map, of, Subject, switchMap, take, takeUntil, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { firstValueFrom } from 'rxjs';
@@ -568,6 +568,9 @@ export class SwapPage {
   readonly pageError = signal<string | null>(null);
   readonly statusMessage = signal<string | null>(null);
 
+  // Track polling subscription to cancel previous ones when starting new polling
+  readonly #pollingCancel$ = new Subject<void>();
+
   readonly ccxToEvmForm = this.#fb.group({
     ccxFromAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
     evmToAddress: this.#fb.control('', [Validators.required, Validators.pattern(EVM_ADDRESS_RE)]),
@@ -695,6 +698,8 @@ export class SwapPage {
   }
 
   reset(): void {
+    // Cancel any active polling when resetting
+    this.#pollingCancel$.next();
     this.step.set(0);
     this.isBusy.set(false);
     this.paymentId.set('');
@@ -957,6 +962,9 @@ export class SwapPage {
   }
 
   startPolling(network: EvmNetworkKey, direction: 'wccx' | 'ccx', paymentId: string): void {
+    // Cancel any previous polling before starting new one
+    this.#pollingCancel$.next();
+
     timer(0, 10_000)
       .pipe(
         switchMap(() =>
@@ -966,6 +974,7 @@ export class SwapPage {
         ),
         filter((r) => r.result === true),
         take(1),
+        takeUntil(this.#pollingCancel$),
         takeUntilDestroyed(this.#destroyRef),
       )
       .subscribe((state) => {
