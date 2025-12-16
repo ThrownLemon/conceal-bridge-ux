@@ -14,6 +14,8 @@ import { QrCode } from './qr-code.utils';
           [attr.height]="size()"
           [attr.viewBox]="qr.viewBox"
           xmlns="http://www.w3.org/2000/svg"
+          role="img"
+          [attr.aria-label]="alt()"
         >
           <path [attr.d]="qr.path" fill="#0f172a" />
         </svg>

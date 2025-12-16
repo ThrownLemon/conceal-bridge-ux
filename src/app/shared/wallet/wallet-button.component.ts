@@ -14,12 +14,12 @@ type Variant = 'header' | 'primary';
   template: `
     <!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
     @if (!wallet.isConnected()) {
-      <button type="button" [class]="buttonClass()" (click)="open()">Connect Wallet</button>
+      <button type="button" [class]="buttonClass()" (click)="open()" aria-label="Connect Wallet">Connect Wallet</button>
     } @else {
       @if (variant() === 'header') {
         <div class="relative flex items-center gap-2">
           @if (isNetworkMenuOpen() || isWalletMenuOpen()) {
-            <button type="button" class="fixed inset-0 z-40 w-full h-full cursor-default" (click)="closeHeaderMenus()" tabindex="-1" aria-hidden="true"></button>
+            <button type="button" class="fixed inset-0 z-40 w-full h-full cursor-default" (click)="closeHeaderMenus()" tabindex="-1" aria-label="Close menu"></button>
           }
 
           <!-- Network pill -->
@@ -29,6 +29,7 @@ type Variant = 'header' | 'primary';
             (click)="toggleNetworkMenu()"
             aria-haspopup="menu"
             [attr.aria-expanded]="isNetworkMenuOpen()"
+            aria-label="Select Network"
           >
             @if (currentNetworkLogo(); as logo) {
               <img
@@ -86,6 +87,7 @@ type Variant = 'header' | 'primary';
             (click)="toggleWalletMenu()"
             aria-haspopup="menu"
             [attr.aria-expanded]="isWalletMenuOpen()"
+            aria-label="Wallet Options"
           >
             @if (currentWalletLogo(); as wlogo) {
               <img
@@ -137,6 +139,7 @@ type Variant = 'header' | 'primary';
           (click)="toggleMenu()"
           aria-haspopup="menu"
           [attr.aria-expanded]="isMenuOpen()"
+          aria-label="Wallet Menu"
         >
           @if (connectedChain(); as chain) {
             @if (connectedChainLogo(); as logo) {
@@ -210,7 +213,7 @@ type Variant = 'header' | 'primary';
                   type="button"
                   class="rounded-lg p-2 text-[var(--cb-color-muted)] hover:bg-[var(--cb-color-border)]/50 hover:text-[var(--cb-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
                   (click)="backToList()"
-                  aria-label="Back"
+                  aria-label="Back to wallet list"
                 >
                   ←
                 </button>
@@ -227,7 +230,7 @@ type Variant = 'header' | 'primary';
               type="button"
               class="rounded-lg p-2 text-[var(--cb-color-muted)] hover:bg-[var(--cb-color-border)]/50 hover:text-[var(--cb-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
               (click)="close()"
-              aria-label="Close"
+              aria-label="Close modal"
             >
               ✕
             </button>
@@ -256,6 +259,7 @@ type Variant = 'header' | 'primary';
                   [href]="connectorInstallUrl(c)"
                   target="_blank"
                   rel="noopener"
+                  aria-label="Install browser extension"
                 >
                   Install the Extension
                 </a>
@@ -287,6 +291,7 @@ type Variant = 'header' | 'primary';
                   class="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-[var(--cb-color-accent)] px-4 py-3 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 disabled:opacity-60"
                   [disabled]="isConnecting()"
                   (click)="connect(c)"
+                  aria-label="Connect wallet"
                 >
                   @if (isConnecting()) {
                     Connecting…
@@ -308,6 +313,7 @@ type Variant = 'header' | 'primary';
                 type="button"
                 class="flex w-full items-center justify-between rounded-xl border border-[var(--cb-color-border)] px-4 py-3 text-left hover:bg-[var(--cb-color-border)]/20"
                 (click)="selectConnector('metamask')"
+                aria-label="Connect with MetaMask"
               >
                 <span class="flex items-center gap-3">
                   <img
@@ -326,6 +332,7 @@ type Variant = 'header' | 'primary';
                 type="button"
                 class="flex w-full items-center justify-between rounded-xl border border-[var(--cb-color-border)] px-4 py-3 text-left hover:bg-[var(--cb-color-border)]/20"
                 (click)="selectConnector('trust')"
+                aria-label="Connect with Trust Wallet"
               >
                 <span class="flex items-center gap-3">
                   <img
@@ -344,6 +351,7 @@ type Variant = 'header' | 'primary';
                 type="button"
                 class="flex w-full items-center justify-between rounded-xl border border-[var(--cb-color-border)] px-4 py-3 text-left hover:bg-[var(--cb-color-border)]/20"
                 (click)="selectConnector('binance')"
+                aria-label="Connect with Binance Wallet"
               >
                 <span class="flex items-center gap-3">
                   <img
