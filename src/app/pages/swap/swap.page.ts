@@ -25,6 +25,7 @@ import type {
 import { EVM_NETWORK_KEYS } from '../../core/bridge-types';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 import { EvmWalletService } from '../../core/evm-wallet.service';
+import { TransactionHistoryService } from '../../core/transaction-history.service';
 import { QrCodeComponent } from '../../shared/qr-code/qr-code.component';
 import { WalletButtonComponent } from '../../shared/wallet/wallet-button.component';
 
@@ -530,6 +531,7 @@ export class SwapPage {
 
   readonly api = inject(BridgeApiService);
   readonly wallet = inject(EvmWalletService);
+  readonly historyService = inject(TransactionHistoryService);
 
   readonly #directionParam = toSignal(this.#route.paramMap.pipe(map((pm) => pm.get('direction'))), {
     initialValue: null,
@@ -972,6 +974,24 @@ export class SwapPage {
         this.swapState.set(state);
         this.step.set(2);
         this.statusMessage.set('Payment received!');
+
+        // Add to history
+        if (state.txdata) {
+          const cfg = this.config();
+          const decimals = cfg ? (inferDecimalsFromUnits(cfg.wccx.units) ?? 6) : 6;
+
+          this.historyService.addTransaction({
+            id: paymentId,
+            timestamp: Date.now(),
+            amount: state.txdata.swaped,
+            direction: direction === 'wccx' ? 'ccx-to-evm' : 'evm-to-ccx',
+            network,
+            status: 'completed',
+            depositHash: state.txdata.depositHash,
+            swapHash: state.txdata.swapHash,
+            recipientAddress: state.txdata.address
+          });
+        }
       });
   }
 

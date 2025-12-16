@@ -51,3 +51,15 @@ export interface BridgeSwapStateResponse {
     depositHash: string;
   };
 }
+
+export interface StoredTransaction {
+  id: string; // paymentId
+  timestamp: number;
+  amount: number;
+  direction: SwapDirection;
+  network: EvmNetworkKey;
+  status: 'pending' | 'completed';
+  depositHash?: string;
+  swapHash?: string;
+  recipientAddress?: string;
+}
