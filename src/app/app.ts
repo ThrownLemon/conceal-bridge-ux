@@ -5,11 +5,12 @@ import { ThemeService } from './core/theme.service';
 import { TransactionHistoryService } from './core/transaction-history.service';
 import { TransactionHistoryComponent } from './shared/transaction-history/transaction-history.component';
 import { WalletButtonComponent } from './shared/wallet/wallet-button.component';
+import { WalletModalComponent } from './shared/wallet/wallet-modal.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterLink, RouterOutlet, WalletButtonComponent, TransactionHistoryComponent],
+  imports: [RouterLink, RouterOutlet, WalletButtonComponent, TransactionHistoryComponent, WalletModalComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
