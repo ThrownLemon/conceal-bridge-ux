@@ -9,3 +9,8 @@
 - **Refactor**: Removed `walletconnect` dependency (v2) in favor of specific connectors.
 - **Feature**: Implemented custom SVG QR code generation, removing the `qrcode` dependency.
 - **Config**: Implemented environment-specific configurations (Production vs Development) for API and WalletConnect IDs.
+
+## 2025-12-16
+
+- **Environment**: Fixed Playwright setup by documenting and verifying installation of required system dependencies for browser binaries.
+- **Testing**: Updated E2E tests to match actual application title ("Conceal Bridge"), fixing initial test failures.

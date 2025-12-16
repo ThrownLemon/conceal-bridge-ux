@@ -80,6 +80,17 @@
           "options": {
             "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
+        },
+        "e2e": {
+          "builder": "playwright-ng-schematics:playwright",
+          "options": {
+            "devServerTarget": "conceal-bridge-ux:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "conceal-bridge-ux:serve:production"
+            }
+          }
         }
       }
     }
