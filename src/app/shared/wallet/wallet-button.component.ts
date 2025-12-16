@@ -1,10 +1,8 @@
-
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 
 import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
-
 
 type Variant = 'header' | 'primary';
 
@@ -19,7 +17,13 @@ type Variant = 'header' | 'primary';
       @if (variant() === 'header') {
         <div class="relative flex items-center gap-2">
           @if (isNetworkMenuOpen() || isWalletMenuOpen()) {
-            <button type="button" class="fixed inset-0 z-40 w-full h-full cursor-default" (click)="closeHeaderMenus()" tabindex="-1" aria-label="Close menu"></button>
+            <button
+              type="button"
+              class="fixed inset-0 z-40 w-full h-full cursor-default"
+              (click)="closeHeaderMenus()"
+              tabindex="-1"
+              aria-hidden="true"
+            ></button>
           }
 
           <!-- Network pill -->
@@ -377,7 +381,6 @@ export class WalletButtonComponent {
 
   readonly wallet = inject(EvmWalletService);
   readonly #chains = inject(EvmChainMetadataService);
-
 
   readonly isModalOpen = signal(false);
   readonly isMenuOpen = signal(false);
