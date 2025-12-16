@@ -55,6 +55,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
                     (click)="toggleFromMenu()"
                     aria-haspopup="listbox"
                     [attr.aria-expanded]="isFromMenuOpen()"
+                    aria-label="Select source network"
                   >
                     @if (fromDisplay(); as n) {
                       <img
@@ -125,6 +126,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
                     (click)="toggleToMenu()"
                     aria-haspopup="listbox"
                     [attr.aria-expanded]="isToMenuOpen()"
+                    aria-label="Select destination network"
                   >
                     @if (toDisplay(); as n) {
                       <img
@@ -196,6 +198,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
               <button
                 class="inline-flex items-center justify-center rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
                 type="submit"
+                aria-label="Continue to swap"
               >
                 Continue
               </button>
@@ -210,6 +213,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
           href="https://concealnetwork.medium.com/conceal-bridge-user-guide-2ad03eee4963"
           target="_blank"
           rel="noopener"
+          aria-label="Open User guide"
         >
           <div class="font-medium text-[var(--cb-color-text)]">User guide</div>
           <div class="mt-1 text-[var(--cb-color-muted)]">
@@ -222,6 +226,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
           href="https://metamask.io/download.html"
           target="_blank"
           rel="noopener"
+          aria-label="Get MetaMask"
         >
           <div class="font-medium text-[var(--cb-color-text)]">Get MetaMask</div>
           <div class="mt-1 text-[var(--cb-color-muted)]">

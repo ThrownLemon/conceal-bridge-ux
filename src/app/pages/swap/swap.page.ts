@@ -78,6 +78,7 @@ const erc20Abi = [
       <a
         routerLink="/"
         class="text-sm font-medium text-[var(--cb-color-text-secondary)] hover:text-[var(--cb-color-text)]"
+        aria-label="Back to home"
         >← Back</a
       >
 
@@ -155,6 +156,7 @@ const erc20Abi = [
                       placeholder="ccx…"
                       autocomplete="off"
                       spellcheck="false"
+                      aria-label="Your CCX address"
                     />
                     <p class="text-xs text-[var(--cb-color-muted)]">
                       Used by the backend to associate the payment ID to your swap.
@@ -172,6 +174,7 @@ const erc20Abi = [
                       placeholder="0x…"
                       autocomplete="off"
                       spellcheck="false"
+                      aria-label="Your EVM address"
                     />
                     <div class="flex flex-wrap gap-2">
                       <button
@@ -179,6 +182,7 @@ const erc20Abi = [
                         class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                         (click)="useConnectedWalletAsEvmTo()"
                         [disabled]="!wallet.isConnected()"
+                        aria-label="Use connected wallet address"
                       >
                         Use connected wallet
                       </button>
@@ -187,6 +191,7 @@ const erc20Abi = [
                         class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                         (click)="addTokenToWallet()"
                         [disabled]="!wallet.isConnected() || !config()"
+                        aria-label="Add wCCX token to wallet"
                       >
                         Add wCCX token
                       </button>
@@ -204,6 +209,7 @@ const erc20Abi = [
                         formControlName="amount"
                         placeholder="0.0"
                         inputmode="decimal"
+                        aria-label="Amount"
                       />
                       @if (config(); as cfg) {
                         <p class="text-xs text-[var(--cb-color-muted)]">
@@ -227,6 +233,7 @@ const erc20Abi = [
                         formControlName="email"
                         placeholder="you@example.com"
                         autocomplete="email"
+                        aria-label="Email (optional)"
                       />
                       <p class="text-xs text-[var(--cb-color-muted)]">
                         Used only for notifications/support.
@@ -239,6 +246,7 @@ const erc20Abi = [
                     class="mt-2 inline-flex items-center justify-center rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 disabled:opacity-50"
                     (click)="startCcxToEvm()"
                     [disabled]="isBusy()"
+                    aria-label="Start swap"
                   >
                     Start swap
                   </button>
@@ -271,6 +279,7 @@ const erc20Abi = [
                         type="button"
                         class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                         (click)="copy(cfg.ccx.accountAddress)"
+                        aria-label="Copy CCX deposit address"
                       >
                         Copy address
                       </button>
@@ -292,6 +301,7 @@ const erc20Abi = [
                       class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                       (click)="copy(paymentId())"
                       [disabled]="!paymentId()"
+                      aria-label="Copy payment ID"
                     >
                       Copy payment ID
                     </button>
@@ -305,6 +315,7 @@ const erc20Abi = [
                     class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                     (click)="reset()"
                     [disabled]="isBusy()"
+                    aria-label="Start over"
                   >
                     Start over
                   </button>
@@ -348,6 +359,7 @@ const erc20Abi = [
                     type="button"
                     class="rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80"
                     (click)="reset()"
+                    aria-label="Start a new swap"
                   >
                     New swap
                   </button>
@@ -380,6 +392,7 @@ const erc20Abi = [
                       placeholder="ccx…"
                       autocomplete="off"
                       spellcheck="false"
+                      aria-label="Your CCX address"
                     />
                   </div>
 
@@ -394,6 +407,7 @@ const erc20Abi = [
                         formControlName="amount"
                         placeholder="0.0"
                         inputmode="decimal"
+                        aria-label="Amount"
                       />
                       @if (config(); as cfg) {
                         <p class="text-xs text-[var(--cb-color-muted)]">
@@ -417,6 +431,7 @@ const erc20Abi = [
                         formControlName="email"
                         placeholder="you@example.com"
                         autocomplete="email"
+                        aria-label="Email (optional)"
                       />
                     </div>
                   </div>
@@ -427,6 +442,7 @@ const erc20Abi = [
                       class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                       (click)="addTokenToWallet()"
                       [disabled]="!wallet.isConnected() || !config()"
+                      aria-label="Add wCCX token to wallet"
                     >
                       Add wCCX token
                     </button>
@@ -437,6 +453,7 @@ const erc20Abi = [
                     class="mt-2 inline-flex items-center justify-center rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 disabled:opacity-50"
                     (click)="startEvmToCcx()"
                     [disabled]="isBusy()"
+                    aria-label="Start swap"
                   >
                     Start swap
                   </button>
@@ -471,6 +488,7 @@ const erc20Abi = [
                     class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                     (click)="reset()"
                     [disabled]="isBusy()"
+                    aria-label="Start over"
                   >
                     Start over
                   </button>
@@ -514,6 +532,7 @@ const erc20Abi = [
                     type="button"
                     class="rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80"
                     (click)="reset()"
+                    aria-label="Start a new swap"
                   >
                     New swap
                   </button>
