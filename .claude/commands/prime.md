@@ -8,8 +8,9 @@
 
 - Prefer **Angular CLI MCP** for Angular-project analysis and refactors instead of running raw shell commands. Failback to web search if needed.
 - Prefer **Context7 MCP** for up-to-date library docs and code examples (resolve library ID first). Failback to web search if needed.
-- Use **Chrome DevTools MCP** for UI verification (snapshots/screenshots, DOM inspection, console/network). **Exception:** Use built-in browser tools if available/equivalent.
-- Use any other tool you have available to you as required e.g web search.
+- Use **GitHub MCP** for repository analysis, searching code/issues, and managing PRs/issues.
+- Use **SearXNG MCP** for external web searches and reading content from URLs.
+- Use any other tool you have available to you as required (e.g., built-in browser).
 
 ### When to use what
 
@@ -66,13 +67,21 @@ Use this quick flow to decide when and how to invoke Context7:
 
 ```
 
-#### Chrome DevTools MCP (`chrome-devtools`)
+#### GitHub MCP (`github`)
 
-Use for (or use equivalent built-in browser tools):
+Use for:
 
-- DOM snapshots and screenshots
-- verifying rendering/states in a running dev server
-- checking console messages and network requests
+- Repository analysis (listing files, searching code)
+- Issue management (searching, reading, creating, commenting)
+- Pull Request management (listing, reading, diffs, reviews)
+- Searching users and teams
+
+#### SearXNG MCP (`searxng`)
+
+Use for:
+
+- General web search (`searxng_web_search`)
+- Reading content from external URLs (`web_url_read`)
 
 ## Common Commands
 
