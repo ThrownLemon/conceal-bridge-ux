@@ -112,6 +112,7 @@ const erc20Abi = [
       @if (pageError(); as err) {
         <div
           class="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200"
+          role="alert"
         >
           {{ err }}
         </div>
@@ -120,6 +121,7 @@ const erc20Abi = [
       @if (statusMessage(); as msg) {
         <div
           class="mt-6 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-4 text-sm text-[var(--cb-color-text)]"
+          aria-live="polite"
         >
           {{ msg }}
         </div>
