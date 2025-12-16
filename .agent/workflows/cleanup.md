@@ -1,5 +1,5 @@
 ---
-description: Standardize the process of finalizing a task. Run this checklist before marking a user request as "Complete" to ensure quality and documentation consistency.
+description: Standardize the process of finalizing a task. Run this checklist before marking a user request as "Complete"
 ---
 
 # Verification & Cleanup Routine
