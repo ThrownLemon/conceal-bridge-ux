@@ -597,14 +597,22 @@ export class SwapPage {
   readonly ccxToEvmForm = this.#fb.group({
     ccxFromAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
     evmToAddress: this.#fb.control('', [Validators.required, Validators.pattern(EVM_ADDRESS_RE)]),
-    amount: this.#fb.control('', [Validators.required, Validators.pattern(/^[0-9]+\.?[0-9]*$/)]),
-    email: this.#fb.control('', [Validators.email]),
+    amount: this.#fb.control('', [
+      Validators.required,
+      Validators.pattern(/^[0-9]+\.?[0-9]*$/),
+      Validators.maxLength(32),
+    ]),
+    email: this.#fb.control('', [Validators.email, Validators.maxLength(254)]),
   });
 
   readonly evmToCcxForm = this.#fb.group({
     ccxToAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
-    amount: this.#fb.control('', [Validators.required, Validators.pattern(/^[0-9]+\.?[0-9]*$/)]),
-    email: this.#fb.control('', [Validators.email]),
+    amount: this.#fb.control('', [
+      Validators.required,
+      Validators.pattern(/^[0-9]+\.?[0-9]*$/),
+      Validators.maxLength(32),
+    ]),
+    email: this.#fb.control('', [Validators.email, Validators.maxLength(254)]),
   });
 
   constructor() {
@@ -1007,7 +1015,6 @@ export class SwapPage {
 
         // Add to history
         if (state.txdata) {
-
           this.historyService.addTransaction({
             id: paymentId,
             timestamp: Date.now(),
