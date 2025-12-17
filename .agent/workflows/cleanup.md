@@ -6,7 +6,7 @@ description: Standardize the process of finalizing a task. Run this checklist be
 
 > Purpose: Standardize the process of finalizing a task. Run this checklist before marking a user request as "Complete" to ensure quality and documentation consistency.
 
-## 1. Verification (Code Quality)
+## 1. Code Quality Verification
 
 > Goal: Ensure no regressions or errors were introduced.
 
@@ -16,59 +16,41 @@ description: Standardize the process of finalizing a task. Run this checklist be
 
 2. **Formatting**:
    - Run `npm run format` to ensure all code follows Prettier standards.
+   - **Optimization**: You can often just run `npm run format` (which writes fixes) instead of just checking.
 
-3. **Unit Tests**:
-   - **Check**: Inspect `package.json` to determine the test runner (Vitest vs Karma).
-   - **Command**:
-     - **Vitest**: `npm test` (adding `--watch=false` if needed).
-     - **Karma**: `npm run test -- --watch=false --browsers=ChromeHeadless`.
-   - **Action**: Fix any failing tests immediately. Ensure strict type changes (e.g., `any` -> `unknown`) didn't break implementation logic.
+3. **Compilation**:
+   - Run `npm run build` (or `ng build`) to ensure the application compiles AOT without error. Typescript errors often show up here that linter misses.
 
-4. **Build Check (Performance & Integrity)**:
-   - **CRITICAL**: Run this _after_ lint/format fixes to catch missing imports or broken types.
-   - Run `npm run build` to verify the production build succeeds.
-   - **Action**: Address any build errors.
-   - **Check**: Verify bundle budgets are met (no warnings). If warned, investigate enabling more tree-shaking or lazy-loading.
+4. **Unit Tests**:
+   - Run `npm test` to verify logic.
+   - **Note**: If the project uses Karma, this might launch a browser. If so, use `npm run test -- --watch=false --browsers=ChromeHeadless` for CI-like execution.
 
-5. **Runtime Check**:
-   - If UI changes were made, verify them in the browser or via `npm start`.
-   - **Check**: Ensure no console errors appear during basic navigation.
-   - **Accessibility**: Run a quick keyboard navigation test (Tab through interactive elements) to ensure focus states are visible and logical.
+## 2. Documentation Updates
 
-## 2. Documentation & Spec Management
+> Goal: Keep documentation in sync with code changes.
 
-> Goal: Keep docs and AI specs in sync with the code.
+1. **Project History**:
+   - Update `docs/project_history.md` if you added a major feature, changed architecture, or performed significant refactoring.
+   - Log the date, change summary, and impact.
 
-1. **Spec Lifecycle**:
-   - **Requirement**: If you worked on a feature defined in `ai_spec/`:
-     - Move the spec file to `ai_spec/complete/`: `mv ai_spec/my-feature.md ai_spec/complete/`.
-     - Update references if necessary (though usually independent).
+2. **Specific Docs**:
+   - Did you change how the Bridge works? Update `docs/bridge_*.md`.
+   - Did you change API integration? Update `docs/backend_api.md`.
+   - **Check**: `ls docs/` to remind yourself what documentation exists.
 
-2. **Search & Update**:
-   - Use `grep` to find references to modified components/logic in `docs/`, `ai_spec/`, and `.claude/`.
-   - **Key Files to Check**:
-     - `README.md` (Setup instructions, features)
-     - `docs/build_guide.md` (Architecture, dependencies)
-     - `docs/backend_api.md` (If API calls changed)
-     - `docs/*.md` (General check for any related docs)
-     - `ai_spec/` (Update specs if implementation diverged from plan)
+## 3. Artifact Cleanup
 
-3. **Update Agent Context**:
-   - If you added new tools or patterns, update `.claude/commands/prime.md` or other context files.
-   - **Project History**:
-     - If you made a _major_ change (arch/refactor/feature), append a bullet point to `docs/project_history.md`.
-     - _Criteria_: Would a future agent need to know this to understand why the code looks this way?
+1. **Unused Files**:
+   - Delete any temporary files created during development (e.g., `.tmp`, debug scripts).
 
-## 3. Artifact Finalization
+2. **Console Cleanliness**:
+   - Remove temporary `console.log` statements used for debugging.
 
-> Goal: Leave a clear trail of work for the user and future agents.
+## 4. Final Sanity Check
 
-1. **Task List**:
-   - Update `task.md` to reflect all completed items.
+- [ ] Does the solution fully address the user's prompt?
+- [ ] Are all new files strictly typed?
+- [ ] Is the UI cleanly styled (if applicable)?
 
-2. **Walkthrough**:
-   - Update `walkthrough.md`.
-   - Include:
-     - Summary of changes.
-     - Proof of verification (e.g., "Build passed", "Tests passed").
-     - Screenshots/Videos if UI was touched.
+---
+*Run this checklist silently or summarized before handing off control to the user.*
