@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { shareReplay } from 'rxjs/operators';
+import { Observable, catchError, shareReplay, throwError } from 'rxjs';
 
 import { APP_CONFIG } from './app-config';
 import type {
@@ -35,7 +34,13 @@ export class BridgeApiService {
 
     const request$ = this.#http
       .get<BridgeChainConfig>(this.#url(network, '/config/chain'))
-      .pipe(shareReplay(1));
+      .pipe(
+        catchError((error) => {
+          this.#configCache.delete(network);
+          return throwError(() => error);
+        }),
+        shareReplay({ bufferSize: 1, refCount: true }),
+      );
 
     this.#configCache.set(network, request$);
     return request$;

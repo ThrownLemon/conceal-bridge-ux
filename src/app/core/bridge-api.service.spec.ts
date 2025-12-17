@@ -84,4 +84,29 @@ describe('BridgeApiService', () => {
     service.getChainConfig('eth').subscribe();
     httpMock.expectOne('https://api.example.com/eth/config/chain').flush(mockConfig);
   });
+
+  it('should retry fetching config after a failed request', () => {
+    let errorReceived = false;
+
+    service.getChainConfig('bsc').subscribe({
+      next: () => {
+        throw new Error('Expected error to be thrown');
+      },
+      error: () => {
+        errorReceived = true;
+      },
+    });
+
+    const firstRequest = httpMock.expectOne('https://api.example.com/bsc/config/chain');
+    firstRequest.flush('error', { status: 500, statusText: 'Server Error' });
+
+    expect(errorReceived).toBe(true);
+
+    service.getChainConfig('bsc').subscribe((config) => {
+      expect(config).toEqual(mockConfig);
+    });
+
+    const secondRequest = httpMock.expectOne('https://api.example.com/bsc/config/chain');
+    secondRequest.flush(mockConfig);
+  });
 });
