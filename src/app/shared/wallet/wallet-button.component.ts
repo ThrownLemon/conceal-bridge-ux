@@ -124,7 +124,7 @@ type Variant = 'header' | 'primary';
                 role="menuitem"
                 (click)="copyAddressFromHeader()"
               >
-                Copy address
+                {{ copyStatus() ?? 'Copy address' }}
               </button>
               <button
                 type="button"
@@ -180,7 +180,7 @@ type Variant = 'header' | 'primary';
                 role="menuitem"
                 (click)="copyAddress()"
               >
-                Copy address
+                {{ copyStatus() ?? 'Copy address' }}
               </button>
               <button
                 type="button"
@@ -211,6 +211,8 @@ export class WalletButtonComponent {
   readonly isWalletMenuOpen = signal(false);
   readonly isSwitchingNetwork = signal(false);
   readonly networkStatus = signal<string | null>(null);
+
+  readonly copyStatus = signal<string | null>(null);
 
   readonly connectedChain = computed(() => this.#chains.get(this.wallet.chainId()));
 
@@ -273,12 +275,14 @@ export class WalletButtonComponent {
 
   toggleMenu(): void {
     this.isMenuOpen.update((v) => !v);
+    if (this.isMenuOpen()) this.copyStatus.set(null);
   }
 
   closeHeaderMenus(): void {
     this.isNetworkMenuOpen.set(false);
     this.isWalletMenuOpen.set(false);
     this.networkStatus.set(null);
+    this.copyStatus.set(null);
   }
 
   toggleNetworkMenu(): void {
@@ -291,6 +295,7 @@ export class WalletButtonComponent {
     this.isWalletMenuOpen.update((v) => !v);
     this.isNetworkMenuOpen.set(false);
     this.networkStatus.set(null);
+    if (this.isWalletMenuOpen()) this.copyStatus.set(null);
   }
 
   async switchNetwork(key: 'eth' | 'bsc' | 'plg'): Promise<void> {
@@ -315,8 +320,7 @@ export class WalletButtonComponent {
   }
 
   async copyAddressFromHeader(): Promise<void> {
-    await this.copyAddress();
-    this.closeHeaderMenus();
+    await this.handleCopy(() => this.closeHeaderMenus());
   }
 
   async disconnectFromHeader(): Promise<void> {
@@ -337,13 +341,24 @@ export class WalletButtonComponent {
   }
 
   async copyAddress(): Promise<void> {
-    this.isMenuOpen.set(false);
+    await this.handleCopy(() => this.isMenuOpen.set(false));
+  }
+
+  private async handleCopy(closeAction: () => void): Promise<void> {
     const addr = this.wallet.address();
     if (!addr) return;
     try {
       await navigator.clipboard.writeText(addr);
+      this.copyStatus.set('Copied!');
+      setTimeout(() => {
+        // Only close if status is still 'Copied!'
+        if (this.copyStatus() === 'Copied!') {
+          this.copyStatus.set(null);
+          closeAction();
+        }
+      }, 1000);
     } catch {
-      // ignore
+      closeAction();
     }
   }
 }
