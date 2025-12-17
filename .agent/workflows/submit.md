@@ -35,7 +35,7 @@ description: Automate the process of committing changes, syncing with remote, an
 ## 4. Pull Request (GitHub MCP)
 
 1.  **Check Existing PR**:
-    - Use `mcp_github_list_pull_requests` filtering by `head=<owner>:<current_branch>` to see if a PR already exists.
+    - Use `mcp_github_list_pull_requests` filtering by `head=<owner>:<current_branch>` **and** `state=open` to check whether an **open** PR already exists.
 
 2.  **Create PR**:
     - If NO open PR exists, use `mcp_github_create_pull_request`.
