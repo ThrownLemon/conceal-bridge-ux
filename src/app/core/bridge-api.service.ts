@@ -1,5 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 import { APP_CONFIG } from './app-config';
 import type {
@@ -17,14 +19,26 @@ export class BridgeApiService {
 
   readonly #jsonHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
 
+  // Cache for chain config to avoid redundant requests
+  readonly #configCache = new Map<EvmNetworkKey, Observable<BridgeChainConfig>>();
+
   #url(network: EvmNetworkKey, path: string): string {
     const base = this.#config.apiBaseUrl.replace(/\/+$/, '');
     const normalizedPath = path.replace(/^\/+/, '');
     return `${base}/${network}/${normalizedPath}`;
   }
 
-  getChainConfig(network: EvmNetworkKey) {
-    return this.#http.get<BridgeChainConfig>(this.#url(network, '/config/chain'));
+  getChainConfig(network: EvmNetworkKey): Observable<BridgeChainConfig> {
+    if (this.#configCache.has(network)) {
+      return this.#configCache.get(network)!;
+    }
+
+    const request$ = this.#http
+      .get<BridgeChainConfig>(this.#url(network, '/config/chain'))
+      .pipe(shareReplay(1));
+
+    this.#configCache.set(network, request$);
+    return request$;
   }
 
   estimateGasPrice(network: EvmNetworkKey, amount: number) {
