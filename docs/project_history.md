@@ -10,6 +10,10 @@
 - **Feature**: Implemented custom SVG QR code generation, removing the `qrcode` dependency.
 - **Config**: Implemented environment-specific configurations (Production vs Development) for API and WalletConnect IDs.
 
+## 2025-12-17
+
+- **Agent**: Implemented "Expert Agent" system. Added `docs/expert_knowledge/` for persistent mental models and `.agent/workflows/learn.md` for self-improvement. Updated `.agent/workflows/prime.md` to load expert context.
+
 ## 2025-12-16
 
 - **Environment**: Fixed Playwright setup by documenting and verifying installation of required system dependencies for browser binaries.

@@ -139,3 +139,10 @@ Use for:
 
 1. docs/bridge_overview.md
 2. docs/project_history.md
+
+### Expert Knowledge (Mental Models)
+
+> Check `docs/expert_knowledge/` for domain-specific expertise.
+
+1. `docs/expert_knowledge/angular_expert.md` (read if doing UI/Frontend work)
+2. `docs/expert_knowledge/web3_expert.md` (read if doing Blockchain/Wallet work)

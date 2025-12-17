@@ -9,13 +9,15 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (modalService.isOpen()) {
-      <button
-        type="button"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
         (click)="close()"
+        (keydown.escape)="close()"
         (keyup.escape)="close()"
         (keyup.enter)="close()"
-        title="Close"
+        tabindex="0"
+        role="button"
+        aria-label="Close modal"
       >
         <div
           class="w-full max-w-md rounded-2xl bg-[var(--cb-color-surface)] p-6 text-[var(--cb-color-text)] shadow-xl"
@@ -23,6 +25,7 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
           aria-modal="true"
           aria-label="Connect wallet"
           (click)="$event.stopPropagation()"
+          (keydown)="$event.stopPropagation()"
         >
           <div class="flex items-start justify-between gap-4">
             <div class="flex items-center gap-2">
@@ -186,7 +189,7 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
             </div>
           }
         </div>
-      </button>
+      </div>
     }
   `,
 })

@@ -53,4 +53,5 @@ description: Standardize the process of finalizing a task. Run this checklist be
 - [ ] Is the UI cleanly styled (if applicable)?
 
 ---
-*Run this checklist silently or summarized before handing off control to the user.*
+
+_Run this checklist silently or summarized before handing off control to the user._

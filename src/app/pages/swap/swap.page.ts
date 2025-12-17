@@ -1007,8 +1007,6 @@ export class SwapPage {
 
         // Add to history
         if (state.txdata) {
-          const cfg = this.config();
-          const decimals = cfg ? (inferDecimalsFromUnits(cfg.wccx.units) ?? 6) : 6;
 
           this.historyService.addTransaction({
             id: paymentId,
@@ -1019,7 +1017,7 @@ export class SwapPage {
             status: 'completed',
             depositHash: state.txdata.depositHash,
             swapHash: state.txdata.swapHash,
-            recipientAddress: state.txdata.address
+            recipientAddress: state.txdata.address,
           });
         }
       });

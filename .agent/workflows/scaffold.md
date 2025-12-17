@@ -16,12 +16,14 @@ description: Guide for creating new Angular components, services, and features f
 Use the Angular CLI for scaffolding. It handles boilerplate and test files automatically.
 
 **For a Component:**
+
 ```bash
 # Example: Creating a 'TokenInput' component in the bridge feature
 ng generate component features/bridge/components/token-input --change-detection OnPush --style css
 ```
 
 **For a Service:**
+
 ```bash
 # Example: Creating a 'BridgeState' service
 ng generate service features/bridge/services/bridge-state
@@ -32,6 +34,7 @@ ng generate service features/bridge/services/bridge-state
 After generating the files, you **MUST** modify them to meet specific v21+ standards that CLI might not fully adopt by default yet.
 
 ### A. Component (`.ts`)
+
 1. **Inputs/Outputs**: Convert any `@Input() / @Output()` to `input()` / `output()`.
    ```typescript
    // Before
@@ -50,27 +53,30 @@ After generating the files, you **MUST** modify them to meet specific v21+ stand
 4. **Imports**: Add necessary imports to the `imports` array (e.g., `CommonModule` is often redundant if using `@if/@for`, but imports like `RouterLink` might be needed).
 
 ### B. Template (`.html`)
+
 1. **Control Flow**: Use `@if`, `@for`, `@switch`.
 2. **Event Binding**: Ensure strict typing in templates.
 
 ### C. Service (`.ts`)
+
 1. **State**: If the service holds state, use `signal` or `writableSignal`.
 2. **Cleanup**: If using observables, ensure appropriate cleanup logic.
 
 ## 4. Registering the Feature
 
 - **Routing**: If this is a page/view, add it to the `app.routes.ts` or the feature's route config.
-   - **Lazy Loading**: Use `loadComponent: () => import(...)`.
-   ```typescript
-   {
-     path: 'bridge',
-     loadComponent: () => import('./features/bridge/bridge.component').then(m => m.BridgeComponent)
-   }
-   ```
+  - **Lazy Loading**: Use `loadComponent: () => import(...)`.
+  ```typescript
+  {
+    path: 'bridge',
+    loadComponent: () => import('./features/bridge/bridge.component').then(m => m.BridgeComponent)
+  }
+  ```
 
 ## 5. Verification
 
 Run the test suite to ensure the new component passes its initial scaffolding tests:
+
 ```bash
 ng test --include src/app/path/to/new/component
 ```

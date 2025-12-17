@@ -56,11 +56,13 @@ description: Comprehensive code review checklist and process for Angular v21+ pr
 To run the automated parts of this review:
 
 1. **Linting**:
+
    ```bash
    npm run lint
    ```
 
 2. **Testing**:
+
    ```bash
    npm test
    ```

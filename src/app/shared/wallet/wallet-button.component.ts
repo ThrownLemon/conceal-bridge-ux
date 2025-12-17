@@ -11,9 +11,10 @@ type Variant = 'header' | 'primary';
   selector: 'app-wallet-button',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
     @if (!wallet.isConnected()) {
-      <button type="button" [class]="buttonClass()" (click)="open()" aria-label="Connect Wallet">Connect Wallet</button>
+      <button type="button" [class]="buttonClass()" (click)="open()" aria-label="Connect Wallet">
+        Connect Wallet
+      </button>
     } @else {
       @if (variant() === 'header') {
         <div class="relative flex items-center gap-2">
@@ -194,7 +195,6 @@ type Variant = 'header' | 'primary';
         }
       }
     }
-
   `,
 })
 export class WalletButtonComponent {

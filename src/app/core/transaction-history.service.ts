@@ -1,4 +1,4 @@
-import { Injectable, signal, effect, computed } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { StoredTransaction } from './bridge-types';
 
 const STORAGE_KEY = 'conceal_bridge_tx_history';
