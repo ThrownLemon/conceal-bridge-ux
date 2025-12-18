@@ -87,4 +87,20 @@ describe('SwapPage Security', () => {
     emailControl.setValue(validEmail);
     expect(emailControl.valid).toBe(true);
   });
+
+  it('should reject excessively long inputs for addresses', () => {
+    // Test CCX address length limit (98)
+    const longCcx = 'ccx' + 'a'.repeat(100); // 103 chars
+    const ccxControl = component.ccxToEvmForm.controls.ccxFromAddress;
+    ccxControl.setValue(longCcx);
+    expect(ccxControl.valid).toBe(false);
+    expect(ccxControl.errors?.['maxlength']).toBeTruthy();
+
+    // Test EVM address length limit (42)
+    const longEvm = '0x' + 'a'.repeat(50); // 52 chars
+    const evmControl = component.ccxToEvmForm.controls.evmToAddress;
+    evmControl.setValue(longEvm);
+    expect(evmControl.valid).toBe(false);
+    expect(evmControl.errors?.['maxlength']).toBeTruthy();
+  });
 });

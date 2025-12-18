@@ -595,8 +595,16 @@ export class SwapPage {
   readonly #pollingCancel$ = new Subject<void>();
 
   readonly ccxToEvmForm = this.#fb.group({
-    ccxFromAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
-    evmToAddress: this.#fb.control('', [Validators.required, Validators.pattern(EVM_ADDRESS_RE)]),
+    ccxFromAddress: this.#fb.control('', [
+      Validators.required,
+      Validators.pattern(CCX_ADDRESS_RE),
+      Validators.maxLength(98),
+    ]),
+    evmToAddress: this.#fb.control('', [
+      Validators.required,
+      Validators.pattern(EVM_ADDRESS_RE),
+      Validators.maxLength(42),
+    ]),
     amount: this.#fb.control('', [
       Validators.required,
       Validators.pattern(/^[0-9]+\.?[0-9]*$/),
@@ -606,7 +614,11 @@ export class SwapPage {
   });
 
   readonly evmToCcxForm = this.#fb.group({
-    ccxToAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
+    ccxToAddress: this.#fb.control('', [
+      Validators.required,
+      Validators.pattern(CCX_ADDRESS_RE),
+      Validators.maxLength(98),
+    ]),
     amount: this.#fb.control('', [
       Validators.required,
       Validators.pattern(/^[0-9]+\.?[0-9]*$/),
