@@ -15,6 +15,14 @@ interface LifiChain {
   chainType?: string;
 }
 
+interface CachedChains {
+  timestamp: number;
+  chains: [number, EvmChainMetadata][];
+}
+
+const CACHE_KEY = 'conceal_bridge_chain_metadata';
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
 /**
  * Lightweight public chain metadata (name + logo).
  *
@@ -39,6 +47,26 @@ export class EvmChainMetadataService {
   }
 
   #load(): void {
+    // Try to load from cache first
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = window.localStorage.getItem(CACHE_KEY);
+        if (stored) {
+          const cache = JSON.parse(stored) as CachedChains;
+          if (
+            Date.now() - cache.timestamp < CACHE_TTL &&
+            Array.isArray(cache.chains) &&
+            cache.chains.length > 0
+          ) {
+            this.#byId.set(new Map(cache.chains));
+            return;
+          }
+        }
+      } catch {
+        // ignore cache errors
+      }
+    }
+
     this.#http
       .get<{ chains: LifiChain[] }>('https://li.quest/v1/chains')
       .pipe(catchError(() => of({ chains: [] as LifiChain[] })))
@@ -57,6 +85,19 @@ export class EvmChainMetadataService {
           });
         }
         this.#byId.set(next);
+
+        // Cache the result
+        if (typeof window !== 'undefined' && next.size > 0) {
+          try {
+            const cache: CachedChains = {
+              timestamp: Date.now(),
+              chains: Array.from(next.entries()),
+            };
+            window.localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+          } catch {
+            // ignore storage errors
+          }
+        }
       });
   }
 }

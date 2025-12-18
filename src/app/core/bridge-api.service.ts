@@ -32,15 +32,13 @@ export class BridgeApiService {
       return this.#configCache.get(network)!;
     }
 
-    const request$ = this.#http
-      .get<BridgeChainConfig>(this.#url(network, '/config/chain'))
-      .pipe(
-        catchError((error) => {
-          this.#configCache.delete(network);
-          return throwError(() => error);
-        }),
-        shareReplay({ bufferSize: 1, refCount: true }),
-      );
+    const request$ = this.#http.get<BridgeChainConfig>(this.#url(network, '/config/chain')).pipe(
+      catchError((error) => {
+        this.#configCache.delete(network);
+        return throwError(() => error);
+      }),
+      shareReplay({ bufferSize: 1, refCount: true }),
+    );
 
     this.#configCache.set(network, request$);
     return request$;
