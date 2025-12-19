@@ -15,6 +15,14 @@ interface LifiChain {
   chainType?: string;
 }
 
+const CACHE_KEY = 'CONCEAL_BRIDGE_CHAIN_METADATA';
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+interface CacheData {
+  timestamp: number;
+  data: EvmChainMetadata[];
+}
+
 /**
  * Lightweight public chain metadata (name + logo).
  *
@@ -39,24 +47,67 @@ export class EvmChainMetadataService {
   }
 
   #load(): void {
+    if (this.#loadFromCache()) {
+      return;
+    }
+
     this.#http
       .get<{ chains: LifiChain[] }>('https://li.quest/v1/chains')
       .pipe(catchError(() => of({ chains: [] as LifiChain[] })))
       .subscribe(({ chains }) => {
         const next = new Map<number, EvmChainMetadata>();
+        const toCache: EvmChainMetadata[] = [];
         for (const c of chains) {
           // Only EVM chains are relevant for this app.
           if (c.chainType && c.chainType !== 'EVM') continue;
           if (!Number.isFinite(c.id)) continue;
           const name = (c.name ?? '').trim();
           if (!name) continue;
-          next.set(c.id, {
+
+          const meta: EvmChainMetadata = {
             chainId: c.id,
             name,
             logoUri: c.logoURI?.trim() || null,
-          });
+          };
+          next.set(c.id, meta);
+          toCache.push(meta);
         }
         this.#byId.set(next);
+        this.#saveToCache(toCache);
       });
+  }
+
+  #loadFromCache(): boolean {
+    try {
+      const stored = localStorage.getItem(CACHE_KEY);
+      if (!stored) return false;
+
+      const parsed: CacheData = JSON.parse(stored);
+      if (Date.now() - parsed.timestamp > CACHE_TTL) {
+        localStorage.removeItem(CACHE_KEY);
+        return false;
+      }
+
+      const next = new Map<number, EvmChainMetadata>();
+      for (const item of parsed.data) {
+        next.set(item.chainId, item);
+      }
+      this.#byId.set(next);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  #saveToCache(data: EvmChainMetadata[]): void {
+    try {
+      const cacheData: CacheData = {
+        timestamp: Date.now(),
+        data,
+      };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+    } catch {
+      // Ignore storage errors
+    }
   }
 }
