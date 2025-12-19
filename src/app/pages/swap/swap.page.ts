@@ -278,10 +278,14 @@ const erc20Abi = [
                       <button
                         type="button"
                         class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
-                        (click)="copy(cfg.ccx.accountAddress)"
+                        (click)="copy(cfg.ccx.accountAddress, 'ccx-deposit')"
                         aria-label="Copy CCX deposit address"
                       >
-                        Copy address
+                        @if (copiedTarget() === 'ccx-deposit') {
+                          Copied!
+                        } @else {
+                          Copy address
+                        }
                       </button>
                       <app-qr-code [data]="cfg.ccx.accountAddress" alt="CCX deposit address QR" />
                     } @else {
@@ -299,11 +303,15 @@ const erc20Abi = [
                     <button
                       type="button"
                       class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
-                      (click)="copy(paymentId())"
+                      (click)="copy(paymentId(), 'payment-id')"
                       [disabled]="!paymentId()"
                       aria-label="Copy payment ID"
                     >
-                      Copy payment ID
+                      @if (copiedTarget() === 'payment-id') {
+                        Copied!
+                      } @else {
+                        Copy payment ID
+                      }
                     </button>
                     <app-qr-code [data]="paymentId()" alt="Payment ID QR" />
                   </div>
@@ -590,6 +598,7 @@ export class SwapPage {
 
   readonly pageError = signal<string | null>(null);
   readonly statusMessage = signal<string | null>(null);
+  readonly copiedTarget = signal<string | null>(null);
 
   // Track polling subscription to cancel previous ones when starting new polling
   readonly #pollingCancel$ = new Subject<void>();
@@ -1030,16 +1039,18 @@ export class SwapPage {
       });
   }
 
-  async copy(text: string): Promise<void> {
+  async copy(text: string, target: string): Promise<void> {
     const value = text.trim();
     if (!value) return;
 
     try {
       await navigator.clipboard.writeText(value);
-      this.statusMessage.set('Copied to clipboard.');
-      await new Promise((r) => setTimeout(r, 1200));
-      // Only clear if it wasn't replaced by another message.
-      if (this.statusMessage() === 'Copied to clipboard.') this.statusMessage.set(null);
+      this.copiedTarget.set(target);
+
+      await new Promise((r) => setTimeout(r, 1500));
+      if (this.copiedTarget() === target) {
+        this.copiedTarget.set(null);
+      }
     } catch {
       this.statusMessage.set('Copy failed (clipboard unavailable).');
     }
