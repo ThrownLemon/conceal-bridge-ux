@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { SwapPage } from './swap.page';
 import { BridgeApiService } from '../../core/bridge-api.service';
 import { EvmWalletService } from '../../core/evm-wallet.service';
@@ -86,5 +87,18 @@ describe('SwapPage Security', () => {
     const validEmail = 'test@example.com';
     emailControl.setValue(validEmail);
     expect(emailControl.valid).toBe(true);
+  });
+
+  it('should provide in-context feedback when copying', async () => {
+    // Ensure navigator.clipboard exists (JSDOM might not implement it fully)
+    if (!navigator.clipboard) {
+      Object.assign(navigator, { clipboard: { writeText: () => Promise.resolve() } });
+    }
+    const writeTextSpy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+
+    await component.copy('test-address', 'test-id');
+
+    expect(writeTextSpy).toHaveBeenCalledWith('test-address');
+    expect(component.copiedItem()).toBe('test-id');
   });
 });

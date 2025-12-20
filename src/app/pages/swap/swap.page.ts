@@ -278,10 +278,14 @@ const erc20Abi = [
                       <button
                         type="button"
                         class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
-                        (click)="copy(cfg.ccx.accountAddress)"
-                        aria-label="Copy CCX deposit address"
+                        (click)="copy(cfg.ccx.accountAddress, 'ccx-deposit')"
+                        [attr.aria-label]="
+                          copiedItem() === 'ccx-deposit'
+                            ? 'Address copied'
+                            : 'Copy CCX deposit address'
+                        "
                       >
-                        Copy address
+                        {{ copiedItem() === 'ccx-deposit' ? 'Copied!' : 'Copy address' }}
                       </button>
                       <app-qr-code [data]="cfg.ccx.accountAddress" alt="CCX deposit address QR" />
                     } @else {
@@ -299,11 +303,13 @@ const erc20Abi = [
                     <button
                       type="button"
                       class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
-                      (click)="copy(paymentId())"
+                      (click)="copy(paymentId(), 'payment-id')"
                       [disabled]="!paymentId()"
-                      aria-label="Copy payment ID"
+                      [attr.aria-label]="
+                        copiedItem() === 'payment-id' ? 'Payment ID copied' : 'Copy payment ID'
+                      "
                     >
-                      Copy payment ID
+                      {{ copiedItem() === 'payment-id' ? 'Copied!' : 'Copy payment ID' }}
                     </button>
                     <app-qr-code [data]="paymentId()" alt="Payment ID QR" />
                   </div>
@@ -585,6 +591,7 @@ export class SwapPage {
   readonly isBusy = signal(false);
 
   readonly paymentId = signal('');
+  readonly copiedItem = signal<string | null>(null);
   readonly evmTxHash = signal<Hash | ''>('');
   readonly swapState = signal<BridgeSwapStateResponse | null>(null);
 
@@ -1030,16 +1037,23 @@ export class SwapPage {
       });
   }
 
-  async copy(text: string): Promise<void> {
+  async copy(text: string, id?: string): Promise<void> {
     const value = text.trim();
     if (!value) return;
 
     try {
       await navigator.clipboard.writeText(value);
-      this.statusMessage.set('Copied to clipboard.');
-      await new Promise((r) => setTimeout(r, 1200));
-      // Only clear if it wasn't replaced by another message.
-      if (this.statusMessage() === 'Copied to clipboard.') this.statusMessage.set(null);
+      if (id) {
+        this.copiedItem.set(id);
+        setTimeout(() => {
+          if (this.copiedItem() === id) this.copiedItem.set(null);
+        }, 1500);
+      } else {
+        this.statusMessage.set('Copied to clipboard.');
+        await new Promise((r) => setTimeout(r, 1200));
+        // Only clear if it wasn't replaced by another message.
+        if (this.statusMessage() === 'Copied to clipboard.') this.statusMessage.set(null);
+      }
     } catch {
       this.statusMessage.set('Copy failed (clipboard unavailable).');
     }
