@@ -157,6 +157,7 @@ const erc20Abi = [
                       autocomplete="off"
                       spellcheck="false"
                       aria-label="Your CCX address"
+                      maxlength="98"
                     />
                     <p class="text-xs text-[var(--cb-color-muted)]">
                       Used by the backend to associate the payment ID to your swap.
@@ -175,6 +176,7 @@ const erc20Abi = [
                       autocomplete="off"
                       spellcheck="false"
                       aria-label="Your EVM address"
+                      maxlength="42"
                     />
                     <div class="flex flex-wrap gap-2">
                       <button
@@ -210,6 +212,7 @@ const erc20Abi = [
                         placeholder="0.0"
                         inputmode="decimal"
                         aria-label="Amount"
+                        maxlength="32"
                       />
                       @if (config(); as cfg) {
                         <p class="text-xs text-[var(--cb-color-muted)]">
@@ -234,6 +237,7 @@ const erc20Abi = [
                         placeholder="you@example.com"
                         autocomplete="email"
                         aria-label="Email (optional)"
+                        maxlength="254"
                       />
                       <p class="text-xs text-[var(--cb-color-muted)]">
                         Used only for notifications/support.
@@ -393,6 +397,7 @@ const erc20Abi = [
                       autocomplete="off"
                       spellcheck="false"
                       aria-label="Your CCX address"
+                      maxlength="98"
                     />
                   </div>
 
@@ -408,6 +413,7 @@ const erc20Abi = [
                         placeholder="0.0"
                         inputmode="decimal"
                         aria-label="Amount"
+                        maxlength="32"
                       />
                       @if (config(); as cfg) {
                         <p class="text-xs text-[var(--cb-color-muted)]">
@@ -432,6 +438,7 @@ const erc20Abi = [
                         placeholder="you@example.com"
                         autocomplete="email"
                         aria-label="Email (optional)"
+                        maxlength="254"
                       />
                     </div>
                   </div>
@@ -595,8 +602,16 @@ export class SwapPage {
   readonly #pollingCancel$ = new Subject<void>();
 
   readonly ccxToEvmForm = this.#fb.group({
-    ccxFromAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
-    evmToAddress: this.#fb.control('', [Validators.required, Validators.pattern(EVM_ADDRESS_RE)]),
+    ccxFromAddress: this.#fb.control('', [
+      Validators.required,
+      Validators.pattern(CCX_ADDRESS_RE),
+      Validators.maxLength(98),
+    ]),
+    evmToAddress: this.#fb.control('', [
+      Validators.required,
+      Validators.pattern(EVM_ADDRESS_RE),
+      Validators.maxLength(42),
+    ]),
     amount: this.#fb.control('', [
       Validators.required,
       Validators.pattern(/^[0-9]+\.?[0-9]*$/),
@@ -606,7 +621,11 @@ export class SwapPage {
   });
 
   readonly evmToCcxForm = this.#fb.group({
-    ccxToAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
+    ccxToAddress: this.#fb.control('', [
+      Validators.required,
+      Validators.pattern(CCX_ADDRESS_RE),
+      Validators.maxLength(98),
+    ]),
     amount: this.#fb.control('', [
       Validators.required,
       Validators.pattern(/^[0-9]+\.?[0-9]*$/),
