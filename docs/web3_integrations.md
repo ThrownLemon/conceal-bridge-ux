@@ -1325,7 +1325,7 @@ try {
 ## Related docs/specs in this repo
 
 - [`docs/wallets.md`](./wallets.md)
-- [`docs/smart_conctracts.md`](./smart_conctracts.md)
+- [`docs/smart_contracts.md`](./smart_contracts.md)
 - [`docs/backend_api.md`](./backend_api.md)
 - [`docs/error_handling.md`](./error_handling.md)
 - [`docs/security.md`](./security.md)

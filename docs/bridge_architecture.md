@@ -972,7 +972,7 @@ export class BridgeTransactionService {
 - [`docs/backend_api.md`](./backend_api.md)
 - [`docs/web3_integrations.md`](./web3_integrations.md)
 - [`docs/wallets.md`](./wallets.md)
-- [`docs/smart_conctracts.md`](./smart_conctracts.md)
+- [`docs/smart_contracts.md`](./smart_contracts.md)
 - [`docs/error_handling.md`](./error_handling.md)
 - [`docs/security.md`](./security.md)
 - [`docs/testing.md`](./testing.md)

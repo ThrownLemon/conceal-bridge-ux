@@ -257,11 +257,22 @@ For detailed deployment information, see:
 
 This project uses:
 
-- **Issue tracking**: [bd (beads)](https://github.com/google-labs/breadboard/tree/main/packages/beads) for AI-native issue tracking
+- **Issue tracking**: [bd (beads)](https://github.com/steveyegge/beads) - AI-native issue tracking that lives in your repo (`.beads/`)
 - **Commit style**: Conventional Commits (feat:, fix:, docs:, chore:, refactor:)
 - **Branching**: Feature branches merged to `master` via pull requests
 
-See [AGENTS.md](./AGENTS.md) for detailed workflow instructions.
+### For Developers & AI Agents
+
+- **Agent instructions**: [AGENTS.md](./AGENTS.md) - Critical workflows, patterns, and "Landing the Plane" rules
+- **Detailed workflows**: [.agent/workflows/](./.agent/workflows/) - Comprehensive guides for:
+  - Testing (`test.md`) - Unit & E2E testing
+  - Deployment (`deploy.md`) - GitHub Actions & manual deployment
+  - Debugging (`debug.md`) - Browser DevTools, Angular, Web3
+  - Releases (`release.md`) - Versioning & changelog
+  - Hotfixes (`hotfix.md`) - Emergency fix procedures
+  - And more (review, scaffold, submit, update-packages)
+
+**Quick start:** Run `bd onboard` to get started with beads issue tracking.
 
 ## Related Repositories
 

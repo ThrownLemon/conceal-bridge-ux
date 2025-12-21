@@ -201,7 +201,7 @@ When users report wallet issues, diagnose using these facts:
 
 - Wallet error mapping and user-facing messaging rules: [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)
 - Backend API (init/exec/poll endpoints) and response shapes that wallet flows drive: [`backend_api.md`](conceal-bridge-ux/docs/backend_api.md:1)
-- Smart contract & on-chain verification patterns (wCCX ERC-20, calldata decoding): [`smart_conctracts.md`](conceal-bridge-ux/docs/smart_conctracts.md:1)
+- Smart contract & on-chain verification patterns (wCCX ERC-20, calldata decoding): [`smart_contracts.md`](conceal-bridge-ux/docs/smart_contracts.md:1)
 - Security constraints for wallet integration (no secrets, safe links, CSP considerations): [`security.md`](conceal-bridge-ux/docs/security.md:1)
 - Testing strategy for wallet-heavy flows (mocking providers/viem, E2E plan): [`testing.md`](conceal-bridge-ux/docs/testing.md:1)
 - Web3 implementation notes (viem patterns; treat as supplemental to actual code): [`web3_integrations.md`](conceal-bridge-ux/docs/web3_integrations.md:1)

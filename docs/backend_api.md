@@ -446,6 +446,6 @@ AI agent rule:
 
 ## 9) Related docs/specs in this repo
 
-- Smart contract behavior (ERC-20 wCCX) and backend verification patterns: [`smart_conctracts.md`](conceal-bridge-ux/docs/smart_conctracts.md:1)
+- Smart contract behavior (ERC-20 wCCX) and backend verification patterns: [`smart_contracts.md`](conceal-bridge-ux/docs/smart_contracts.md:1)
 - Frontend runtime types for swap responses (new UX): [`BridgeInitSwapResponse`](conceal-bridge-ux/src/app/core/bridge-types.ts:39), [`BridgeSwapStateResponse`](conceal-bridge-ux/src/app/core/bridge-types.ts:45)
 - Error handling expectations for the UX: [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)

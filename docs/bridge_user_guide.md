@@ -193,7 +193,7 @@ Make sure you've added the custom token using the correct contract address for y
 - [`docs/wallets.md`](./wallets.md)
 - [`docs/web3_integrations.md`](./web3_integrations.md)
 - [`docs/backend_api.md`](./backend_api.md)
-- [`docs/smart_conctracts.md`](./smart_conctracts.md)
+- [`docs/smart_contracts.md`](./smart_contracts.md)
 - [`docs/error_handling.md`](./error_handling.md)
 - [`docs/security.md`](./security.md)
 - [`ai_spec/http_and_error_handling.md`](../ai_spec/http_and_error_handling.md)

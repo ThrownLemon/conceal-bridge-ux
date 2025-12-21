@@ -221,7 +221,7 @@ Use the plan in [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1). 
 - Error states to validate (busy gating, status messages, retries): [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)
 - Backend endpoints to mock and their real response shapes: [`backend_api.md`](conceal-bridge-ux/docs/backend_api.md:1)
 - Wallet integration behaviors (connectors, chain switching, error codes): [`wallets.md`](conceal-bridge-ux/docs/wallets.md:1)
-- Smart contract interaction/verification patterns (ERC-20, unit scaling): [`smart_conctracts.md`](conceal-bridge-ux/docs/smart_conctracts.md:1)
+- Smart contract interaction/verification patterns (ERC-20, unit scaling): [`smart_contracts.md`](conceal-bridge-ux/docs/smart_contracts.md:1)
 - E2E framework plan and mocks to implement: [`e2e_testing.md`](conceal-bridge-ux/ai_spec/e2e_testing.md:1)
 - HTTP behavior and retry/timeout guidance (for test realism): [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:1)
 - Security constraints that affect test doubles (no secrets, CSP assumptions): [`security.md`](conceal-bridge-ux/docs/security.md:1)
