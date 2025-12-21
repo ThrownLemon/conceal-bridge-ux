@@ -32,6 +32,7 @@ npx playwright test --debug
 ### Console Tab
 
 **View JavaScript errors:**
+
 ```javascript
 // Check for errors (red text)
 console.error('Critical error');
@@ -47,6 +48,7 @@ observable$.subscribe(val => console.log('value:', val));
 ```
 
 **Clear console:**
+
 ```javascript
 console.clear()
 // or Ctrl+L
@@ -66,6 +68,7 @@ console.clear()
    - Timing (slow requests)
 
 **Common issues:**
+
 - CORS errors: Backend needs to allow origin
 - 401 Unauthorized: Check API keys/tokens
 - 404 Not Found: Check URL and endpoint
@@ -82,12 +85,14 @@ console.clear()
 5. Execution pauses at breakpoint
 
 **Debug controls:**
+
 - Resume (F8): Continue execution
 - Step Over (F10): Next line
 - Step Into (F11): Enter function
 - Step Out (Shift+F11): Exit function
 
 **Watch expressions:**
+
 ```javascript
 this.wallet.address()
 this.chainId()
@@ -97,6 +102,7 @@ this.isConnected()
 ### Application Tab
 
 **Check local storage:**
+
 ```javascript
 // View all storage
 Application → Storage → Local Storage
@@ -107,6 +113,7 @@ localStorage.getItem('transaction_history')
 ```
 
 **Clear storage:**
+
 ```javascript
 localStorage.clear()
 sessionStorage.clear()
@@ -119,6 +126,7 @@ sessionStorage.clear()
 Install: [Chrome](https://chrome.google.com/webstore/detail/angular-devtools/ienfalfjdbdpebioblfackkekamfmbnh)
 
 **Features:**
+
 - Component tree inspector
 - Signal value viewer
 - Profiler for performance
@@ -186,10 +194,12 @@ async connect() {
 ### Common Wallet Issues
 
 **User rejected request:**
+
 - User clicked "Cancel" in MetaMask
 - Check error message
 
 **Chain mismatch:**
+
 ```typescript
 // Check current chain
 const chainId = await publicClient.getChainId();
@@ -200,6 +210,7 @@ console.log('Expected:', mainnet.id);
 ```
 
 **Insufficient funds:**
+
 - Check wallet balance
 - Check gas estimation
 
@@ -249,6 +260,7 @@ import { ChangeDetectionStrategy } from '@angular/core';
 ### Common Causes
 
 **Unsubscribed observables:**
+
 ```typescript
 // Bad
 ngOnInit() {
@@ -268,6 +280,7 @@ ngOnInit() {
 ```
 
 **Effect cleanup:**
+
 ```typescript
 effect((onCleanup) => {
   const timer = setInterval(() => {}, 1000);
@@ -285,6 +298,7 @@ effect((onCleanup) => {
 **Cause:** Signal/state changed during change detection
 
 **Solution:**
+
 ```typescript
 // Use setTimeout to defer change
 setTimeout(() => {
@@ -303,6 +317,7 @@ effect(() => {
 **Cause:** Data not loaded yet
 
 **Solution:**
+
 ```typescript
 // Use optional chaining
 {{ wallet.address()?.slice(0, 6) }}
@@ -318,6 +333,7 @@ effect(() => {
 **Cause:** Signal updates triggering themselves
 
 **Solution:**
+
 ```typescript
 // Bad
 effect(() => {
@@ -333,6 +349,7 @@ button.click(() => {
 ### Issue: HTTP call not returning
 
 **Check:**
+
 1. Network tab - is request sent?
 2. Request URL correct?
 3. CORS headers present?
@@ -366,6 +383,7 @@ it('should work', () => {
 ```
 
 Run with inspect:
+
 ```bash
 npm test -- --inspect
 ```
@@ -426,7 +444,7 @@ F12 → Lighthouse → Generate report
 
 ## Related Tools
 
-- **Angular DevTools**: https://angular.io/guide/devtools
-- **Chrome DevTools**: https://developer.chrome.com/docs/devtools/
-- **Playwright Inspector**: https://playwright.dev/docs/debug
-- **Viem Docs**: https://viem.sh/docs/
+- **Angular DevTools**: <https://angular.io/guide/devtools>
+- **Chrome DevTools**: <https://developer.chrome.com/docs/devtools/>
+- **Playwright Inspector**: <https://playwright.dev/docs/debug>
+- **Viem Docs**: <https://viem.sh/docs/>

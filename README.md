@@ -59,24 +59,26 @@ The dev server will automatically reload when source files change.
 
 ### Backend API Base URL
 
-The backend base URL is provided via the `APP_CONFIG` injection token:
-
-- **Config file**: `src/app/core/app-config.ts`
-
 The app uses Angular environment files for configuration:
 
-- **Development (default)**: `src/environments/environment.development.ts` (Testing backend)
-- **Production**: `src/environments/environment.ts` (Production backend)
+- **Development (default)**: `src/environments/environment.development.ts` (Testing backend at `https://bridge.conceal.network/testing/backend`)
+- **Production**: `src/environments/environment.ts` (Production backend at `https://bridge.conceal.network/backend`)
 
-The `APP_CONFIG` injection token reads from the active environment file based on the build configuration.
+The backend URL is accessed via the `APP_CONFIG` injection token (`src/app/core/app-config.ts`), which automatically reads `apiBaseUrl` from the active environment file based on the build configuration.
 
-### WalletConnect Project ID
+**To change the backend URL:**
+- For development: Edit `src/environments/environment.development.ts`
+- For production: Edit `src/environments/environment.ts`
 
-WalletConnect v2 uses `walletConnectProjectId` from the same config token:
+### Supported Wallets
 
-- `src/app/core/app-config.ts`
+The app supports EVM wallet connections through **injected providers** (browser extensions):
 
-If WalletConnect is not configured (missing/invalid project ID), the WalletConnect connector will be unavailable. Currently, the app supports MetaMask, Trust Wallet, and Binance Wallet via injected providers.
+- **MetaMask** - Most popular Ethereum wallet
+- **Trust Wallet** - Mobile-first multi-chain wallet
+- **Binance Wallet** - Binance Chain wallet
+
+No additional configuration is required. The `EvmWalletService` (`src/app/core/evm-wallet.service.ts`) automatically detects and connects to available wallet providers using Viem.
 
 ## Project Structure
 

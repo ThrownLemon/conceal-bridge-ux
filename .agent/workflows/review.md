@@ -51,7 +51,7 @@ description: Comprehensive code review checklist and process for Angular v21+ pr
 - [ ] **Comments**: Remove commented-out code.
 - [ ] **Unused Imports**: Remove unused imports.
 
-# Execution
+## Execution
 
 To run the automated parts of this review:
 
@@ -68,6 +68,7 @@ To run the automated parts of this review:
    ```
 
 3. **Build Check**:
+
    ```bash
    npm run build
    ```

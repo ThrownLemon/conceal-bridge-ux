@@ -96,7 +96,7 @@ Additionally, this project includes “soft failures” that should not hard-fai
   - Don’t show raw `HttpErrorResponse` JSON.
   - Don’t show RPC stack traces, hex codes, or provider internals unless already user-friendly.
 - **Do not expose secrets**:
-  - Never echo private keys, seeds, walletconnect secrets, etc. (project has `walletConnectProjectId` in [`APP_CONFIG`](conceal-bridge-ux/src/app/core/app-config.ts:17); still treat runtime config as potentially sensitive in logs).
+  - Never echo private keys, seeds, API keys, or sensitive configuration.
 
 ### 4.2 Message placement rules
 

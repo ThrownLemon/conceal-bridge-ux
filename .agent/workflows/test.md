@@ -73,7 +73,7 @@ npm run e2e
 npx playwright test --ui
 ```
 
-### Run Specific Test File
+### Run Specific E2E Test File
 
 ```bash
 npx playwright test e2e/swap.spec.ts
@@ -104,6 +104,7 @@ npx playwright test --project=webkit
 ### Writing Unit Tests
 
 **Component Test Template:**
+
 ```typescript
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MyComponent } from './my.component';
@@ -129,6 +130,7 @@ describe('MyComponent', () => {
 ```
 
 **Service Test Template:**
+
 ```typescript
 import { TestBed } from '@angular/core/testing';
 import { MyService } from './my.service';
@@ -150,6 +152,7 @@ describe('MyService', () => {
 ### Writing E2E Tests
 
 **E2E Test Template:**
+
 ```typescript
 import { test, expect } from '@playwright/test';
 

@@ -34,22 +34,24 @@ git log v1.0.0..HEAD --oneline
 ```
 
 Decide version bump based on changes:
+
 - Breaking changes? → Major
 - New features? → Minor  
 - Only bug fixes? → Patch
 
 ### 2. Update Version in package.json
 
-**Option A: Manual**
+#### Option A: Manual
 
 Edit `package.json`:
+
 ```json
 {
   "version": "1.1.0"
 }
 ```
 
-**Option B: npm version command**
+#### Option B: npm version command
 
 ```bash
 # Patch: 1.0.0 → 1.0.1
@@ -63,6 +65,7 @@ npm version major
 ```
 
 This automatically:
+
 - Updates package.json
 - Creates git commit
 - Creates git tag
@@ -103,6 +106,7 @@ npx conventional-changelog -p angular -i CHANGELOG.md -s
 ### 4. Update Documentation
 
 Update version numbers in:
+
 - [ ] `README.md` (if version is shown)
 - [ ] `docs/project_history.md` (major releases)
 - [ ] `package.json` (already done)
@@ -151,7 +155,7 @@ git push origin master --follow-tags
 
 #### Option A: GitHub Web UI
 
-1. Go to: https://github.com/ThrownLemon/conceal-bridge-ux/releases
+1. Go to: <https://github.com/ThrownLemon/conceal-bridge-ux/releases>
 2. Click "Draft a new release"
 3. Choose tag: v1.1.0
 4. Release title: v1.1.0 - [Short Description]
@@ -169,7 +173,8 @@ gh release create v1.1.0 \
 ### 9. Verify Release
 
 Check:
-- [ ] Release appears on GitHub: https://github.com/ThrownLemon/conceal-bridge-ux/releases
+
+- [ ] Release appears on GitHub: <https://github.com/ThrownLemon/conceal-bridge-ux/releases>
 - [ ] Tag is visible: `git tag -l`
 - [ ] Deployment successful (if auto-deploy configured)
 - [ ] Live site running new version
@@ -177,6 +182,7 @@ Check:
 ### 10. Announce Release (Optional)
 
 If you have a changelog or blog:
+
 - Post release notes
 - Announce new features
 - Thank contributors
@@ -194,6 +200,7 @@ bd close <issue-id> --comment "Released in v1.1.0"
 ### Monitor for Issues
 
 Watch for:
+
 - User reports
 - Error monitoring alerts
 - GitHub issues
@@ -215,6 +222,7 @@ See [hotfix.md](./hotfix.md) for full hotfix workflow.
 ## Release Cadence
 
 Recommended schedule:
+
 - **Major releases**: Every 6-12 months (breaking changes)
 - **Minor releases**: Every 2-4 weeks (new features)
 - **Patch releases**: As needed (bug fixes)

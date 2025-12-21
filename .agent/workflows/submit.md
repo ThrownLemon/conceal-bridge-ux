@@ -11,6 +11,7 @@ description: Complete workflow for committing changes, running quality gates, an
 1. **Check Current Branch**:
    - Run `git branch --show-current` to confirm the current branch.
    - **Rule**: Do NOT commit directly to `master`. If on master, create a feature branch:
+
      ```bash
      git checkout -b feature/your-feature-name
      ```
@@ -20,37 +21,47 @@ description: Complete workflow for committing changes, running quality gates, an
 Before committing, ensure code quality:
 
 1. **Linting**:
+
    ```bash
    npm run lint
    ```
+
    - Fix any errors with `npm run lint:fix`
 
 2. **Unit Tests**:
+
    ```bash
    npm test
    ```
+
    - All tests must pass
 
 3. **Build Check**:
+
    ```bash
    npm run build
    ```
+
    - Production build must succeed
 
 ## 3. Stage and Commit Changes
 
 1. **Check Status**:
+
    ```bash
    git status
    ```
 
 2. **Stage Files**:
+
    ```bash
    git add .
    ```
+
    - Or specify files if partial commit is desired
 
 3. **Review Changes**:
+
    ```bash
    git diff --cached
    ```
@@ -59,6 +70,7 @@ Before committing, ensure code quality:
    - Format: `<type>(<scope>): <subject>`
    - Types: feat, fix, docs, chore, refactor, test, ci
    - Examples:
+
      ```bash
      git commit -m "feat: add transaction history modal"
      git commit -m "fix: resolve chain switching bug"
@@ -87,6 +99,7 @@ git status  # MUST show "up to date with origin"
 ```
 
 **If upstream not set:**
+
 ```bash
 git push -u origin <current-branch>
 ```
@@ -97,7 +110,7 @@ git push -u origin <current-branch>
 git status
 ```
 
-Should show: "Your branch is up to date with 'origin/<branch>'"
+Should show: "Your branch is up to date with 'origin/\<branch>'"
 
 ## 7. Create Pull Request (Optional)
 

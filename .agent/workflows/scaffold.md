@@ -36,19 +36,23 @@ After generating the files, you **MUST** modify them to meet specific v21+ stand
 ### A. Component (`.ts`)
 
 1. **Inputs/Outputs**: Convert any `@Input() / @Output()` to `input()` / `output()`.
+
    ```typescript
    // Before
    @Input() amount: number;
    // After
    readonly amount = input<number>();
    ```
+
 2. **Dependency Injection**: Convert constructor DI to `inject()`.
+
    ```typescript
    // Before
    constructor(private service: MyService) {}
    // After
    private readonly service = inject(MyService);
    ```
+
 3. **Change Detection**: Ensure `changeDetection: ChangeDetectionStrategy.OnPush` is in the decorator.
 4. **Imports**: Add necessary imports to the `imports` array (e.g., `CommonModule` is often redundant if using `@if/@for`, but imports like `RouterLink` might be needed).
 
@@ -66,6 +70,7 @@ After generating the files, you **MUST** modify them to meet specific v21+ stand
 
 - **Routing**: If this is a page/view, add it to the `app.routes.ts` or the feature's route config.
   - **Lazy Loading**: Use `loadComponent: () => import(...)`.
+
   ```typescript
   {
     path: 'bridge',

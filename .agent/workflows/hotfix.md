@@ -9,12 +9,14 @@ description: Emergency hotfix workflow for critical production issues
 ## When to Use This Workflow
 
 Use hotfix workflow when:
+
 - ✅ Production site is broken or severely degraded
 - ✅ Security vulnerability discovered
 - ✅ Data loss or corruption risk
 - ✅ Critical feature completely broken
 
 **Do NOT use for:**
+
 - ❌ Minor bugs
 - ❌ UI polish
 - ❌ Performance improvements
@@ -25,6 +27,7 @@ Use hotfix workflow when:
 ### 1. Assess Severity
 
 **Critical (Deploy ASAP):**
+
 - Site won't load
 - Wallet connection completely broken
 - Transactions failing
@@ -32,11 +35,13 @@ Use hotfix workflow when:
 - Data loss
 
 **High (Deploy within hours):**
+
 - Major feature broken
 - Error affecting >50% of users
 - Workaround available but poor UX
 
 **Medium (Can wait for normal cycle):**
+
 - Minor bug with workaround
 - UI glitch
 - Non-critical feature broken
@@ -89,6 +94,7 @@ npm start
 ```
 
 Verify:
+
 - [ ] The specific bug is fixed
 - [ ] No new errors in console
 - [ ] Core functionality still works
@@ -124,12 +130,14 @@ This triggers automatic deployment via GitHub Actions.
 ### 8. Monitor Deployment
 
 Watch GitHub Actions:
-```
+
+```text
 https://github.com/ThrownLemon/conceal-bridge-ux/actions
 ```
 
 Verify live site within 5 minutes:
-```
+
+```text
 https://thrownlemon.github.io/conceal-bridge-ux/
 ```
 
@@ -143,17 +151,20 @@ After deployment:
    - Confirm with user who reported (if applicable)
 
 2. **Create Retrospective Issue:**
+
    ```bash
    bd create "Retrospective: <hotfix-name>" --priority P2
    ```
 
 3. **Document in Project History:**
    Add entry to `docs/project_history.md`:
+
    ```markdown
    - **2025-12-21**: Hotfix - Fixed wallet connection error affecting MetaMask users
    ```
 
 4. **Clean Up Branch:**
+
    ```bash
    git branch -d hotfix/describe-the-fix
    git push origin --delete hotfix/describe-the-fix
@@ -186,7 +197,7 @@ After deployment:
 
 1. Check `BridgeApiService`
 2. Verify environment variables
-3. Check backend status (https://github.com/ConcealNetwork/conceal-wswap)
+3. Check backend status (<https://github.com/ConcealNetwork/conceal-wswap>)
 
 ### Build Failing on Deploy
 

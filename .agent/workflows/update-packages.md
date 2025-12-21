@@ -23,6 +23,7 @@ ncu
 This shows available updates without making changes.
 
 **Review the output:**
+
 - 🟢 **Patch updates** (1.0.0 → 1.0.1) - Usually safe
 - 🟡 **Minor updates** (1.0.0 → 1.1.0) - Generally safe, check changelog
 - 🔴 **Major updates** (1.0.0 → 2.0.0) - Breaking changes, review carefully
@@ -39,6 +40,7 @@ npm view <package-name>@latest
 Or visit package on npmjs.com to read CHANGELOG/migration guides.
 
 **Key packages to watch:**
+
 - `@angular/*` - Major Angular updates require migration guides
 - `viem` - Web3 library, check for breaking API changes
 - `tailwindcss` - CSS framework updates may affect utilities
@@ -103,6 +105,7 @@ npm start
 ```
 
 **Check:**
+
 - [ ] App loads without console errors
 - [ ] Wallet connection works
 - [ ] Main swap flow functions
@@ -114,10 +117,12 @@ If tests fail or app breaks:
 
 1. **Check package changelog** for migration steps
 2. **Revert if needed**:
+
    ```bash
    git restore package.json package-lock.json
    npm install
    ```
+
 3. **Update incrementally** - Update one major package at a time
 
 ## 6. Commit Changes
@@ -135,6 +140,7 @@ git commit -m "chore: update npm dependencies
 ## 7. Document Major Updates
 
 For significant updates (especially Angular), update:
+
 - `docs/project_history.md` - Log the update
 - `README.md` - Update version numbers if shown
 - `AGENTS.md` - Update if tech stack versions mentioned

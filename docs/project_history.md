@@ -8,7 +8,7 @@
 - **Documentation**: Updated `docs/build_guide.md` to accurately reflect project configuration (Linting, Budgets, Dependencies).
 - **Refactor**: Removed `walletconnect` dependency (v2) in favor of specific connectors.
 - **Feature**: Implemented custom SVG QR code generation, removing the `qrcode` dependency.
-- **Config**: Implemented environment-specific configurations (Production vs Development) for API and WalletConnect IDs.
+- **Config**: Implemented environment-specific configurations (Production vs Development) for API base URLs.
 
 ## 2025-12-17
 

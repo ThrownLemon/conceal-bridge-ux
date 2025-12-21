@@ -19,6 +19,7 @@ git push origin master
 ```
 
 GitHub Actions will automatically:
+
 1. Run linting checks
 2. Run unit tests
 3. Build production bundle
@@ -27,18 +28,21 @@ GitHub Actions will automatically:
 ### Monitor Deployment
 
 View deployment status:
+
 - GitHub repo → **Actions** tab
-- Or: https://github.com/ThrownLemon/conceal-bridge-ux/actions
+- Or: <https://github.com/ThrownLemon/conceal-bridge-ux/actions>
 
 **Live URLs:**
-- Production: https://bridge.conceal.network
-- GitHub Pages: https://thrownlemon.github.io/conceal-bridge-ux/
+
+- Production: <https://bridge.conceal.network>
+- GitHub Pages: <https://thrownlemon.github.io/conceal-bridge-ux/>
 
 ## Manual Deployment (If Needed)
 
 ### Prerequisites
 
 Ensure GitHub Pages is configured:
+
 1. Repo Settings → Pages
 2. Source: **GitHub Actions**
 
@@ -62,7 +66,8 @@ npm run build
 npx http-server dist/conceal-bridge-ux/browser -p 8080
 ```
 
-Open http://localhost:8080 and verify:
+Open <http://localhost:8080> and verify:
+
 - [ ] App loads without errors
 - [ ] Wallet connection works
 - [ ] Swap interface functions
@@ -86,9 +91,10 @@ After deployment completes:
 
 ### Check Live Site
 
-Visit: https://thrownlemon.github.io/conceal-bridge-ux/
+Visit: <https://thrownlemon.github.io/conceal-bridge-ux/>
 
 Verify:
+
 - [ ] Site loads
 - [ ] No console errors (F12 → Console)
 - [ ] Connect wallet button works
@@ -97,13 +103,14 @@ Verify:
 
 ### Check Production Site (If Different)
 
-Visit: https://bridge.conceal.network
+Visit: <https://bridge.conceal.network>
 
 Same verification as above.
 
 ### Monitor for Issues
 
 Check:
+
 - Browser console for errors
 - Network tab for failed requests
 - Performance (Lighthouse score)
@@ -161,13 +168,16 @@ Before major deployments:
 ## 7. Deployment Configuration Files
 
 **GitHub Actions Workflow:**
+
 - `.github/workflows/deploy.yml`
 
 **Angular Build Config:**
+
 - `angular.json` (production configuration)
 - `src/environments/environment.ts` (production environment)
 
 **Important Settings:**
+
 - Base href: `/conceal-bridge-ux/` (for GitHub Pages subdirectory)
 - Output path: `dist/conceal-bridge-ux/browser`
 
@@ -176,6 +186,7 @@ Before major deployments:
 ### Deployment Fails - Build Error
 
 Check GitHub Actions logs for error details. Common issues:
+
 - TypeScript errors
 - Missing dependencies
 - Build budget exceeded
@@ -183,6 +194,7 @@ Check GitHub Actions logs for error details. Common issues:
 ### Site Loads But Routes Don't Work
 
 Check `baseHref` in `angular.json`:
+
 ```json
 {
   "configurations": {
