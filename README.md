@@ -67,6 +67,7 @@ The app uses Angular environment files for configuration:
 The backend URL is accessed via the `APP_CONFIG` injection token (`src/app/core/app-config.ts`), which automatically reads `apiBaseUrl` from the active environment file based on the build configuration.
 
 **To change the backend URL:**
+
 - For development: Edit `src/environments/environment.development.ts`
 - For production: Edit `src/environments/environment.ts`
 
