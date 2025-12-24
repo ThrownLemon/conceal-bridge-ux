@@ -197,5 +197,3 @@ As the first Cryptonote coin to bridge multiple networks, Conceal Network is pio
 - [`docs/smart_contracts.md`](./smart_contracts.md)
 - [`docs/error_handling.md`](./error_handling.md)
 - [`docs/security.md`](./security.md)
-- [`ai_spec/http_and_error_handling.md`](../ai_spec/http_and_error_handling.md)
-- [`ai_spec/runtime_config.md`](../ai_spec/runtime_config.md)

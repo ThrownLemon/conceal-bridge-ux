@@ -1333,5 +1333,3 @@ try {
 - [`docs/bridge_overview.md`](./bridge_overview.md)
 - [`docs/bridge_user_guide.md`](./bridge_user_guide.md)
 - [`docs/bridge_architecture.md`](./bridge_architecture.md)
-- [`ai_spec/http_and_error_handling.md`](../ai_spec/http_and_error_handling.md)
-- [`ai_spec/security_headers_and_csp.md`](../ai_spec/security_headers_and_csp.md)

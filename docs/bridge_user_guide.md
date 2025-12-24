@@ -196,5 +196,3 @@ Make sure you've added the custom token using the correct contract address for y
 - [`docs/smart_contracts.md`](./smart_contracts.md)
 - [`docs/error_handling.md`](./error_handling.md)
 - [`docs/security.md`](./security.md)
-- [`ai_spec/http_and_error_handling.md`](../ai_spec/http_and_error_handling.md)
-- [`ai_spec/e2e_testing.md`](../ai_spec/e2e_testing.md)

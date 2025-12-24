@@ -16,9 +16,6 @@
 docs/backend_api.md
 docs/error_handling.md
 
-ai_spec/http_and_error_handling.md
-ai_spec/runtime_config.md
-
 src/app/core/app-config.ts
 src/app/core/bridge-api.service.ts
 src/app/core/bridge-types.ts

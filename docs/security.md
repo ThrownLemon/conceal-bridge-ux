@@ -9,8 +9,6 @@ Core references in this repo:
 - Wallet UI: [`WalletButtonComponent`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:309)
 - Backend API client: [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13)
 - Backend-provided chain config shape: [`BridgeChainConfig`](conceal-bridge-ux/src/app/core/bridge-types.ts:8)
-- Hosting security (CSP/headers): [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1)
-
 ---
 
 ## 1) Threat model (what we defend against)
@@ -274,8 +272,7 @@ This app is a static Angular SPA (bootstrapped via [`bootstrapApplication()`](co
 
 Rules:
 
-- Follow the deployment spec in [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1).
-- Keep CSP tight and iterate using report-only rollout as described in [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:41).
+- Keep CSP tight and iterate using report-only rollout
 - Minimize external asset hosts:
   - prefer local assets in [`conceal-bridge-ux/public/`](conceal-bridge-ux/public:1)
   - be deliberate about `connect-src` allowlists for:
@@ -292,7 +289,7 @@ Before finalizing any change that touches wallet, transactions, config, or exter
 - Wallet operations remain scoped to required actions (see [`EvmWalletService.sendNativeTransaction()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:245) and [`walletClient.writeContract()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:794)).
 - No new secret-handling was introduced (see storage usage in [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:389)).
 - External links are safe (see [`HomePage`](conceal-bridge-ux/src/app/pages/home/home.page.ts:169)).
-- CSP/headers implications are updated if new external hosts are used (see [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:150)).
+- CSP/headers implications are updated if new external hosts are used
 
 ---
 
@@ -302,6 +299,4 @@ Before finalizing any change that touches wallet, transactions, config, or exter
 - Backend endpoint behavior and response shapes: [`backend_api.md`](conceal-bridge-ux/docs/backend_api.md:1)
 - Wallet security constraints and provider behavior: [`wallets.md`](conceal-bridge-ux/docs/wallets.md:1)
 - Smart contract (wCCX ERC-20) trust boundaries and tx verification: [`smart_contracts.md`](conceal-bridge-ux/docs/smart_contracts.md:1)
-- HTTP error-handling roadmap (timeouts/retries/interceptor plan): [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:1)
-- CSP + security headers deployment plan: [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1)
 - Testing strategy for security- and wallet-sensitive flows: [`testing.md`](conceal-bridge-ux/docs/testing.md:1)

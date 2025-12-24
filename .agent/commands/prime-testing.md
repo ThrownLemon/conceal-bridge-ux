@@ -17,8 +17,6 @@ docs/error_handling.md
 docs/wallets.md
 docs/backend_api.md
 
-ai_spec/e2e_testing.md
-
 package.json
 angular.json
 tsconfig.spec.json

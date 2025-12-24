@@ -17,10 +17,6 @@ docs/security.md
 docs/error_handling.md
 docs/wallets.md
 
-ai_spec/security_headers_and_csp.md
-ai_spec/observability_and_client_logging.md
-ai_spec/runtime_config.md
-
 src/app/pages/home/home.page.ts
 src/app/pages/swap/swap.page.ts
 src/app/core/evm-wallet.service.ts

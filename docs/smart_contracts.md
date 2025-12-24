@@ -249,4 +249,3 @@ Agent rule:
 - Error handling patterns for web3 + backend responses: [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)
 - Wallet integration patterns (MetaMask/etc.): [`wallets.md`](conceal-bridge-ux/docs/wallets.md:1)
 - Security posture and constraints: [`security.md`](conceal-bridge-ux/docs/security.md:1)
-- Future: explorer/history feature spec: [`bridge_explorer_and_history.md`](conceal-bridge-ux/ai_spec/bridge_explorer_and_history.md:1)

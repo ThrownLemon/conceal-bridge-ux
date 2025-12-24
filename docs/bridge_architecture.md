@@ -976,4 +976,3 @@ export class BridgeTransactionService {
 - [`docs/error_handling.md`](./error_handling.md)
 - [`docs/security.md`](./security.md)
 - [`docs/testing.md`](./testing.md)
-- [`ai_spec/http_and_error_handling.md`](../ai_spec/http_and_error_handling.md)

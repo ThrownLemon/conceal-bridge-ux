@@ -17,10 +17,3 @@ angular.json
 tsconfig.json
 
 docs/build_guide.md
-
-ai_spec/runtime_config.md
-ai_spec/environment_configuration.md
-ai_spec/deployment_static_hosting.md
-ai_spec/ci_cd_pipeline.md
-
-ai_spec/security_headers_and_csp.md

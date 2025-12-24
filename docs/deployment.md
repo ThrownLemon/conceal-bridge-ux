@@ -375,7 +375,6 @@ This uses `src/environments/environment.development.ts` (testing backend URL).
 
 **Option 2: Runtime configuration** (not currently implemented)
 
-- See `ai_spec/runtime_config.md` for details on implementing runtime config
 - Deploy the same bundle to multiple environments
 - Vary only the `config.json` file per environment
 
@@ -401,11 +400,7 @@ Before deploying to production:
 ## Related Documentation
 
 - **CI/CD Pipeline:** `docs/ci_cd.md`
-- **Deployment Spec:** `ai_spec/deployment_static_hosting.md`
-- **Security Headers:** `ai_spec/security_headers_and_csp.md`
-- **Environment Configuration:** `ai_spec/environment_configuration.md`
 - **Build Guide:** `docs/build_guide.md`
-- **CI/CD Spec:** `ai_spec/ci_cd_pipeline.md`
 
 ---
 
@@ -415,5 +410,4 @@ For deployment issues:
 
 1. Check the troubleshooting section above
 2. Review GitHub Actions logs in the **Actions** tab
-3. Review the deployment spec: `ai_spec/deployment_static_hosting.md`
 4. Verify build output: `npm run build`

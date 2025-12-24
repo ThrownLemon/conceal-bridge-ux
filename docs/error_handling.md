@@ -7,7 +7,6 @@ Core code references:
 - HTTP service: [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13)
 - Wallet/EVM integration: [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:34)
 - Main swap flow + UI error signals: [`SwapPage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:400)
-- Existing HTTP/error-handling spec: [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:1)
 
 ---
 
@@ -16,7 +15,7 @@ Core code references:
 When an error happens, the app must:
 
 1. **Keep users safe from double-spends / double-swaps**
-   - Never retry non-idempotent swap actions blindly (see retry guidance in [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:63)).
+
 2. **Keep the UI state consistent**
    - Clear busy states and avoid advancing steps when a step failed (patterns in [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:598) and [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:720)).
 3. **Show actionable user-facing messages**
@@ -169,8 +168,6 @@ Backend calls can fail in two ways:
 
 ### 6.2 Retry policy (safety first)
 
-Follow the constraints in [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:63):
-
 - **Do retry** idempotent operations:
   - GETs like config and balances from [`BridgeApiService.getChainConfig()`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:26), [`getCcxSwapBalance()`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:42), etc.
 - **Do not retry** swap init/execution by default:
@@ -187,7 +184,6 @@ There is no global timeout currently (no interceptors beyond [`provideHttpClient
 
 - longer for init/exec
 - shorter for polling/status
-- consistent across the app (prefer centralizing per [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:71))
 
 ---
 
@@ -283,7 +279,7 @@ Two examples already in the codebase:
 When implementing or refactoring error handling:
 
 1. **Prefer centralization for HTTP errors**
-   - Follow the roadmap in [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:42): interceptor + shared mapping.
+
 2. **Preserve current UX contracts**
    - Keep using [`pageError`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:445) and [`statusMessage`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:446) appropriately.
 3. **Never introduce unsafe retries**
@@ -308,7 +304,6 @@ The app enables browser-level listeners via [`provideBrowserGlobalErrorListeners
 ## Related docs/specs in this repo
 
 - Backend API contracts and response shapes: [`backend_api.md`](conceal-bridge-ux/docs/backend_api.md:1)
-- HTTP and error-handling roadmap (retry rules, interceptor strategy): [`http_and_error_handling.md`](conceal-bridge-ux/ai_spec/http_and_error_handling.md:1)
 - Wallet/provider error codes and mapping strategy: [`wallets.md`](conceal-bridge-ux/docs/wallets.md:1)
 - Smart contract + tx verification patterns (wCCX ERC-20, calldata decoding): [`smart_contracts.md`](conceal-bridge-ux/docs/smart_contracts.md:1)
 - Security constraints that affect error handling (no secrets in logs, safe UX): [`security.md`](conceal-bridge-ux/docs/security.md:1)

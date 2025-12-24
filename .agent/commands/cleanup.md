@@ -36,18 +36,15 @@
 > Goal: Keep docs and AI specs in sync with the code.
 
 1. **Spec Lifecycle**:
-   - **Requirement**: If you worked on a feature defined in `ai_spec/`:
-     - Move the spec file to `ai_spec/complete/`: `mv ai_spec/my-feature.md ai_spec/complete/`.
-     - Update references if necessary (though usually independent).
+   - **Requirement**: If you worked on a task from beads, make sure to update the bead as required.
 
 2. **Search & Update**:
-   - Use `grep` to find references to modified components/logic in `docs/`, `ai_spec/`, and `.claude/`.
+   - Use `grep` to find references to modified components/logic in `docs/`, and `.claude/`.
    - **Key Files to Check**:
      - `README.md` (Setup instructions, features)
      - `docs/build_guide.md` (Architecture, dependencies)
      - `docs/backend_api.md` (If API calls changed)
      - `docs/*.md` (General check for any related docs)
-     - `ai_spec/` (Update specs if implementation diverged from plan)
 
 3. **Update Agent Context**:
    - If you added new tools or patterns, update `.claude/commands/prime.md` or other context files.

@@ -284,6 +284,4 @@ When adding or editing UI:
 - Error/status banner UX rules (pageError vs statusMessage): [`error_handling.md`](conceal-bridge-ux/docs/error_handling.md:1)
 - Wallet UI patterns (connect modal, network menu) that must match styling: [`wallets.md`](conceal-bridge-ux/docs/wallets.md:1)
 - Security constraints affecting styling/assets/fonts (CSP, external hosts): [`security.md`](conceal-bridge-ux/docs/security.md:1)
-- CSP/headers deployment requirements (affects font hosting and external assets): [`security_headers_and_csp.md`](conceal-bridge-ux/ai_spec/security_headers_and_csp.md:1)
-- Conceal branding + typography implementation plan: [`branding_and_typography.md`](conceal-bridge-ux/ai_spec/branding_and_typography.md:1)
 - Testing guidance for UI assertions (components, wallet flows): [`testing.md`](conceal-bridge-ux/docs/testing.md:1)

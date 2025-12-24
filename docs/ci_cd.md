@@ -176,7 +176,7 @@ npm run build
 
 ### Linting
 
-Once linting is configured (see `ai_spec/linting_and_formatting.md`), add a lint step:
+Add a lint step:
 
 ```yaml
 - name: Run linter
@@ -352,18 +352,14 @@ Track deployment success rate over time. If failures increase:
 - **Deployment Guide:** `docs/deployment.md`
 - **Build Guide:** `docs/build_guide.md`
 - **Testing Guide:** `docs/testing.md`
-- **CI/CD Spec:** `ai_spec/ci_cd_pipeline.md`
 
 ## Future Enhancements
 
 ### Planned Improvements
 
-1. **Add linting** to the pipeline (once configured)
-2. **E2E tests** in CI (see `ai_spec/e2e_testing.md`)
-3. **Bundle size tracking** to prevent bloat
-4. **Lighthouse CI** for performance monitoring
-5. **Automated release notes** generation
-6. **Slack/Discord notifications** for deployment status
+1. **Lighthouse CI** for performance monitoring
+2. **Automated release notes** generation
+3. **Slack/Discord notifications** for deployment status
 
 ### Alternative CI/CD Platforms
 
@@ -372,5 +368,3 @@ While GitHub Actions is the current choice, the app can be deployed via:
 - **GitLab CI** (`.gitlab-ci.yml`)
 - **CircleCI** (`.circleci/config.yml`)
 - **Travis CI** (`.travis.yml`)
-
-See `ai_spec/ci_cd_pipeline.md` for platform-agnostic pipeline requirements.
