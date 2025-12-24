@@ -36,7 +36,7 @@ git log v1.0.0..HEAD --oneline
 Decide version bump based on changes:
 
 - Breaking changes? → Major
-- New features? → Minor  
+- New features? → Minor
 - Only bug fixes? → Patch
 
 ### 2. Update Version in package.json
@@ -80,20 +80,24 @@ Create or update `CHANGELOG.md`:
 ## [1.1.0] - 2025-12-21
 
 ### Added
+
 - Transaction history modal with local storage persistence
 - Chain configuration caching to reduce API calls
 - Copy feedback animations for wallet addresses
 
 ### Changed
+
 - Improved wallet connection state management
 - Updated Angular to v21.0.6
 
 ### Fixed
+
 - Chain switching bug in MetaMask
 - QR code generation performance
 - Input validation edge cases
 
 ### Security
+
 - Updated dependencies with security patches
 ```
 

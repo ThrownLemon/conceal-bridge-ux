@@ -320,6 +320,7 @@ The workflow automatically deploys to GitHub Pages whenever changes are pushed t
 **Manual trigger:** You can also trigger the workflow manually from the GitHub Actions tab in your repository.
 
 For CI/CD details and alternative configurations, see:
+
 - [`.github/workflows/deploy.yml`](conceal-bridge-ux/.github/workflows/deploy.yml)
 
 ---

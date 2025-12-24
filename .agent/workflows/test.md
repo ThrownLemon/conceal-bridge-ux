@@ -115,7 +115,7 @@ describe('MyComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MyComponent] // Standalone component
+      imports: [MyComponent], // Standalone component
     }).compileComponents();
 
     fixture = TestBed.createComponent(MyComponent);
@@ -158,7 +158,7 @@ import { test, expect } from '@playwright/test';
 
 test('should load home page', async ({ page }) => {
   await page.goto('/');
-  
+
   await expect(page).toHaveTitle(/Conceal Bridge/);
   await expect(page.locator('h1')).toContainText('Bridge');
 });

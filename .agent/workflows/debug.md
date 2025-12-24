@@ -44,13 +44,13 @@ debugger;
 console.log('address:', this.address());
 
 // Log observable emissions
-observable$.subscribe(val => console.log('value:', val));
+observable$.subscribe((val) => console.log('value:', val));
 ```
 
 **Clear console:**
 
 ```javascript
-console.clear()
+console.clear();
 // or Ctrl+L
 ```
 
@@ -94,9 +94,9 @@ console.clear()
 **Watch expressions:**
 
 ```javascript
-this.wallet.address()
-this.chainId()
-this.isConnected()
+this.wallet.address();
+this.chainId();
+this.isConnected();
 ```
 
 ### Application Tab
@@ -115,8 +115,8 @@ localStorage.getItem('transaction_history')
 **Clear storage:**
 
 ```javascript
-localStorage.clear()
-sessionStorage.clear()
+localStorage.clear();
+sessionStorage.clear();
 ```
 
 ## Angular-Specific Debugging
@@ -165,7 +165,7 @@ Enable router tracing:
 
 ```typescript
 // app.config.ts
-provideRouter(routes, withDebugTracing())
+provideRouter(routes, withDebugTracing());
 ```
 
 ## Web3 / Wallet Debugging
@@ -174,9 +174,9 @@ provideRouter(routes, withDebugTracing())
 
 ```javascript
 // In browser console
-ethereum.isMetaMask
-ethereum.selectedAddress
-ethereum.chainId
+ethereum.isMetaMask;
+ethereum.selectedAddress;
+ethereum.chainId;
 ```
 
 ### Debug Viem Calls
@@ -284,7 +284,7 @@ ngOnInit() {
 ```typescript
 effect((onCleanup) => {
   const timer = setInterval(() => {}, 1000);
-  
+
   onCleanup(() => {
     clearInterval(timer);
   });
@@ -342,7 +342,7 @@ effect(() => {
 
 // Good
 button.click(() => {
-  this.counter.update(c => c + 1);
+  this.counter.update((c) => c + 1);
 });
 ```
 
@@ -357,12 +357,15 @@ button.click(() => {
 
 ```typescript
 // Add error handling
-this.http.get('/api/data').pipe(
-  catchError(error => {
-    console.error('HTTP Error:', error);
-    return throwError(() => error);
-  })
-).subscribe();
+this.http
+  .get('/api/data')
+  .pipe(
+    catchError((error) => {
+      console.error('HTTP Error:', error);
+      return throwError(() => error);
+    }),
+  )
+  .subscribe();
 ```
 
 ## Testing Debugging

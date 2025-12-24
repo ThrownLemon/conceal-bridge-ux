@@ -9,6 +9,7 @@ Core references in this repo:
 - Wallet UI: [`WalletButtonComponent`](conceal-bridge-ux/src/app/shared/wallet/wallet-button.component.ts:309)
 - Backend API client: [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13)
 - Backend-provided chain config shape: [`BridgeChainConfig`](conceal-bridge-ux/src/app/core/bridge-types.ts:8)
+
 ---
 
 ## 1) Threat model (what we defend against)

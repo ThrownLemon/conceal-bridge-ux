@@ -410,4 +410,4 @@ For deployment issues:
 
 1. Check the troubleshooting section above
 2. Review GitHub Actions logs in the **Actions** tab
-4. Verify build output: `npm run build`
+3. Verify build output: `npm run build`
