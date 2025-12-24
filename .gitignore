@@ -37,6 +37,7 @@ yarn-error.log
 /coverage
 /libpeerconnection.log
 testem.log
+start.log
 /typings
 __screenshots__/
 
@@ -50,8 +51,6 @@ __screenshots__/
 Thumbs.db
 
 # AI Tools
-.agent/
-.beads/
 .claude/
 .cursor/
 .jules/
