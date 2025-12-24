@@ -93,7 +93,7 @@ Angular — Deliver web apps with confidence 🚀
 - [Hydration](https://angular.dev/guide/hydration)
 - [Incremental Hydration](https://angular.dev/guide/incremental-hydration)
 
-# CLI
+## CLI
 
 [Angular CLI Overview](https://angular.dev/tools/cli)
 

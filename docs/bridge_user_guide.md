@@ -21,14 +21,14 @@ Before you begin, ensure you have the following:
 
 You must have the MetaMask browser extension installed and properly configured.
 
-- **Download MetaMask:** https://metamask.io/
+- **Download MetaMask:** <https://metamask.io/>
 - For help with installation or DApp interactions, visit the MetaMask FAQ
 
 ### 2. Conceal Wallet
 
 You need a Conceal Wallet to hold your $CCX. Any official Conceal Wallet will work.
 
-- **Download a Conceal Wallet:** https://conceal.network/#wallets
+- **Download a Conceal Wallet:** <https://conceal.network/#wallets>
 
 ### 3. Sufficient Funds
 
@@ -73,7 +73,7 @@ This example demonstrates bridging $CCX to $wCCX on Ethereum Mainnet. The proces
 
 ### Step 2: Navigate to the Conceal Bridge
 
-Go to the official Conceal Bridge website: https://bridge.conceal.network/
+Go to the official Conceal Bridge website: <https://bridge.conceal.network/>
 
 ### Step 3: Connect and Initiate the Transfer
 
@@ -173,9 +173,9 @@ Make sure you've added the custom token using the correct contract address for y
 
 ## Support and Resources
 
-- **Conceal Bridge:** https://bridge.conceal.network/
-- **Conceal Wallets:** https://conceal.network/#wallets
-- **MetaMask:** https://metamask.io/
+- **Conceal Bridge:** <https://bridge.conceal.network/>
+- **Conceal Wallets:** <https://conceal.network/#wallets>
+- **MetaMask:** <https://metamask.io/>
 - **Community Support:** Join the Conceal Network community channels for assistance
 
 ## Security Reminders

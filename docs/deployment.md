@@ -21,7 +21,7 @@ Deployment happens automatically when you push to the `main` branch.
    - Tests
    - Production build
    - Deployment to GitHub Pages (using `actions/deploy-pages@v4`)
-3. Live site updates at https://thrownlemon.github.io/conceal-bridge-ux/
+3. Live site updates at <https://thrownlemon.github.io/conceal-bridge-ux/>
 
 **Monitor deployment:**
 
@@ -95,7 +95,7 @@ This is set in `angular.json`:
 
 ### Live URL
 
-**Production:** https://thrownlemon.github.io/conceal-bridge-ux/
+**Production:** <https://thrownlemon.github.io/conceal-bridge-ux/>
 
 ## First-Time Setup
 
@@ -200,12 +200,14 @@ This ensures assets load correctly when the app is hosted under `/conceal-bridge
 **Solution:**
 
 1. Verify the workflow has the correct permissions:
+
    ```yaml
    permissions:
      contents: read
      pages: write
      id-token: write
    ```
+
 2. Check repository settings: Settings > Actions > General > Workflow permissions
 3. Ensure "Read and write permissions" is enabled
 
@@ -368,7 +370,7 @@ This uses `src/environments/environment.development.ts` (testing backend URL).
 
 ### Deploying Different Environments
 
-**Option 1: Separate deployments**
+#### Option 1: Separate deployments
 
 - Deploy production build to `bridge.conceal.network`
 - Deploy development build to `test-bridge.conceal.network`

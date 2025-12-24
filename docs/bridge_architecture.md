@@ -11,7 +11,7 @@ The Conceal Bridge Service is a two-way bridge enabling swaps between native ₡
 
 ## Architecture Layers
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                   Angular 21 Frontend                   │
 │  ┌──────────────────────────────────────────────────┐   │
@@ -52,7 +52,7 @@ The Conceal Bridge Service is a two-way bridge enabling swaps between native ₡
 
 ### Frontend Services Organization
 
-```
+```text
 src/app/
 ├── core/
 │   └── services/
@@ -81,7 +81,7 @@ src/app/
 
 ### CCX → wCCX (Wrapping) Flow
 
-```
+```text
 1. User Input → Validation
    ↓
 2. Estimate Gas Fee
@@ -101,7 +101,7 @@ src/app/
 
 ### wCCX → CCX (Unwrapping) Flow
 
-```
+```text
 1. User Input → Validation
    ↓
 2. User Approves wCCX Transfer (if needed)
@@ -152,7 +152,7 @@ export const API_CONFIG = {
 
 ### CCX → wCCX Endpoints
 
-#### 1. Initialize Swap
+#### 1. Initialize Swap (Wrap)
 
 **Endpoint:** `POST /api/ccx/wccx/swap/init`
 
@@ -199,7 +199,7 @@ interface EstimateGasResponse {
 }
 ```
 
-#### 3. Get Transaction Status
+#### 3. Get Transaction Status (Wrap)
 
 **Endpoint:** `POST /api/ccx/wccx/tx`
 
@@ -237,7 +237,7 @@ interface BalanceResponse {
 
 ### wCCX → CCX Endpoints
 
-#### 1. Initialize Swap
+#### 1. Initialize Swap (Unwrap)
 
 **Endpoint:** `POST /api/wccx/ccx/swap/init`
 
@@ -283,7 +283,7 @@ interface ExecuteSwapResponse {
 }
 ```
 
-#### 3. Get Transaction Status
+#### 3. Get Transaction Status (Unwrap)
 
 **Endpoint:** `POST /api/wccx/ccx/tx`
 

@@ -34,7 +34,7 @@
 
 This project uses the newer Angular “public assets” approach (no `src/assets/`).
 
-```
+```text
 conceal-bridge-ux/
 ├── angular.json
 ├── package.json
@@ -281,7 +281,7 @@ ng build --configuration production
 
 - **Deployment method:** GitHub Actions workflow using `actions/deploy-pages@v4`
 - **Workflow file:** `.github/workflows/deploy.yml`
-- **Live URL:** https://thrownlemon.github.io/conceal-bridge-ux/
+- **Live URL:** <https://thrownlemon.github.io/conceal-bridge-ux/>
 - **Trigger:** Automatic on push to `master` branch, or manual via workflow dispatch
 - **SPA Routing:** Handled automatically by GitHub Actions deployment
 

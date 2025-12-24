@@ -154,15 +154,13 @@ Swap flows use:
 Backend calls can fail in two ways:
 
 1. **HTTP-level failure** (network issues, 5xx, 4xx)
-
-- Calls are made via [`HttpClient`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:1)
-- There is no interceptor today (see [`provideHttpClient()`](conceal-bridge-ux/src/app/app.config.ts:10)), so pages often do local [`rxjs.catchError()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:490).
+   - Calls are made via [`HttpClient`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:1)
+   - There is no interceptor today (see [`provideHttpClient()`](conceal-bridge-ux/src/app/app.config.ts:10)), so pages often do local [`rxjs.catchError()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:490).
 
 2. **Payload-level failure** (HTTP 200 but success flag false)
-
-- Example:
-  - Init: check [`BridgeInitSwapResponse.success`](conceal-bridge-ux/src/app/core/bridge-types.ts:40) and use [`BridgeInitSwapResponse.error`](conceal-bridge-ux/src/app/core/bridge-types.ts:42)
-  - In practice: swap init throws on `!init.success` in [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:704) and [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:822)
+   - Example:
+     - Init: check [`BridgeInitSwapResponse.success`](conceal-bridge-ux/src/app/core/bridge-types.ts:40) and use [`BridgeInitSwapResponse.error`](conceal-bridge-ux/src/app/core/bridge-types.ts:42)
+     - In practice: swap init throws on `!init.success` in [`SwapPage.startCcxToEvm()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:704) and [`SwapPage.startEvmToCcx()`](conceal-bridge-ux/src/app/pages/swap/swap.page.ts:822)
 
 **Rule:** always check payload success flags; do not assume HTTP 200 means “success”.
 

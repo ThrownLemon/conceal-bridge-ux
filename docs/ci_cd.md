@@ -80,7 +80,7 @@ No additional secrets are required for the current setup.
 1. Developer pushes code to `main` branch
 2. GitHub Actions workflow is triggered automatically
 3. Tests run → Build executes → Deployment to GitHub Pages
-4. Live site updates at: https://thrownlemon.github.io/conceal-bridge-ux/
+4. Live site updates at: <https://thrownlemon.github.io/conceal-bridge-ux/>
 
 ### Manual Deployment
 
@@ -253,7 +253,7 @@ This runs tests and builds on every PR without deploying.
 ### Production
 
 - **Branch:** `main`
-- **URL:** https://thrownlemon.github.io/conceal-bridge-ux/
+- **URL:** <https://thrownlemon.github.io/conceal-bridge-ux/>
 - **Environment file:** `src/environments/environment.ts`
 - **Backend:** Production backend URL
 

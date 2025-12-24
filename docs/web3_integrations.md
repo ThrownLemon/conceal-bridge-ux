@@ -32,7 +32,7 @@ Viem provides different client types for different purposes:
 
 ### Recommended Service Organization
 
-```
+```text
 src/app/
 ├── core/
 │   └── services/
@@ -1317,10 +1317,10 @@ try {
 
 ## Additional Resources
 
-- **Viem Documentation:** https://viem.sh
-- **Ethereum JSON-RPC Specification:** https://ethereum.github.io/execution-apis/api-documentation/
-- **EIP-1559 Gas Explanation:** https://eips.ethereum.org/EIPS/eip-1559
-- **Contract ABI Specification:** https://docs.soliditylang.org/en/latest/abi-spec.html
+- **Viem Documentation:** <https://viem.sh>
+- **Ethereum JSON-RPC Specification:** <https://ethereum.github.io/execution-apis/api-documentation/>
+- **EIP-1559 Gas Explanation:** <https://eips.ethereum.org/EIPS/eip-1559>
+- **Contract ABI Specification:** <https://docs.soliditylang.org/en/latest/abi-spec.html>
 
 ## Related docs/specs in this repo
 

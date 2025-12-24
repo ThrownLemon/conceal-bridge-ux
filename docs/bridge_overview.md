@@ -4,7 +4,7 @@
 
 The Conceal Network Bridge enables seamless conversion between native ₡CCX and Wrapped Conceal ($wCCX) across multiple blockchain ecosystems. This bridge serves as the gateway for Conceal Network users to access DeFi applications while maintaining the option to return to the privacy-focused Conceal Network.
 
-**Bridge URL:** https://bridge.conceal.network
+**Bridge URL:** <https://bridge.conceal.network>
 
 ## What is Wrapped Conceal ($wCCX)?
 
@@ -23,19 +23,19 @@ The Conceal Bridge currently supports three blockchain ecosystems:
 
 - **Maximum Supply:** 500,000 $wCCX
 - **Token Contract:** `0x21686f8ce003a95c99acd297e302faacf742f7d4`
-- **Explorer:** https://etherscan.io/token/0x21686f8ce003a95c99acd297e302faacf742f7d4
+- **Explorer:** <https://etherscan.io/token/0x21686f8ce003a95c99acd297e302faacf742f7d4>
 
 ### Binance Smart Chain (BSC)
 
 - **Maximum Supply:** 350,000 $wCCX
 - **Token Contract:** `0x988c11625472340b7B36FF1534893780E0d8d841`
-- **Explorer:** https://bscscan.com/token/0x988c11625472340b7B36FF1534893780E0d8d841
+- **Explorer:** <https://bscscan.com/token/0x988c11625472340b7B36FF1534893780E0d8d841>
 
 ### Polygon (Matic)
 
 - **Maximum Supply:** 500,000 $wCCX
 - **Token Contract:** `0x137Ee749f0F8c2eD34cA00dE33BB59E3dafA494A`
-- **Explorer:** https://explorer-mainnet.maticvigil.com/tokens/0x137Ee749f0F8c2eD34cA00dE33BB59E3dafA494A/token-transfers
+- **Explorer:** <https://explorer-mainnet.maticvigil.com/tokens/0x137Ee749f0F8c2eD34cA00dE33BB59E3dafA494A/token-transfers>
 
 ## How the Bridge Works
 
@@ -83,7 +83,7 @@ The Conceal Bridge currently supports three blockchain ecosystems:
 
 To ensure transparency and trust, you can verify the ₡CCX reserves backing $wCCX:
 
-1. Visit the swapping wallet explorer: https://explorer.conceal.network/index.html#funds
+1. Visit the swapping wallet explorer: <https://explorer.conceal.network/index.html#funds>
 2. Click "Verify"
 3. Select the specific ecosystem (Ethereum, BSC, or Polygon)
 4. Confirm that reserves match circulating $wCCX supply
@@ -98,11 +98,11 @@ To use $wCCX, you'll need to configure MetaMask for the appropriate network:
 
 **For Binance Smart Chain:**
 
-- Guide: https://medium.com/stakingbits/setting-up-metamask-for-binance-smart-chain-bsc-921d9a2625fd
+- Guide: <https://medium.com/stakingbits/setting-up-metamask-for-binance-smart-chain-bsc-921d9a2625fd>
 
 **For Polygon:**
 
-- Guide: https://medium.com/stakingbits/setting-up-metamask-for-polygon-matic-network-838058f6d844
+- Guide: <https://medium.com/stakingbits/setting-up-metamask-for-polygon-matic-network-838058f6d844>
 
 **For Ethereum:**
 
@@ -128,13 +128,13 @@ After setting up the correct network:
 - Reserves are auditable on the Conceal Network blockchain
 - No $wCCX can exist without corresponding ₡CCX in custody
 
-**Custodial Security**
+#### Custodial Security
 
 - Industry-standard security practices protect bridge reserves
 - Multi-signature controls for custodial wallets
 - Regular security audits
 
-**Transparency**
+#### Transparency
 
 - All transactions are publicly verifiable on respective blockchains
 - Real-time reserve verification available
@@ -161,12 +161,12 @@ After setting up the correct network:
 
 **Official Documentation:**
 
-- The Anatomy of Wrapped CCX: https://concealnetwork.medium.com/the-anatomy-of-wrapped-ccx-97b2a8c008d9
+- The Anatomy of Wrapped CCX: <https://concealnetwork.medium.com/the-anatomy-of-wrapped-ccx-97b2a8c008d9>
 
 **Official Links:**
 
-- Conceal Network Bridge: https://bridge.conceal.network
-- Explorer: https://explorer.conceal.network
+- Conceal Network Bridge: <https://bridge.conceal.network>
+- Explorer: <https://explorer.conceal.network>
 
 ## Key Benefits
 
