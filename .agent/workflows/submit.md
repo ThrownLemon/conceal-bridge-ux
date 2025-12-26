@@ -119,6 +119,7 @@ git pull origin master
 ```
 
 **Why merge immediately?**
+
 - Prevents branch rot and stale PRs.
 - Ensures the next task starts from a clean, up-to-date `master`.
 - Validates the final squashed commit in the main history.
@@ -151,7 +152,7 @@ bd close <issue-id> --reason "Merged in PR #123"
 - ✅ If CI fails, fix locally and push again
 
 > [!CAUTION]
-> **Husky & Tests**: Ensure `npm test` in `.husky/pre-commit` runs with `--no-watch` (or `--watch=false`). 
+> **Husky & Tests**: Ensure `npm test` in `.husky/pre-commit` runs with `--no-watch` (or `--watch=false`).
 > If it runs in watch mode, the commit process will hang indefinitely in autonomous environments.
 
 ## Quick Reference

@@ -139,16 +139,29 @@ Run these before EVERY commit:
 ```bash
 npm run lint        # ESLint (fix: npm run lint:fix)
 npm run format      # Prettier formatting
-npm test -- --no-watch # Vitest unit tests (Single run)
+npm test --no-watch # Vitest unit tests (Single run)
 npm run build       # Production build (run AFTER lint/format)
 ```
 
+### Markdown Style & Linting
+
+To avoid common linting errors when creating or updating `.md` files:
+
+1. **First Line**: Always start with a top-level heading (`# Heading`). (MD041)
+2. **Code Blocks**: Always include a language specifier for fenced code blocks (e.g., ` ```typescript `). (MD040)
+3. **Surrounding Lines**: Surround fenced code blocks and lists with blank lines. (MD031, MD032)
+4. **Trailing Newline**: Ensure every file ends with a single trailing newline. (MD047)
+5. **Punctuation**: Avoid trailing punctuation in headings (e.g., `# Title?` is okay, but `# Title:` is often flagged). (MD026)
+6. **Formatting**: Always run `npm run format` after editing Markdown files to ensure consistent spacing and list indentation.
+
+> [!TIP]
+> Use the `.agent/workflows/markdown.md` workflow for a comprehensive checklist when working with documentation.
 > [!CAUTION]
 > **Robust Scripting**: When writing scripts that search for forbidden patterns (like Git hooks), ensure the script itself doesn't match the pattern (use obfuscation like `"eslint""-disable"`) or exclude the script file.
 
 All gates MUST pass before pushing. Do not skip.
 
-### Quality Gate Anti-Patterns (STRICTLY FORBIDDEN)
+### Quality Gate Anti-Patterns
 
 ❌ **NEVER modify lint rules** to make code pass - fix the code instead
 ❌ **NEVER add inline eslint-disable** comments to bypass errors
@@ -158,14 +171,14 @@ All gates MUST pass before pushing. Do not skip.
 ❌ **NEVER commit with failing tests** - fix the test or the code
 ❌ **NEVER assume a build error is "harmless"** - all errors must be resolved
 
-### When Quality Gates Fail
+### When They Fail
 
 1. Read the error message carefully
 2. Understand **why** the rule exists (security, maintainability, consistency)
 3. Fix the actual code to satisfy the rule
 4. If the rule seems wrong for this case, discuss with the team first - don't disable it
 
-### Examples of Correct vs Incorrect Approaches
+### Quality Gate Examples
 
 | Incorrect (Shortcut)                      | Correct (Proper Fix)                        |
 | ----------------------------------------- | ------------------------------------------- |
