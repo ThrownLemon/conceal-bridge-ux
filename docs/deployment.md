@@ -10,13 +10,13 @@ The project uses **GitHub Actions** with the official `actions/deploy-pages` act
 
 ## Automated Deployment (Recommended)
 
-Deployment happens automatically when you push to the `main` branch.
+Deployment happens automatically when you push to the `master` branch.
 
 **Workflow:** `.github/workflows/deploy.yml`
 
 **How it works:**
 
-1. Push code to `main` branch
+1. Push code to `master` branch
 2. GitHub Actions automatically runs:
    - Tests
    - Production build
@@ -46,7 +46,7 @@ We use the official `actions/deploy-pages@v4` instead of third-party tools becau
 
 There is **no manual deployment** with this setup. All deployments happen via GitHub Actions.
 
-If you need to deploy from a branch other than `main`:
+If you need to deploy from a branch other than `master`:
 
 1. Go to **Actions** tab in GitHub
 2. Select **Deploy to GitHub Pages** workflow
@@ -63,7 +63,7 @@ The workflow (`.github/workflows/deploy.yml`) has two jobs:
 #### 1. Build Job
 
 - Checks out code
-- Sets up Node.js 20
+- Sets up Node.js 22
 - Installs dependencies (`npm ci`)
 - Runs tests
 - Builds production bundle
@@ -105,7 +105,7 @@ After pushing the workflow file to your repository:
 2. Navigate to **Settings > Pages**
 3. Under **Source**, select **GitHub Actions** (not "Deploy from a branch")
 4. Save (if needed)
-5. Push to `main` branch to trigger the first deployment
+5. Push to `master` branch to trigger the first deployment
 
 GitHub will automatically deploy on every subsequent push to `master`.
 

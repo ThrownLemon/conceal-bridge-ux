@@ -1,10 +1,10 @@
 ---
-description: Safe workflow for updating npm packages with testing and verification
+description: Workflow for updating packages with testing and verification
 ---
 
 # Update Packages Workflow
 
-> **Purpose**: Safely update npm dependencies while ensuring no breaking changes are introduced.
+> **Purpose**: Safely update dependencies while ensuring no breaking changes are introduced.
 
 ## Prerequisites
 

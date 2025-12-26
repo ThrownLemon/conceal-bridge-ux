@@ -4,7 +4,7 @@ description: Comprehensive code review checklist and process for Angular v21+ pr
 
 # Code Review Workflow
 
-> Purpose: Ensure code quality, consistency, and adherence to Angular v21+ best practices before merging or completing a task.
+> **Purpose**: Ensure code quality, consistency, and adherence to Angular v21+ best practices before merging or completing a task.
 
 ## 1. Architectural & Structural Review
 

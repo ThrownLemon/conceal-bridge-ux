@@ -14,7 +14,7 @@
 
 ## Read the following files
 
-docs/smart_conctracts.md
+docs/smart_contracts.md
 docs/backend_api.md
 docs/security.md
 

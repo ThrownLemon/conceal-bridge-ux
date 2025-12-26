@@ -1,4 +1,4 @@
-# Web3 Integration Guide with Viem and WalletConnet
+# Web3 Integration Guide with Viem and WalletConnect
 
 ## Overview
 
@@ -65,7 +65,7 @@ src/app/
 ```typescript
 import { Injectable } from '@angular/core';
 import { createPublicClient, http, PublicClient } from 'viem';
-import { mainnet, bsc, polygon, avalanche } from 'viem/chains';
+import { mainnet, bsc, polygon } from 'viem/chains';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -83,7 +83,7 @@ export class ViemService {
    * Initialize public clients for all supported chains
    */
   private initializeClients(): void {
-    const chains = [mainnet, bsc, polygon, avalanche];
+    const chains = [mainnet, bsc, polygon];
 
     chains.forEach((chain) => {
       const client = createPublicClient({
@@ -311,7 +311,7 @@ export class ContractService {
    * Get contract instance for reading
    */
   getReadContract(address: Address, abi: any, chainId: number) {
-    const publicClient = this.viemService.getPublicClient(chainId);
+    const publicClient = this.#viemService.getPublicClient(chainId);
     if (!publicClient) {
       throw new Error(`No public client for chain ${chainId}`);
     }
@@ -328,7 +328,7 @@ export class ContractService {
    */
   getWriteContract(address: Address, abi: any, chainId: number) {
     const walletClient = this.walletService.getWalletClient();
-    const publicClient = this.viemService.getPublicClient(chainId);
+    const publicClient = this.#viemService.getPublicClient(chainId);
 
     if (!walletClient) {
       throw new Error('Wallet not connected');
@@ -355,8 +355,8 @@ export class ContractService {
     chainId?: number,
   ): Promise<T> {
     const publicClient = chainId
-      ? this.viemService.getPublicClient(chainId)
-      : this.viemService.getCurrentPublicClient();
+      ? this.#viemService.getPublicClient(chainId)
+      : this.#viemService.getCurrentPublicClient();
 
     if (!publicClient) {
       throw new Error('No public client available');
@@ -458,9 +458,8 @@ export interface TrackedTransaction {
   providedIn: 'root',
 })
 export class TransactionService {
-  private trackedTransactions$ = new BehaviorSubject<Map<Hash, TrackedTransaction>>(new Map());
-
-  constructor(private viemService: ViemService) {}
+  readonly #viemService = inject(ViemService);
+  readonly #trackedTransactions$ = new BehaviorSubject<Map<Hash, TrackedTransaction>>(new Map());
 
   /**
    * Wait for transaction receipt
@@ -470,7 +469,7 @@ export class TransactionService {
     chainId: number,
     confirmations: number = 1,
   ): Promise<TransactionReceipt> {
-    const publicClient = this.viemService.getPublicClient(chainId);
+    const publicClient = this.#viemService.getPublicClient(chainId);
     if (!publicClient) {
       throw new Error(`No public client for chain ${chainId}`);
     }
@@ -498,15 +497,15 @@ export class TransactionService {
       confirmations: 0,
     };
 
-    const transactions = this.trackedTransactions$.value;
+    const transactions = this.#trackedTransactions$.value;
     transactions.set(hash, tracked);
-    this.trackedTransactions$.next(new Map(transactions));
+    this.#trackedTransactions$.next(new Map(transactions));
 
     // Poll for transaction status
     interval(2000)
       .pipe(
         takeWhile(() => {
-          const tx = this.trackedTransactions$.value.get(hash);
+          const tx = this.#trackedTransactions$.value.get(hash);
           return tx?.status === TransactionStatus.Pending;
         }),
         switchMap(() => from(this.checkTransactionStatus(hash, chainId))),
@@ -530,7 +529,7 @@ export class TransactionService {
     hash: Hash,
     chainId: number,
   ): Promise<TransactionReceipt | null> {
-    const publicClient = this.viemService.getPublicClient(chainId);
+    const publicClient = this.#viemService.getPublicClient(chainId);
     if (!publicClient) return null;
 
     try {
@@ -545,7 +544,7 @@ export class TransactionService {
    * Update transaction status
    */
   private updateTransactionStatus(hash: Hash, receipt: TransactionReceipt): void {
-    const transactions = this.trackedTransactions$.value;
+    const transactions = this.#trackedTransactions$.value;
     const tracked = transactions.get(hash);
 
     if (tracked) {
@@ -553,7 +552,7 @@ export class TransactionService {
         receipt.status === 'success' ? TransactionStatus.Confirmed : TransactionStatus.Failed;
       tracked.receipt = receipt;
       transactions.set(hash, tracked);
-      this.trackedTransactions$.next(new Map(transactions));
+      this.#trackedTransactions$.next(new Map(transactions));
     }
   }
 
@@ -561,14 +560,14 @@ export class TransactionService {
    * Update transaction error
    */
   private updateTransactionError(hash: Hash, error: string): void {
-    const transactions = this.trackedTransactions$.value;
+    const transactions = this.#trackedTransactions$.value;
     const tracked = transactions.get(hash);
 
     if (tracked) {
       tracked.status = TransactionStatus.Failed;
       tracked.error = error;
       transactions.set(hash, tracked);
-      this.trackedTransactions$.next(new Map(transactions));
+      this.#trackedTransactions$.next(new Map(transactions));
     }
   }
 
@@ -576,21 +575,21 @@ export class TransactionService {
    * Get tracked transactions observable
    */
   getTrackedTransactions$() {
-    return this.trackedTransactions$.asObservable();
+    return this.#trackedTransactions$.asObservable();
   }
 
   /**
    * Get specific transaction
    */
   getTransaction(hash: Hash): TrackedTransaction | undefined {
-    return this.trackedTransactions$.value.get(hash);
+    return this.#trackedTransactions$.value.get(hash);
   }
 
   /**
    * Estimate gas for transaction
    */
   async estimateGas(chainId: number, transaction: any): Promise<bigint> {
-    const publicClient = this.viemService.getPublicClient(chainId);
+    const publicClient = this.#viemService.getPublicClient(chainId);
     if (!publicClient) {
       throw new Error(`No public client for chain ${chainId}`);
     }
@@ -608,7 +607,7 @@ export class TransactionService {
    * Get current gas price
    */
   async getGasPrice(chainId: number): Promise<bigint> {
-    const publicClient = this.viemService.getPublicClient(chainId);
+    const publicClient = this.#viemService.getPublicClient(chainId);
     if (!publicClient) {
       throw new Error(`No public client for chain ${chainId}`);
     }
@@ -626,7 +625,7 @@ export class TransactionService {
 **Location:** `src/app/config/chains.config.ts`
 
 ```typescript
-import { mainnet, bsc, polygon, avalanche, type Chain } from 'viem/chains';
+import { mainnet, bsc, polygon, type Chain } from 'viem/chains';
 
 export interface ChainConfig {
   chain: Chain;
@@ -660,13 +659,6 @@ export const SUPPORTED_CHAINS: Record<number, ChainConfig> = {
     rpcUrl: 'https://polygon-rpc.com',
     blockExplorer: 'https://polygonscan.com',
     nativeCurrency: polygon.nativeCurrency,
-    bridgeContract: '0x...', // Your bridge contract address
-  },
-  [avalanche.id]: {
-    chain: avalanche,
-    rpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
-    blockExplorer: 'https://snowtrace.io',
-    nativeCurrency: avalanche.nativeCurrency,
     bridgeContract: '0x...', // Your bridge contract address
   },
 };
@@ -895,7 +887,7 @@ async estimateGasWithBuffer(
  * Get EIP-1559 gas fees
  */
 async getEIP1559Fees(chainId: number) {
-  const publicClient = this.viemService.getPublicClient(chainId);
+  const publicClient = this.#viemService.getPublicClient(chainId);
   if (!publicClient) {
     throw new Error(`No public client for chain ${chainId}`);
   }
@@ -1220,7 +1212,7 @@ async checkBalancesAcrossChains(
 import { multicall } from 'viem';
 
 async batchReadContracts(calls: any[]) {
-  const publicClient = this.viemService.getCurrentPublicClient();
+  const publicClient = this.#viemService.getCurrentPublicClient();
   if (!publicClient) throw new Error('No client');
 
   const results = await publicClient.multicall({

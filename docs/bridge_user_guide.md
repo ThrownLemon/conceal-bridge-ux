@@ -11,7 +11,6 @@ $wCCX is a tokenized version of $CCX on another blockchain. Its value is always 
 - Ethereum Mainnet
 - Binance Smart Chain
 - Polygon Network
-- Avalanche
 
 ## Prerequisites
 
@@ -39,7 +38,6 @@ You need a Conceal Wallet to hold your $CCX. Any official Conceal Wallet will wo
 - Ethereum: $ETH
 - Binance Smart Chain: $BNB
 - Polygon: $MATIC
-- Avalanche: $AVAX
 
 ## Setting Up Your MetaMask Wallet
 

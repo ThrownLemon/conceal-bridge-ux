@@ -1,5 +1,5 @@
 ---
-description: Run tests with various options and configurations
+description: Workflow for running tests with various options and configurations
 ---
 
 # Test Workflow

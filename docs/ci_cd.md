@@ -16,7 +16,7 @@ The project uses **GitHub Actions** for automated testing, building, and deploym
 
 The workflow runs automatically on:
 
-- **Push to `main` branch** — Automatically deploys to production
+- **Push to `master` branch** — Automatically deploys to production
 - **Manual workflow dispatch** — Can be triggered manually from the GitHub Actions tab
 
 ### Pipeline Stages
@@ -26,7 +26,7 @@ The workflow has two separate jobs for better organization and security:
 #### Job 1: Build
 
 1. **Checkout** - Uses `actions/checkout@v4` to check out the repository code
-2. **Setup Node.js** - Uses `actions/setup-node@v4` with Node.js 20 and npm caching
+2. **Setup Node.js** - Uses `actions/setup-node@v4` with Node.js 22 and npm caching
 3. **Install Dependencies** - Runs `npm ci` for deterministic builds
 4. **Run Tests** - Runs `npm run test -- --run --reporter=verbose`
 5. **Build Production Bundle** - Runs `npm run build`
@@ -77,7 +77,7 @@ No additional secrets are required for the current setup.
 
 ### Automatic Deployment
 
-1. Developer pushes code to `main` branch
+1. Developer pushes code to `master` branch
 2. GitHub Actions workflow is triggered automatically
 3. Tests run → Build executes → Deployment to GitHub Pages
 4. Live site updates at: <https://thrownlemon.github.io/conceal-bridge-ux/>
@@ -87,7 +87,7 @@ No additional secrets are required for the current setup.
 1. Go to **Actions** tab in GitHub repository
 2. Select **Deploy to GitHub Pages** workflow
 3. Click **Run workflow**
-4. Select branch (usually `main`)
+4. Select branch (usually `master`)
 5. Click **Run workflow** button
 
 ## Monitoring
@@ -207,13 +207,13 @@ Add a step to check bundle size:
 
 ### Current Setup
 
-- **`main` branch** → Production deployment (automatic)
+- **`master` branch** → Production deployment (automatic)
 
 ### Recommended Enhancement
 
 For larger teams, consider:
 
-- **`main` branch** → Production deployment (automatic)
+- **`master` branch** → Production deployment (automatic)
 - **`develop` branch** → Staging deployment (automatic to a separate GitHub Pages site or Netlify preview)
 - **Feature branches** → No automatic deployment (manual testing only)
 
@@ -229,7 +229,7 @@ name: PR Checks
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   test-and-build:
@@ -239,7 +239,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
       - run: npm ci
       - run: npm run test -- --run
@@ -252,7 +252,7 @@ This runs tests and builds on every PR without deploying.
 
 ### Production
 
-- **Branch:** `main`
+- **Branch:** `master`
 - **URL:** <https://thrownlemon.github.io/conceal-bridge-ux/>
 - **Environment file:** `src/environments/environment.ts`
 - **Backend:** Production backend URL

@@ -1,142 +1,135 @@
 ---
-description: Complete workflow for committing changes, running quality gates, and pushing to remote (aligned with AGENTS.md "Landing the Plane").
+description: Workflow for committing changes, creating PRs, and merging to master
 ---
 
 # Submit Workflow
 
-> **Purpose**: Streamline the process of completing work and pushing to remote, following the "Landing the Plane" workflow from AGENTS.md.
+> **Purpose**: Complete work by pushing to remote and creating a PR. Work is NOT complete until the PR is merged.
 
 ## 1. Verify You're on the Right Branch
 
-1. **Check Current Branch**:
-   - Run `git branch --show-current` to confirm the current branch.
-   - **Rule**: Do NOT commit directly to `master`. If on master, create a feature branch:
-
-     ```bash
-     git checkout -b feature/your-feature-name
-     ```
-
-## 2. Run Quality Gates (If Code Changed)
-
-Before committing, ensure code quality:
-
-1. **Linting**:
-
-   ```bash
-   npm run lint
-   ```
-
-   - Fix any errors with `npm run lint:fix`
-
-2. **Unit Tests**:
-
-   ```bash
-   npm test
-   ```
-
-   - All tests must pass
-
-3. **Build Check**:
-
-   ```bash
-   npm run build
-   ```
-
-   - Production build must succeed
-
-## 3. Stage and Commit Changes
-
-1. **Check Status**:
-
-   ```bash
-   git status
-   ```
-
-2. **Stage Files**:
-
-   ```bash
-   git add .
-   ```
-
-   - Or specify files if partial commit is desired
-
-3. **Review Changes**:
-
-   ```bash
-   git diff --cached
-   ```
-
-4. **Commit with Conventional Commits**:
-   - Format: `<type>(<scope>): <subject>`
-   - Types: feat, fix, docs, chore, refactor, test, ci
-   - Examples:
-
-     ```bash
-     git commit -m "feat: add transaction history modal"
-     git commit -m "fix: resolve chain switching bug"
-     git commit -m "docs: update AGENTS.md workflows"
-     ```
-
-## 4. Update Issue Status (bd)
-
-If working on a bd issue:
-
 ```bash
-bd close <issue-id>  # If fully complete
-# or
-bd update <issue-id> --status done  # Mark as done but not closed
+git branch --show-current
 ```
 
-## 5. Push to Remote (MANDATORY)
+**Branching rules:**
+- ❌ Do NOT commit directly to `master` (except docs-only changes)
+- ✅ Feature work: `feature/your-feature-name`
+- ✅ Bug fixes: `fix/issue-description`
+- ✅ Hotfixes: `hotfix/critical-fix` (see `hotfix.md`)
 
-This is the critical "Landing the Plane" step from AGENTS.md:
-
-```bash
-git pull --rebase
-bd sync  # If using bd for issue tracking
-git push origin <current-branch>
-git status  # MUST show "up to date with origin"
-```
-
-**If upstream not set:**
+**If on master, create a branch:**
 
 ```bash
-git push -u origin <current-branch>
+git checkout -b feature/your-feature-name
 ```
 
-## 6. Verify Push Succeeded
+## 2. Run Quality Gates
+
+Before committing, ALL gates must pass:
 
 ```bash
-git status
+npm run lint        # Fix with: npm run lint:fix
+npm test            # All tests must pass
+npm run build       # Production build must succeed
 ```
 
-Should show: "Your branch is up to date with 'origin/\<branch>'"
-
-## 7. Create Pull Request (Optional)
-
-If you want to open a PR:
+## 3. Stage and Commit
 
 ```bash
-gh pr create --title "Your PR title" --body "Description"
+git status                    # Check what changed
+git add .                     # Stage all (or specify files)
+git diff --cached             # Review staged changes
+git commit -m "feat: description"
 ```
 
-Or use GitHub web interface.
+**Conventional Commits format:** `<type>(<scope>): <subject>`
+
+| Type | Use for |
+|------|---------|
+| `feat` | New functionality |
+| `fix` | Bug fixes |
+| `docs` | Documentation only |
+| `chore` | Dependencies, tooling |
+| `refactor` | Code changes without feature/fix |
+| `test` | Adding/updating tests |
+| `ci` | CI/CD changes |
+
+## 4. Push Branch to Remote
+
+```bash
+git push -u origin $(git branch --show-current)
+```
+
+## 5. Create Pull Request
+
+PRs are required for all code changes (not optional):
+
+```bash
+gh pr create --title "feat: your change" --body "Description of changes"
+```
+
+**Why PRs for solo work?**
+- CI runs lint/test/build before merge is allowed
+- Self-review in PR diff view catches mistakes
+- Clean revert path via merge commits
+
+## 6. Merge PR (After CI Passes)
+
+```bash
+gh pr merge --squash --delete-branch
+```
+
+Or merge via GitHub web UI.
+
+## 7. Update Issue Status (bd)
+
+```bash
+bd close <issue-id> --reason "Merged in PR #123"
+```
+
+## What "Complete" Means
+
+| Task Type | Complete When |
+|-----------|---------------|
+| Feature | PR merged to master |
+| Bug fix | PR merged to master |
+| Hotfix | PR merged and verified on production |
+| Docs only | Push directly to master |
+| Release | Push directly to master (version + changelog) |
 
 ## Critical Rules
 
-- ❌ **NEVER** stop before pushing - that leaves work stranded locally
-- ❌ **NEVER** say "ready to push when you are" - YOU must push
-- ✅ Work is NOT complete until `git push` succeeds
-- ✅ If push fails, resolve conflicts and retry until it succeeds
+- ❌ NEVER stop before pushing - work stranded locally is lost work
+- ❌ NEVER say "ready to push when you are" - YOU must push
+- ❌ NEVER skip the PR for code changes - CI validation matters
+- ✅ Work is complete when PR is merged (not just pushed)
+- ✅ If CI fails, fix locally and push again
 
 ## Quick Reference
 
 ```bash
-# Full workflow
+# Code changes (feature/fix) - requires PR
+git checkout -b feature/my-feature
 npm run lint && npm test && npm run build
-git add .
-git commit -m "feat: your change"
+git add . && git commit -m "feat: description"
+git push -u origin feature/my-feature
+gh pr create --title "feat: description" --body "Details"
+gh pr merge --squash --delete-branch
 bd close <id>
-git pull --rebase && bd sync && git push
-git status
+
+# Docs only (direct to master)
+git add docs/
+git commit -m "docs: update guide"
+git push origin master
+
+# Release (direct to master)
+npm version patch  # or minor/major
+git push origin master --follow-tags
 ```
+
+## Related Workflows
+
+- [hotfix.md](./hotfix.md) - Emergency production fixes
+- [review.md](./review.md) - Code review checklist
+- [cleanup.md](./cleanup.md) - Pre-commit verification

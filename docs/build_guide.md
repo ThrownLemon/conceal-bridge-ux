@@ -336,7 +336,10 @@ For CI/CD details and alternative configurations, see:
 
 ### E2E Testing
 
-Not configured (Angular CLI doesn’t include an e2e framework by default; see note in [`README.md`](conceal-bridge-ux/README.md:53)).
+- **Framework:** Playwright
+- **Run command:** `npm run e2e`
+- **Configuration:** `playwright.config.ts`
+- **Test files:** `e2e/` directory
 
 ---
 

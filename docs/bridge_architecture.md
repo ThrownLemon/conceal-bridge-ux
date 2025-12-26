@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Conceal Bridge Service is a two-way bridge enabling swaps between native ₡CCX (Conceal Network) and wrapped $wCCX (on Ethereum, BSC, Polygon, Avalanche). The architecture consists of an API backend and an Angular 21 frontend that communicates with it.
+The Conceal Bridge Service is a two-way bridge enabling swaps between native ₡CCX (Conceal Network) and wrapped $wCCX (on Ethereum, BSC, Polygon). The architecture consists of an API backend and an Angular 21 frontend that communicates with it.
 
 **Bridge Direction:**
 
@@ -329,7 +329,7 @@ interface BalanceResponse {
 
 ### Bridge API Service
 
-**Location:** `src/app/core/services/bridge/bridge-api.service.ts`
+**Location:** `src/app/core/bridge-api.service.ts`
 
 ```typescript
 import { Injectable } from '@angular/core';
@@ -355,9 +355,8 @@ import {
   providedIn: 'root',
 })
 export class BridgeApiService {
-  private baseUrl = API_CONFIG.baseUrl;
-
-  constructor(private http: HttpClient) {}
+  readonly #http = inject(HttpClient);
+  readonly #baseUrl = API_CONFIG.baseUrl;
 
   // ========== CCX → wCCX APIs ==========
 
@@ -365,8 +364,8 @@ export class BridgeApiService {
    * Initialize CCX to wCCX swap
    */
   initCCXToWCCXSwap(request: CCXToWCCXInitRequest): Observable<CCXToWCCXInitResponse> {
-    return this.http.post<CCXToWCCXInitResponse>(
-      `${this.baseUrl}${API_CONFIG.endpoints.ccxToWccx.init}`,
+    return this.#http.post<CCXToWCCXInitResponse>(
+      `${this.#baseUrl}${API_CONFIG.endpoints.ccxToWccx.init}`,
       request,
     );
   }
@@ -375,8 +374,8 @@ export class BridgeApiService {
    * Estimate gas for CCX to wCCX swap
    */
   estimateGas(request: EstimateGasRequest): Observable<EstimateGasResponse> {
-    return this.http.post<EstimateGasResponse>(
-      `${this.baseUrl}${API_CONFIG.endpoints.ccxToWccx.estimateGas}`,
+    return this.#http.post<EstimateGasResponse>(
+      `${this.#baseUrl}${API_CONFIG.endpoints.ccxToWccx.estimateGas}`,
       request,
     );
   }
@@ -385,8 +384,8 @@ export class BridgeApiService {
    * Get CCX to wCCX transaction status
    */
   getCCXToWCCXStatus(paymentId: string): Observable<CCXToWCCXTxResponse> {
-    return this.http.post<CCXToWCCXTxResponse>(
-      `${this.baseUrl}${API_CONFIG.endpoints.ccxToWccx.status}`,
+    return this.#http.post<CCXToWCCXTxResponse>(
+      `${this.#baseUrl}${API_CONFIG.endpoints.ccxToWccx.status}`,
       { paymentId },
     );
   }
@@ -395,7 +394,7 @@ export class BridgeApiService {
    * Get CCX swap wallet balance
    */
   getCCXBalance(): Observable<BalanceResponse> {
-    return this.http.get<BalanceResponse>(`${this.baseUrl}${API_CONFIG.endpoints.balance.ccx}`);
+    return this.#http.get<BalanceResponse>(`${this.#baseUrl}${API_CONFIG.endpoints.balance.ccx}`);
   }
 
   // ========== wCCX → CCX APIs ==========
@@ -404,8 +403,8 @@ export class BridgeApiService {
    * Initialize wCCX to CCX swap
    */
   initWCCXToCCXSwap(request: WCCXToCCXInitRequest): Observable<WCCXToCCXInitResponse> {
-    return this.http.post<WCCXToCCXInitResponse>(
-      `${this.baseUrl}${API_CONFIG.endpoints.wccxToCcx.init}`,
+    return this.#http.post<WCCXToCCXInitResponse>(
+      `${this.#baseUrl}${API_CONFIG.endpoints.wccxToCcx.init}`,
       request,
     );
   }
@@ -414,8 +413,8 @@ export class BridgeApiService {
    * Execute wCCX to CCX swap
    */
   executeWCCXToCCXSwap(request: ExecuteSwapRequest): Observable<ExecuteSwapResponse> {
-    return this.http.post<ExecuteSwapResponse>(
-      `${this.baseUrl}${API_CONFIG.endpoints.wccxToCcx.exec}`,
+    return this.#http.post<ExecuteSwapResponse>(
+      `${this.#baseUrl}${API_CONFIG.endpoints.wccxToCcx.exec}`,
       request,
     );
   }
@@ -424,8 +423,8 @@ export class BridgeApiService {
    * Get wCCX to CCX transaction status
    */
   getWCCXToCCXStatus(paymentId: string): Observable<WCCXToCCXTxResponse> {
-    return this.http.post<WCCXToCCXTxResponse>(
-      `${this.baseUrl}${API_CONFIG.endpoints.wccxToCcx.status}`,
+    return this.#http.post<WCCXToCCXTxResponse>(
+      `${this.#baseUrl}${API_CONFIG.endpoints.wccxToCcx.status}`,
       { paymentId },
     );
   }
@@ -434,7 +433,7 @@ export class BridgeApiService {
    * Get wCCX swap wallet balance
    */
   getWCCXBalance(): Observable<BalanceResponse> {
-    return this.http.get<BalanceResponse>(`${this.baseUrl}${API_CONFIG.endpoints.balance.wccx}`);
+    return this.#http.get<BalanceResponse>(`${this.#baseUrl}${API_CONFIG.endpoints.balance.wccx}`);
   }
 }
 ```

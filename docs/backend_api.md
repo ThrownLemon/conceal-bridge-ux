@@ -33,7 +33,7 @@ The backend does **not** blindly trust user-supplied transaction hashes. It vali
 - recipient address matches configured bridge wallet address
 - for ERC-20 deposits: calldata decodes to `transfer(to, amount)` to the bridge wallet
 
-Those checks are performed in API handlers such as [`/api/unwrap/exec`](conceal-wswap/index.js:231) using contract helpers like [`getTxInfo()`](conceal-wswap/units/contract.js:204) and [`decodeTransferData()`](conceal-wswap/units/contract.js:227).
+Those checks are performed in API handlers such as `/api/wccx/ccx/swap/exec` using contract helpers like `getTxInfo()` and `decodeTransferData()`.
 
 ---
 
@@ -49,9 +49,9 @@ This includes the legacy client wrapper:
 
 ### API routing conventions
 
-- JSON POST endpoints live under `/api/...` (see e.g. [`/api/wrap/init`](conceal-wswap/index.js:94))
-- JSON GET endpoints live under `/api/...` (see e.g. [`/api/tx/:paymentId`](conceal-wswap/index.js:520))
-- Config endpoint is `/config/chain` (see [`/config/chain`](conceal-wswap/index.js:631))
+- JSON POST endpoints live under `/api/...` (e.g. `/api/ccx/wccx/swap/init`)
+- JSON GET endpoints live under `/api/...` (e.g. `/api/balance/ccx`)
+- Config endpoint is `/config/chain`
 
 ---
 
@@ -61,8 +61,8 @@ This includes the legacy client wrapper:
 
 The backend uses two different boolean keys depending on endpoint:
 
-- `success: boolean` for “command” endpoints (init/exec), produced in handlers like [`/api/wrap/init`](conceal-wswap/index.js:94) and errors via [`sendError()`](conceal-wswap/index.js:74)
-- `result: boolean` for “query” endpoints (balance/tx/gas), e.g. [`/api/wrap/estimateGas`](conceal-wswap/index.js:464), [`/api/tx/:paymentId`](conceal-wswap/index.js:520), [`/api/balance/:providerId`](conceal-wswap/index.js:569)
+- `success: boolean` for "command" endpoints (init/exec), e.g. `/api/ccx/wccx/swap/init`
+- `result: boolean` for "query" endpoints (balance/tx/gas), e.g. `/api/ccx/wccx/estimateGas`, `/api/balance/ccx`
 
 ### Generic error envelope
 
@@ -75,7 +75,7 @@ Most POST endpoints call [`sendError()`](conceal-wswap/index.js:74), which respo
 }
 ```
 
-Some GET handlers return their own error shapes, e.g. [`/api/tx/:paymentId`](conceal-wswap/index.js:520) returns:
+Some handlers return their own error shapes, e.g. `/api/ccx/wccx/tx` returns:
 
 ```json
 {
@@ -107,266 +107,155 @@ AI agent rules:
 
 ---
 
-## 5) Endpoint reference (authoritative from index.js)
+## 5) Endpoint reference
 
-All endpoints below are taken from [`index.js`](conceal-wswap/index.js:1).
+All endpoints below are from the backend README and match what the Angular frontend uses.
 
 ### 5.1 Wrap (CCX -> wCCX)
 
-#### `POST /api/wrap/init`
-
-Source: [`/api/wrap/init`](conceal-wswap/index.js:94)
+#### `POST /api/ccx/wccx/swap/init`
 
 Purpose:
 
-- Validates the **fee payment transaction** on the destination EVM chain.
-- Creates a DB swap record and returns a `paymentId`.
+- Initializes the CCX → wCCX swap transaction.
+- User must first pay gas fee on EVM chain, then call this endpoint.
+- Returns a `paymentId` to track the swap.
 
-Request body fields (observed usage):
+Request body:
 
-- `amount`
-- `fromAddress` (CCX sender address)
-- `toAddress` (EVM recipient address for wCCX)
-- `email` (optional)
-- `txfeehash` (fee tx hash on EVM chain)
-- `inProviderId` (usually `"ccx"`)
-- `outProviderId` (e.g. `"eth" | "bsc" | "plg"`)
+- `amount` - Amount of CCX to swap for wCCX
+- `fromAddress` - CCX address sending the CCX
+- `toAddress` - EVM address to receive wCCX
+- `email` (optional) - Email to receive swap status
+- `txfeehash` - Hash of the fee payment TX on EVM chain
 
 Response:
 
 - success: `{ "success": true, "paymentId": "<hex>" }`
-- failure: `{ "success": false, "err": "<message>" }` via [`sendError()`](conceal-wswap/index.js:74)
+- failure: `{ "success": false, "err": "<message>" }`
 
-Validation highlights:
+#### `POST /api/ccx/wccx/estimateGas`
 
-- Amount bounded by `metrics.maxSwapAmount` and `metrics.minSwapAmount` in config (see checks in [`/api/wrap/init`](conceal-wswap/index.js:98))
-- Fee tx “too old” check uses `maxTxBlockAge` (see [`txSwapData.blockNumber + providerConfig.maxTxBlockAge`](conceal-wswap/index.js:113))
-- Fee tx cannot be reused (see [`checkFeeTxHash()`](conceal-wswap/units/database.js:45))
+Purpose:
 
-#### `POST /api/wrap/estimateGas`
-
-Source: [`/api/wrap/estimateGas`](conceal-wswap/index.js:464)
+- Estimates gas required for the swap at current network conditions.
 
 Request body:
 
-- `providerId`
-- `toAddress`
-- `amount`
+- `amount` - Amount of CCX to swap
+- `address` - The wCCX smart contract address
 
 Response:
 
 - `{ "result": true, "gas": <number> }`
+
+#### `POST /api/ccx/wccx/tx`
+
+Purpose:
+
+- Check the status of a wrap swap transaction.
+
+Request body:
+
+- `paymentId` - PaymentId of the swap TX
+
+Response:
+
+- `swaped` - Amount of tokens being swapped
+- `address` - Target address
+- `swapHash` - Hash of the swap TX on Ethereum blockchain
+- `depositHash` - Hash of the deposit TX on CCX blockchain
 
 ---
 
 ### 5.2 Unwrap (wCCX -> CCX)
 
-#### `POST /api/unwrap/init`
-
-Source: [`/api/unwrap/init`](conceal-wswap/index.js:168)
+#### `POST /api/wccx/ccx/swap/init`
 
 Purpose:
 
-- Validates the **fee payment transaction** (native coin) to the bridge wallet.
-- Creates a DB swap record and returns `paymentId`.
+- Initializes the wCCX → CCX swap transaction.
+- User deposits wCCX and when confirmed, CCX is sent to target address.
 
 Request body:
 
-- `amount`
-- `fromAddress` (EVM sender address)
-- `toAddress` (CCX recipient address)
-- `email` (optional)
-- `txfeehash` (fee tx hash)
-- `inProviderId` (e.g. `"eth" | "bsc" | "plg"`)
-- `outProviderId` (usually `"ccx"`)
+- `fromAddress` - wCCX address sending the tokens
+- `toAddress` - CCX address to receive CCX
+- `txHash` - Hash of the wCCX deposit TX on EVM chain
+- `email` (optional) - Email to receive swap status
 
 Response:
 
-- `{ "success": true, "paymentId": "<hex>" }` or error via [`sendError()`](conceal-wswap/index.js:74)
+- success: `{ "success": true, "paymentId": "<hex>" }`
+- failure: `{ "success": false, "err": "<message>" }`
 
-#### `POST /api/unwrap/estimateGas`
-
-Source: [`/api/unwrap/estimateGas`](conceal-wswap/index.js:478)
-
-Request body:
-
-- `providerId`
-
-Response:
-
-- `{ "result": true, "gas": <number> }`
-
-#### `POST /api/unwrap/exec`
-
-Source: [`/api/unwrap/exec`](conceal-wswap/index.js:231)
+#### `POST /api/wccx/ccx/swap/exec`
 
 Purpose:
 
-- Verifies that a user’s wCCX deposit transaction is valid (confirmed + correct recipient).
-- Sends CCX on the CCX side (via swap wallet engine).
-- Finalizes DB record.
+- Executes the wCCX → CCX swap after deposit is confirmed.
 
 Request body:
 
-- `inProviderId` (EVM chain id key)
-- `outProviderId` (expected `"ccx"`)
-- `paymentId`
-- `txHash` (the ERC-20 transfer tx hash)
-- `email` (optional)
+- `paymentId` - PaymentId of the swap TX to execute
+- `email` (optional) - Email to receive swap status
 
-Success response:
+Response:
 
-- `{ "success": true, "swapData": <db finalize result> }` (see response in [`/api/unwrap/exec`](conceal-wswap/index.js:278))
+- success: `{ "success": true, "swapData": <object> }`
+- failure: `{ "success": false, "err": "<message>" }`
 
-Important validations:
+#### `POST /api/wccx/ccx/tx`
 
-- swap record must exist: [`getSwapData()`](conceal-wswap/index.js:242)
-- deposit tx must not have been used already: [`checkPaymentTxHash()`](conceal-wswap/index.js:254)
-- tx must meet confirmation threshold: [`txConfirmations >= providerConfig.confirmations`](conceal-wswap/index.js:262)
-- tx calldata must decode to `transfer(to, value)` and `to` must equal bridge wallet address (see recipient check in [`/api/unwrap/exec`](conceal-wswap/index.js:265))
+Purpose:
+
+- Check the status of an unwrap swap transaction.
+
+Request body:
+
+- `paymentId` - PaymentId of the swap TX
+
+Response:
+
+- `hasRecord` - true/false, whether record with paymentId was found
+- `result` - true/false, whether tx is finished
+- `swaped` - Amount of coins being swapped
+- `hasExpired` - true/false, whether swap period has expired
+- `txdata` - TX data object (if successful):
+  - `swapped` - Amount swapped
+  - `address` - Target address
+  - `swapHash` - Hash of swap TX on CCX blockchain
+  - `depositHash` - Hash of deposit TX on EVM blockchain
 
 ---
 
-### 5.3 Swap (wCCX -> wCCX across EVM providers)
+### 5.3 Query endpoints
 
-This is a “token swap between EVM networks” flow.
-
-#### `POST /api/swap/init`
-
-Source: [`/api/swap/init`](conceal-wswap/index.js:314)
+#### `GET /api/balance/ccx`
 
 Purpose:
 
-- Validates a fee tx on the **out** provider chain.
-- Initializes the swap record and returns `paymentId`.
-
-Request body:
-
-- `amount`
-- `fromAddress`
-- `toAddress`
-- `email` (optional)
-- `txfeehash`
-- `inProviderId`
-- `outProviderId`
-
-Response:
-
-- `{ "success": true, "paymentId": "<hex>" }` or error via [`sendError()`](conceal-wswap/index.js:74)
-
-#### `POST /api/swap/estimateGas`
-
-Source: [`/api/swap/estimateGas`](conceal-wswap/index.js:492)
-
-Request body:
-
-- `providerId`
-
-Response:
-
-- `{ "result": true, "gas": <number> }`
-
-#### `POST /api/swap/exec`
-
-Source: [`/api/swap/exec`](conceal-wswap/index.js:378)
-
-Purpose:
-
-- Verify deposit on the **in** provider chain (ERC-20 transfer to bridge wallet).
-- Transfer out on the **out** provider chain (bridge wallet -> user).
-- Finalize DB.
-
-Request body:
-
-- `inProviderId`
-- `outProviderId`
-- `paymentId`
-- `txHash`
-- `email` (optional)
-
-Success response:
-
-- `{ "success": true, "swapData": <db finalize result> }` (see response in [`/api/swap/exec`](conceal-wswap/index.js:429))
-
-⚠️ Known issue (AI agent should be aware):
-Inside [`/api/swap/exec`](conceal-wswap/index.js:378), the recipient validation line references `providerConfig` instead of `inProviderConfig`:
-
-- [`providerConfig.account.address`](conceal-wswap/index.js:413)
-
-This looks like a bug and would throw at runtime (or incorrectly validate). Any work on this endpoint should fix that reference and add coverage.
-
----
-
-### 5.4 Query endpoints
-
-#### `GET /api/getGasPrice/:providerId`
-
-Source: [`/api/getGasPrice/:providerId`](conceal-wswap/index.js:506)
-
-Response:
-
-- `{ "result": true, "gas": <number> }`
-
-#### `GET /api/tx/:paymentId`
-
-Source: [`/api/tx/:paymentId`](conceal-wswap/index.js:520)
-
-Purpose:
-
-- Poll swap status by `paymentId`
-
-Responses:
-
-- Completed swap: `{ hasRecord: true, result: true, txdata: { swaped, address, swapHash, depositHash } }` (see [`result: true`](conceal-wswap/index.js:526))
-- Pending swap: `{ hasRecord: true, result: false, hasExpired: <bool>, txdata: {...} }` (see [`result: false`](conceal-wswap/index.js:540))
-- Unknown paymentId: `{ hasRecord: false, result: false, txdata: null }` (see [`hasRecord: false`](conceal-wswap/index.js:551))
-
-#### `GET /api/balance/:providerId`
-
-Source: [`/api/balance/:providerId`](conceal-wswap/index.js:569)
-
-Purpose:
-
-- Returns available balance for swap liquidity, accounting for reserved funds from DB.
+- Returns how much CCX is available in the swap wallet.
 
 Response:
 
 - `{ "result": true, "balance": <number> }`
 
-Notes:
+#### `GET /api/balance/wccx`
 
-- For `CCX`, it uses swap wallet balance (see [`providerId.toUpperCase() == 'CCX'`](conceal-wswap/index.js:570))
-- For EVM providers, it uses ERC-20 balance of the bridge account (see [`contract.getWalletBalance()`](conceal-wswap/index.js:584))
+Purpose:
 
-#### `POST /api/ccx/wccx/stats`
-
-Source: [`/api/ccx/wccx/stats`](conceal-wswap/index.js:602)
-
-Request body:
-
-- `includeRecentTx: boolean`
-- `includeAllTx: boolean`
+- Returns how much wCCX is available in the swap wallet.
 
 Response:
 
-- `{ "result": true, "stats": <object> }`
-
-Stats implementation: [`getStats_ccx_wccx()`](conceal-wswap/units/database.js:124)
-
-#### `POST /api/wccx/ccx/stats`
-
-Source: [`/api/wccx/ccx/stats`](conceal-wswap/index.js:616)
-
-Note:
-This endpoint currently calls [`getStats_ccx_wccx()`](conceal-wswap/index.js:617) too, even though [`getStats_wccx_ccx()`](conceal-wswap/units/database.js:155) exists. This mismatch likely indicates incomplete/buggy stats wiring.
+- `{ "result": true, "balance": <number> }`
 
 ---
 
-### 5.5 Config endpoint
+### 5.4 Config endpoint
 
 #### `GET /config/chain`
-
-Source: [`/config/chain`](conceal-wswap/index.js:631)
 
 Purpose:
 
@@ -374,15 +263,10 @@ Purpose:
 
 Response includes:
 
-- `providers: contract.getProvidersConfig()`
+- `providers` - Provider configuration for each supported chain
 - `wccx.units`, `ccx.accountAddress`, `ccx.units`
 - `common.maintenance`, `minSwapAmount`, `maxSwapAmount`, `defaultProvider`
 - `tx.gasMultiplier`
-
-AI agent security warning:
-
-- [`getProvidersConfig()`](conceal-wswap/units/contract.js:81) currently returns the in-memory `providers` object which, as constructed in [`SwapContract`](conceal-wswap/units/contract.js:14), can include sensitive config fields (e.g. `account` containing keys/mnemonics) and non-JSON-safe objects (`provider`, `contract`).
-- If this endpoint is used publicly, it must be **sanitized** to include only public fields (contract address, chainId, confirmations, RPC, currency metadata) and must never expose private keys.
 
 ---
 
@@ -428,19 +312,27 @@ AI agent security warning:
 
 ---
 
-## 8) README vs actual endpoints (important!)
+## 8) Frontend service reference
 
-The backend’s README describes older endpoint names like `api/ccx/wccx/swap/init` in [`README.md`](conceal-wswap/README.md:93), but the current implementation uses:
+The Angular frontend (`bridge-api.service.ts`) uses these endpoints:
 
-- [`/api/wrap/init`](conceal-wswap/index.js:94)
-- [`/api/unwrap/init`](conceal-wswap/index.js:168)
-- [`/api/unwrap/exec`](conceal-wswap/index.js:231)
-- [`/api/swap/init`](conceal-wswap/index.js:314)
-- [`/api/swap/exec`](conceal-wswap/index.js:378)
+| Operation | Endpoint |
+|-----------|----------|
+| Wrap init | `POST /api/ccx/wccx/swap/init` |
+| Unwrap init | `POST /api/wccx/ccx/swap/init` |
+| Unwrap exec | `POST /api/wccx/ccx/swap/exec` |
+| Check wrap state | `POST /api/ccx/wccx/tx` |
+| Check unwrap state | `POST /api/wccx/ccx/tx` |
+| CCX balance | `GET /api/balance/ccx` |
+| wCCX balance | `GET /api/balance/wccx` |
+| Gas estimate | `POST /api/ccx/wccx/estimateGas` |
+| Gas price | `GET /api/ccx/wccx/getGasPrice` |
+| Chain config | `GET /config/chain` |
 
 AI agent rule:
 
-- Treat [`index.js`](conceal-wswap/index.js:1) as the authoritative contract, not [`README.md`](conceal-wswap/README.md:1).
+- Always use endpoint names from this table
+- Match what `src/app/core/bridge-api.service.ts` uses
 
 ---
 

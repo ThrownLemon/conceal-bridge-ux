@@ -12,11 +12,10 @@ The project uses GitHub Actions for automatic deployment.
 
 ### Trigger Deployment
 
-Simply push to `master`:
+Deployment is triggered when changes reach `master`:
 
-```bash
-git push origin master
-```
+- **Code changes**: Merge a PR to master
+- **Docs/releases**: Push directly to master
 
 GitHub Actions will automatically:
 
@@ -216,18 +215,19 @@ Check `src/environments/environment.ts` is being used for production build.
 ## Quick Reference
 
 ```bash
-# Automatic deployment
-git push origin master
+# Deployment happens automatically when:
+# - PR is merged to master (code changes)
+# - Push directly to master (docs/releases only)
 
-# Manual verification
+# Manual verification before merge
 npm run lint && npm test && npm run build
 npx http-server dist/conceal-bridge-ux/browser
 
-# Manual deploy (if needed)
+# Manual deploy (if GitHub Actions fails)
 npm run build
 npx gh-pages -d dist/conceal-bridge-ux/browser
 
-# Rollback
+# Rollback (emergency - direct push allowed)
 git revert HEAD && git push origin master
 ```
 

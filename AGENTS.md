@@ -1,262 +1,288 @@
 # Agent Instructions
 
-## Issue Tracking with bd (beads)
+## Critical Rules (Read First)
 
-**IMPORTANT**: This project uses **bd (beads)** for ALL issue tracking. Do NOT use markdown TODOs, task lists, or other tracking methods.
+### General
 
-### Why bd?
+- ❌ NEVER stop before pushing - work is incomplete until `git push` succeeds
+- ❌ NEVER say "ready to push when you are" - YOU must push
+- ❌ NEVER create markdown TODO lists - use bd (beads) for all task tracking
+- ✅ Run quality gates before every commit: `npm run lint && npm test && npm run build`
+- ✅ Use conventional commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`
 
-- Dependency-aware: Track blockers and relationships between issues
-- Git-friendly: Auto-syncs to JSONL for version control
-- Agent-optimized: JSON output, ready work detection, discovered-from links
-- Prevents duplicate tracking systems and confusion
+### Web3 / Wallets
 
-### Quick Start
+- ❌ NEVER handle secrets (no private keys / seed phrases; never log them)
+- ❌ NEVER prompt for wallet permissions during hydration (startup uses silent checks)
+- ❌ NEVER assume tx is final at "hash returned" - wait for confirmations from chain config
+- ✅ Network switching MUST go through `EvmWalletService.ensureChain()`
+- ✅ Preserve disconnect semantics (localStorage flag prevents surprise reconnects)
 
-**Check for ready work:**
+### Smart Contracts
+
+- ❌ NEVER hardcode contract addresses - consume from backend config via `getChainConfig()`
+- ❌ NEVER use float math for on-chain values - use `BigInt` only
+- ✅ Use `parseUnits()` / `parseEther()` from Viem for token amounts
+- ✅ Provider IDs must match between frontend (`EvmNetworkKey`) and backend (`providerId`)
+- ✅ Backend validates deposits via tx hash + calldata decode (not event scanning)
+
+---
+
+## Landing the Plane
+
+Work is NOT complete until code is pushed AND a PR is created (or merged). This is the most important workflow rule.
+
+### Branching Strategy
+
+- ❌ NEVER commit directly to `master`
+- ✅ Feature work: `feature/your-feature-name`
+- ✅ Bug fixes: `fix/issue-description`
+- ✅ Hotfixes: `hotfix/critical-fix` (emergency only)
+
+### Required Steps
 
 ```bash
-bd ready --json
+# 1. Create feature branch (if not already on one)
+git checkout -b feature/your-feature-name
+
+# 2. Quality gates
+npm run lint && npm test && npm run build
+
+# 3. Stage and commit
+git add .
+git commit -m "feat: your change description"
+
+# 4. Push branch to remote
+git push -u origin feature/your-feature-name
+
+# 5. Create PR
+gh pr create --title "feat: your change" --body "Description of changes"
+
+# 6. Update bd issue (if applicable)
+bd close <issue-id>
 ```
 
-**Create new issues:**
+### What "Complete" Means
+
+| Task Type | Complete When |
+|-----------|---------------|
+| Feature | PR merged to master (CI must pass) |
+| Bug fix | PR merged to master |
+| Hotfix | PR merged and verified on production |
+| Docs only | Push directly to master |
+| Release | Push directly to master (version + changelog) |
+
+### Why PRs for Solo Work?
+
+PRs aren't for waiting on reviewers - they validate your work:
+- **CI gate**: GitHub Actions runs lint/test/build before merge
+- **Self-review**: Seeing diff in PR view catches mistakes
+- **Clean history**: Easy to revert merge commits if needed
+
+### Anti-patterns
+
+- ❌ "I've made the changes, ready to commit when you are"
+- ❌ Stopping after local commit without push
+- ❌ Leaving work on an unpushed branch without PR
+- ❌ Committing directly to master (except docs-only changes)
+- ❌ Skipping quality gates to "save time"
+
+---
+
+## Project Overview
+
+See [README.md](./README.md) for full details.
+
+- **Type**: Angular 21 SPA (Standalone, Signals, OnPush)
+- **Purpose**: Bridge ₡CCX ↔ $wCCX across Ethereum, BSC, Polygon
+- **Backend**: [conceal-wswap](https://github.com/ConcealNetwork/conceal-wswap)
+- **Stack**: Viem (Web3), TailwindCSS v4, Vitest, Playwright
+
+### Quick Commands
+
+| Command | Purpose |
+|---------|---------|
+| `npm start` | Dev server at localhost:4200 |
+| `npm test` | Unit tests (Vitest) |
+| `npm run e2e` | E2E tests (Playwright) |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint check |
+| `npm run format` | Prettier format |
+
+---
+
+## Quality Gates
+
+Run these before EVERY commit:
 
 ```bash
-bd create "Issue title" -t bug|feature|task -p 0-4 --json
-bd create "Issue title" -p 1 --deps discovered-from:bd-123 --json
-bd create "Subtask" --parent <epic-id> --json  # Hierarchical subtask (gets ID like epic-id.1)
+npm run lint        # ESLint (fix: npm run lint:fix)
+npm run format      # Prettier formatting
+npm test            # Vitest unit tests
+npm run build       # Production build (run AFTER lint/format)
 ```
 
-**Claim and update:**
+All gates MUST pass before pushing. Do not skip.
 
-```bash
-bd update bd-42 --status in_progress --json
-bd update bd-42 --priority 1 --json
+---
+
+## Angular Patterns (v21+)
+
+### Components
+
+- Standalone only (no NgModules, don't set `standalone: true` explicitly - it's default)
+- `changeDetection: ChangeDetectionStrategy.OnPush` always
+- Use `inject()` function, not constructor injection
+- Private fields use `#` syntax (e.g., `#http`, `#walletService`)
+
+### Signals (State Management)
+
+- Use `signal()`, `computed()`, `effect()` for state
+- Use `input()` and `output()` instead of `@Input` / `@Output` decorators
+- No side effects in `computed()` - use `effect()` for side effects
+- Mutate with `.set()` or `.update()`, never direct assignment
+
+### Templates
+
+- Use `@if`, `@for`, `@switch` (not `*ngIf`, `*ngFor`, `[ngSwitch]`)
+- Use `[class.name]="condition"` not `[ngClass]`
+- Prefer `| async` or `toSignal()` for observables in templates
+
+### RxJS
+
+- No unowned subscriptions - use `takeUntilDestroyed()` or `DestroyRef`
+- Prefer declarative streams over manual event handlers
+- Convert to Signals for view layer: `toSignal(observable$)`
+
+### Styling
+
+- TailwindCSS v4 utility classes in templates
+- Dark theme default: `bg-slate-950`, amber accents for CTAs
+- Use `[class.name]` binding, not `ngClass`
+
+---
+
+## Web3 Patterns (Viem)
+
+### Wallet Connection
+
+```typescript
+// Always use the service, never raw providers
+readonly #wallet = inject(EvmWalletService);
+
+// Check chain before transactions
+await this.#wallet.ensureChain(targetChain);
+
+// Wait for confirmations, never assume success
+const receipt = await this.#wallet.waitForReceipt(hash);
 ```
 
-**Complete work:**
+### Token Amounts
+
+```typescript
+// CORRECT: Use parseUnits with config-derived decimals
+const amount = parseUnits(userInput, chainConfig.units);
+
+// WRONG: Float math
+const amount = parseFloat(userInput) * 1_000_000; // NO!
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/app/core/evm-wallet.service.ts` | Wallet connection, tx sending |
+| `src/app/core/bridge-api.service.ts` | Backend API calls |
+| `src/app/core/bridge-types.ts` | TypeScript interfaces |
+| `src/app/core/evm-networks.ts` | Chain configurations |
+
+---
+
+## Issue Tracking (bd)
+
+Use **bd (beads)** for ALL task tracking. No markdown TODOs.
+
+### Quick Reference
 
 ```bash
-bd close bd-42 --reason "Completed" --json
+bd ready --json                                    # Check for work
+bd create "Title" -t bug|feature|task -p 0-4       # Create issue
+bd update bd-42 --status in_progress               # Claim work
+bd close bd-42 --reason "Completed"                # Complete work
 ```
 
 ### Issue Types
 
-- `bug` - Something broken
-- `feature` - New functionality
-- `task` - Work item (tests, docs, refactoring)
-- `epic` - Large feature with subtasks
-- `chore` - Maintenance (dependencies, tooling)
+| Type | Use For |
+|------|---------|
+| `bug` | Something broken |
+| `feature` | New functionality |
+| `task` | Tests, docs, refactoring |
+| `epic` | Large feature with subtasks |
+| `chore` | Dependencies, tooling |
 
 ### Priorities
 
-- `0` - Critical (security, data loss, broken builds)
-- `1` - High (major features, important bugs)
-- `2` - Medium (default, nice-to-have)
-- `3` - Low (polish, optimization)
-- `4` - Backlog (future ideas)
+| Priority | Meaning |
+|----------|---------|
+| `0` | Critical (security, data loss, broken builds) |
+| `1` | High (major features, important bugs) |
+| `2` | Medium (default) |
+| `3` | Low (polish, optimization) |
+| `4` | Backlog (future ideas) |
 
-### Workflow for AI Agents
+### Rules
 
-1. **Check ready work**: `bd ready` shows unblocked issues
-2. **Claim your task**: `bd update <id> --status in_progress`
-3. **Work on it**: Implement, test, document
-4. **Discover new work?** Create linked issue:
-   - `bd create "Found bug" -p 1 --deps discovered-from:<parent-id>`
-5. **Complete**: `bd close <id> --reason "Done"`
-6. **Commit together**: Always commit the `.beads/issues.jsonl` file together with the code changes so issue state stays in sync with code state
-
-### Auto-Sync
-
-bd automatically syncs with git:
-
-- Exports to `.beads/issues.jsonl` after changes (5s debounce)
-- Imports from JSONL when newer (e.g., after `git pull`)
-- No manual export/import needed!
-
-### GitHub Copilot Integration
-
-If using GitHub Copilot, also create `.github/copilot-instructions.md` for automatic instruction loading.
-Run `bd onboard` to get the content, or see step 2 of the onboard instructions.
-
-### MCP Server (Recommended)
-
-If using Claude or MCP-compatible clients, install the beads MCP server:
-
-```bash
-pip install beads-mcp
-```
-
-Add to MCP config (e.g., `~/.config/claude/config.json`):
-
-```json
-{
-  "beads": {
-    "command": "beads-mcp",
-    "args": []
-  }
-}
-```
-
-Then use `mcp__beads__*` functions instead of CLI commands.
-
-### Managing AI-Generated Planning Documents
-
-AI assistants often create planning and design documents during development:
-
-- PLAN.md, IMPLEMENTATION.md, ARCHITECTURE.md
-- DESIGN.md, CODEBASE_SUMMARY.md, INTEGRATION_PLAN.md
-- TESTING_GUIDE.md, TECHNICAL_DESIGN.md, and similar files
-
-#### Best Practice: Use a dedicated directory for these ephemeral files
-
-**Recommended approach:**
-
-- Create a `history/` directory in the project root
-- Store ALL AI-generated planning/design docs in `history/`
-- Keep the repository root clean and focused on permanent project files
-- Only access `history/` when explicitly asked to review past planning
-
-**Example .gitignore entry (optional):**
-
-```gitignore
-# AI planning documents (ephemeral)
-history/
-```
-
-**Benefits:**
-
-- ✅ Clean repository root
-- ✅ Clear separation between ephemeral and permanent documentation
-- ✅ Easy to exclude from version control if desired
-- ✅ Preserves planning history for archeological research
-- ✅ Reduces noise when browsing the project
-
-### CLI Help
-
-Run `bd <command> --help` to see all available flags for any command.
-For example: `bd create --help` shows `--parent`, `--deps`, `--assignee`, etc.
-
-### Important Rules
-
-- ✅ Use bd for ALL task tracking
 - ✅ Always use `--json` flag for programmatic use
-- ✅ Link discovered work with `discovered-from` dependencies
 - ✅ Check `bd ready` before asking "what should I work on?"
-- ✅ Store AI planning docs in `history/` directory
-- ✅ Run `bd <cmd> --help` to discover available flags
+- ✅ Link discovered work with `--deps discovered-from:bd-123`
 - ❌ Do NOT create markdown TODO lists
 - ❌ Do NOT use external issue trackers
-- ❌ Do NOT duplicate tracking systems
-- ❌ Do NOT clutter repo root with planning documents
 
-## Project Overview
+---
 
-- **Name**: Conceal Bridge UX (`conceal-bridge-ux`)
-- **Type**: Angular 21 Web Application (SPA)
-- **Purpose**: UI for bridging ₡CCX and $wCCX across Ethereum, BSC, and Polygon
-- **Backend**: Works with [conceal-wswap](https://github.com/ConcealNetwork/conceal-wswap) (Express.js API)
-- **Production**: <https://bridge.conceal.network>
-- **GitHub Pages**: <https://thrownlemon.github.io/conceal-bridge-ux/>
+## Workflows (.agent/workflows/)
 
-### Key Technologies
+| Workflow | Purpose |
+|----------|---------|
+| `beads.md` | Issue tracking with bd |
+| `setup.md` | Environment setup |
+| `test.md` | Unit & E2E testing |
+| `review.md` | Code review checklist |
+| `cleanup.md` | Pre-commit verification |
+| `submit.md` | Commit and push (Landing the Plane) |
+| `deploy.md` | GitHub Pages deployment |
+| `release.md` | Version releases |
+| `hotfix.md` | Emergency production fixes |
+| `update.md` | Package updates |
+| `debug.md` | Troubleshooting |
 
-- **Framework**: Angular 21 (Standalone Components, Signals, Zoneless-ready)
-- **Styling**: TailwindCSS v4 (CSS-first, utility-first)
-- **Web3**: Viem (modern EVM wallet integration)
-- **Testing**: Vitest (Unit), Playwright (E2E)
-- **Package Manager**: npm@11.7.0
+---
 
-## Quick Start Commands
+## Context Commands (.agent/commands/)
 
-- **Install**: `npm install`
-- **Dev Server**: `npm start` (Runs on `http://localhost:4200`)
-- **Build (Prod)**: `npm run build` (Output: `dist/conceal-bridge-ux`)
-- **Unit Test**: `npm test`
-- **E2E Test**: `npm run e2e` (Playwright)
-- **Lint**: `npm run lint` (Fix: `npm run lint:fix`)
-- **Format**: `npm run format`
+Load domain-specific context before working in an area:
 
-## Project Structure
+| Command | When to Use |
+|---------|-------------|
+| `prime.md` | General context loading |
+| `prime-wallets.md` | Wallet/Web3 changes |
+| `prime-smart-contracts.md` | Contract interactions |
+| `prime-architecture.md` | Structural changes |
+| `prime-backend-api.md` | API integration work |
+| `prime-testing.md` | Test development |
+| `prime-security.md` | Security-sensitive changes |
 
-```text
-src/
-├── app/
-│   ├── core/           # Singleton services (API, Wallet), Types, App Config
-│   ├── pages/          # Route-level components (Lazy loaded)
-│   ├── shared/         # Reusable UI components
-│   ├── app.config.ts   # Global providers (Router, HTTP, Error Handling)
-│   └── app.routes.ts   # Main routing configuration
-├── environments/       # Build-time configuration (Dev vs Prod)
-└── main.ts             # Application bootstrap
-docs/                   # Detailed project documentation (22+ files)
-```
-
-## Architecture & Patterns
-
-### Components
-
-- **Standalone**: All components are standalone. Do NOT use NgModules.
-- **Change Detection**: `OnPush` by default.
-- **State**: Use **Signals** (`signal()`, `computed()`) for local UI state.
-- **Inputs/Outputs**: Use modern signal-based `input()` and `output()`.
-- **Dependency Injection**: Use `inject()` function, not constructor injection.
-- **Private fields**: Use `#` syntax (e.g., `#http`, `#address`).
-
-### Asynchronous Operations
-
-- **HTTP**: Use `BridgeApiService` in `src/app/core/`.
-- **Wallet**: Use `EvmWalletService` in `src/app/core/` for all Web3 interactions.
-- **Observables**: Use RxJS for HTTP/Event streams, convert to Signals for views (`toSignal()`).
-
-### Styling
-
-- **Tailwind v4**: Use utility classes in template HTML.
-- **Dark Theme**: App is dark-themed by default (`bg-slate-950`).
-- **Brand Colors**: Amber/yellow accents (`bg-amber-500`) for CTAs, slate greys for text.
-- **Global Styles**: `src/styles.css` handles global resets and Tailwind imports.
-
-## Backend Integration (conceal-wswap)
-
-The frontend communicates with the [conceal-wswap](https://github.com/ConcealNetwork/conceal-wswap) backend API.
-
-### Important API Details
-
-- **URL Pattern**: `{baseUrl}/{network}/api/...`
-- **Current Endpoints**: Use `/api/wrap/*`, `/api/unwrap/*`, `/api/swap/*`
-- **Legacy Endpoints**: Documentation may show old `/api/ccx/wccx/swap/*` paths - DO NOT USE
-- **Provider IDs**: Keep consistent between frontend (`EvmNetworkKey`) and backend (`providerId`)
-- **Config Caching**: `BridgeApiService` caches chain config per network to reduce HTTP requests
-
-### Security Model
-
-- Backend validates ALL transaction hashes (confirmations, recipient, amount)
-- Frontend cannot fake deposits or skip gas fees
-- Always call `ensureChain()` before sending transactions
+---
 
 ## Documentation Map
 
-- **Build & Architecture**: [`docs/build_guide.md`](docs/build_guide.md)
-- **Backend API**: [`docs/backend_api.md`](docs/backend_api.md) (conceal-wswap contract)
-- **Wallet Integration**: [`docs/wallets.md`](docs/wallets.md)
-- **Style Guide**: [`docs/style_guide.md`](docs/style_guide.md)
-- **Project History**: [`docs/project_history.md`](docs/project_history.md)
-- **Security**: [`docs/security.md`](docs/security.md)
-- **Testing**: [`docs/testing.md`](docs/testing.md)
-
-## Common Tasks for Agents
-
-1. **Before coding**: Read `docs/build_guide.md` and related specs.
-2. **When modifying UI**: Check `docs/style_guide.md` and use Tailwind utilities.
-3. **When touching state**: Prefer Signals over BehaviorSubjects for component state.
-4. **When adding features**: Ensure new routes are lazy-loaded in `app.routes.ts`.
-5. **When working with wallet**: Respect user disconnection flag (don't auto-reconnect).
-6. **Task tracking**: Use `bd` for issue management throughout your work.
-
-## Common Gotchas
-
-⚠️ **Provider IDs**: Keep consistent between frontend network keys and backend provider IDs.
-
-⚠️ **Wallet State**: Don't auto-reconnect if user explicitly disconnected (check `disconnectedByUser` flag).
-
-⚠️ **Chain Switching**: Always call `ensureChain()` before sending transactions to ensure user is on correct network.
+| Topic | File |
+|-------|------|
+| Build & Architecture | [docs/build_guide.md](docs/build_guide.md) |
+| Backend API Contract | [docs/backend_api.md](docs/backend_api.md) |
+| Wallet Integration | [docs/wallets.md](docs/wallets.md) |
+| Web3 Patterns | [docs/web3_integrations.md](docs/web3_integrations.md) |
+| Style Guide | [docs/style_guide.md](docs/style_guide.md) |
+| Security | [docs/security.md](docs/security.md) |
+| Testing | [docs/testing.md](docs/testing.md) |

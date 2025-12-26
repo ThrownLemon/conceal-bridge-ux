@@ -15,7 +15,7 @@
 docs/wallets.md
 docs/security.md
 docs/error_handling.md
-docs/smart_conctracts.md
+docs/smart_contracts.md
 
 src/app/core/app-config.ts
 src/app/core/bridge-types.ts

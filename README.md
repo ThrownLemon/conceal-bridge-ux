@@ -1,292 +1,101 @@
-# Conceal Bridge UX (`conceal-bridge-ux`)
+# Conceal Bridge UX
 
-Angular 21 standalone SPA for bridging between native ₡CCX and wrapped CCX ($wCCX) on EVM networks (Ethereum / BNB Smart Chain / Polygon).
+[![CI](https://github.com/ThrownLemon/conceal-bridge-ux/actions/workflows/deploy.yml/badge.svg)](https://github.com/ThrownLemon/conceal-bridge-ux/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-- **Production URL**: <https://bridge.conceal.network>
-- **GitHub Pages**: <https://thrownlemon.github.io/conceal-bridge-ux/>
-- **Backend API**: [conceal-wswap](https://github.com/ConcealNetwork/conceal-wswap)
+Angular 21 SPA for bridging native ₡CCX and wrapped $wCCX on EVM networks.
 
-## What This App Does
+**[Use the Bridge](https://bridge.conceal.network)** | [GitHub Pages Mirror](https://thrownlemon.github.io/conceal-bridge-ux/) | [Backend API](https://github.com/ConcealNetwork/conceal-wswap)
 
-The Conceal Bridge UI enables seamless 1:1 conversions between privacy-focused ₡CCX and DeFi-compatible $wCCX tokens.
+## What It Does
 
-### Core Functionality
+Seamless 1:1 conversions between privacy-focused ₡CCX and DeFi-compatible $wCCX tokens.
 
-The UI:
+| Network | Max Supply | Contract |
+|---------|------------|----------|
+| Ethereum | 500k wCCX | [View on Etherscan](https://etherscan.io/token/0x21686f8ce003a95c99acd297e302faacf742f7d4) |
+| BSC | 350k wCCX | [View on BscScan](https://bscscan.com/token/0x988c11625472340b7B36FF1534893780E0d8d841) |
+| Polygon | 500k wCCX | [View on PolygonScan](https://polygonscan.com/token/0x137Ee749f0F8c2eD34cA00dE33BB59E3dafA494A) |
 
-- Connects to EVM wallets (MetaMask, Trust Wallet, Binance Wallet) via Viem
-- Calls the [conceal-wswap](https://github.com/ConcealNetwork/conceal-wswap) backend API to initialize/execute swaps
-- Sends on-chain transactions (native gas fees and ERC-20 transfers)
-- Polls backend state until swaps complete
-- Tracks transaction history locally
+**Supported Wallets**: MetaMask, Trust Wallet, Binance Wallet
 
-### Supported Networks
-
-- **Ethereum** - 500k $wCCX max supply
-- **Binance Smart Chain (BSC)** - 350k $wCCX max supply
-- **Polygon** - 500k $wCCX max supply
-
-## Tech Stack
-
-- **Framework**: Angular 21 (Standalone Components, Signals, OnPush, Zoneless-ready)
-- **Styling**: Tailwind CSS v4 (CSS-first, utility-first, dark theme)
-- **Web3**: Viem (modern EVM wallet integration)
-- **HTTP**: RxJS + Angular HttpClient
-- **Testing**: Vitest (unit tests), Playwright (E2E tests)
-- **Package Manager**: npm@11.7.0
-- **Build**: Angular CLI 21
-
-## Prerequisites
-
-- **Node.js**: v18+ (LTS recommended)
-- **npm**: v11.7.0
-- Install dependencies from this folder (the one containing `package.json`)
-
-## Local Development
+## Quick Start
 
 ```bash
 npm install
-npm start
+npm start         # Dev server at http://localhost:4200
 ```
 
-This runs the Angular dev server. The app will be available at:
+**Prerequisites**: Node.js v22+
 
-- <http://localhost:4200/>
+## Commands
 
-The dev server will automatically reload when source files change.
+| Command | Purpose |
+|---------|---------|
+| `npm start` | Dev server with hot reload |
+| `npm test` | Unit tests (Vitest) |
+| `npm run e2e` | E2E tests (Playwright) |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint check |
+| `npm run format` | Prettier format |
 
-## Configuration
+## Tech Stack
 
-### Backend API Base URL
-
-The app uses Angular environment files for configuration:
-
-- **Development (default)**: `src/environments/environment.development.ts` (Testing backend at `https://bridge.conceal.network/testing/backend`)
-- **Production**: `src/environments/environment.ts` (Production backend at `https://bridge.conceal.network/backend`)
-
-The backend URL is accessed via the `APP_CONFIG` injection token (`src/app/core/app-config.ts`), which automatically reads `apiBaseUrl` from the active environment file based on the build configuration.
-
-**To change the backend URL:**
-
-- For development: Edit `src/environments/environment.development.ts`
-- For production: Edit `src/environments/environment.ts`
-
-### Supported Wallets
-
-The app supports EVM wallet connections through **injected providers** (browser extensions):
-
-- **MetaMask** - Most popular Ethereum wallet
-- **Trust Wallet** - Mobile-first multi-chain wallet
-- **Binance Wallet** - Binance Chain wallet
-
-No additional configuration is required. The `EvmWalletService` (`src/app/core/evm-wallet.service.ts`) automatically detects and connects to available wallet providers using Viem.
+- **Framework**: Angular 21 (Standalone Components, Signals, OnPush)
+- **Styling**: Tailwind CSS v4
+- **Web3**: Viem
+- **Testing**: Vitest + Playwright
 
 ## Project Structure
 
-```text
-src/
-├── app/
-│   ├── core/              # Singleton services, types, configs
-│   │   ├── bridge-api.service.ts      # Backend API client
-│   │   ├── evm-wallet.service.ts      # Viem wallet integration
-│   │   ├── bridge-types.ts            # TypeScript interfaces
-│   │   └── evm-networks.ts            # Chain configurations
-│   ├── pages/             # Route-level components (lazy loaded)
-│   │   ├── home/          # Landing page
-│   │   ├── swap/          # Main swap interface
-│   │   └── not-found/     # 404 page
-│   ├── shared/            # Reusable UI components
-│   │   ├── wallet/        # Wallet connection components
-│   │   ├── qr-code/       # QR code generator
-│   │   └── transaction-history/  # Transaction history modal
-│   ├── app.config.ts      # Global providers (Router, HTTP, etc.)
-│   └── app.routes.ts      # Main routing configuration
-├── environments/          # Environment-specific configs
-└── main.ts                # Application bootstrap
-public/                    # Static assets (Angular public assets)
-docs/                      # Detailed project documentation (22+ files)
+```
+src/app/
+├── core/       # Services: BridgeApiService, EvmWalletService
+├── pages/      # Routes: home, swap, not-found
+└── shared/     # Components: wallet, qr-code, transaction-history
 ```
 
-### Tech Notes
+See [docs/build_guide.md](docs/build_guide.md) for detailed architecture.
 
-- Standalone bootstrap entrypoint: `src/main.ts`
-- Static assets live in `public/` (Angular "public assets" approach; no `src/assets/`)
-- Styling: Tailwind CSS v4 (via PostCSS, no config file required)
-- All components are standalone (no NgModules)
-- State management uses Angular Signals
+## Configuration
 
-## Build
-
-Production build:
-
-```bash
-npm run build
-```
-
-Build artifacts are written to `dist/conceal-bridge-ux/browser/`.
-
-Development build in watch mode:
-
-```bash
-npm run watch
-```
-
-## Testing
-
-### Unit Tests (Vitest)
-
-Run all unit tests:
-
-```bash
-npm test
-```
-
-Vitest provides fast unit testing with native ESM support.
-
-### E2E Tests (Playwright)
-
-Run end-to-end tests:
-
-```bash
-npm run e2e
-```
-
-Playwright tests are configured in `playwright.config.ts` and located in the `e2e/` directory. Tests run against the dev server automatically.
-
-### Linting & Formatting
-
-Run ESLint:
-
-```bash
-npm run lint
-```
-
-Auto-fix linting issues:
-
-```bash
-npm run lint:fix
-```
-
-Format all files with Prettier:
-
-```bash
-npm run format
-```
-
-Check formatting without changing files:
-
-```bash
-npm run format:check
-```
+| Environment | Backend URL | File |
+|-------------|-------------|------|
+| Development | `bridge.conceal.network/testing/backend` | `src/environments/environment.development.ts` |
+| Production | `bridge.conceal.network/backend` | `src/environments/environment.ts` |
 
 ## Deployment
 
-### Automated Deployment via GitHub Actions
+Deployment is automatic via GitHub Actions when changes reach `master`:
 
-The project uses **GitHub Actions** for automated deployment. Simply push to the `master` branch:
+- **Code changes**: Merge PR to master
+- **Docs/releases**: Push directly to master
 
-```bash
-git push origin master
-```
-
-The workflow will automatically:
-
-1. Run linting checks
-2. Run unit tests
-3. Build the production bundle
-4. Deploy to GitHub Pages
-
-**Monitor deployment**: Check the **Actions** tab in your GitHub repository.
-
-**Live URL**: <https://thrownlemon.github.io/conceal-bridge-ux/>
-
-### Workflow Configuration
-
-**Workflow file**: `.github/workflows/deploy.yml`
-
-The workflow uses the native GitHub Actions deployment method (`actions/deploy-pages@v4`) which is:
-
-- ✅ Secure (no third-party dependencies with vulnerabilities)
-- ✅ Official GitHub solution
-- ✅ Automatically handles SPA routing
-- ✅ Integrated with GitHub Pages settings
-
-### First-Time Setup
-
-After pushing the workflow file:
-
-1. Go to your GitHub repository
-2. Navigate to **Settings > Pages**
-3. Under **Source**, select **GitHub Actions**
-4. The deployment will happen automatically on the next push to `master`
-
-For detailed deployment information, see:
-
-- [docs/deployment.md](./docs/deployment.md)
-- [docs/ci_cd.md](./docs/ci_cd.md)
+See [docs/deployment.md](docs/deployment.md) for manual deployment and rollback procedures.
 
 ## Documentation
 
-### High-Level Product & Architecture
-
-- **Bridge overview / concept**: [docs/bridge_overview.md](./docs/bridge_overview.md)
-- **User guide**: [docs/bridge_user_guide.md](./docs/bridge_user_guide.md)
-- **Architecture**: [docs/bridge_architecture.md](./docs/bridge_architecture.md)
-- **Backend API contract**: [docs/backend_api.md](./docs/backend_api.md)
-
-### Development Guides
-
-- **Build guide** (repo-specific): [docs/build_guide.md](./docs/build_guide.md)
-- **Style guide** (UI/UX patterns): [docs/style_guide.md](./docs/style_guide.md)
-- **Testing guide**: [docs/testing.md](./docs/testing.md)
-- **Deployment guide**: [docs/deployment.md](./docs/deployment.md)
-- **CI/CD pipeline**: [docs/ci_cd.md](./docs/ci_cd.md)
-
-### Technical Specs
-
-- **Wallets / Web3 integrations**: [docs/wallets.md](./docs/wallets.md), [docs/web3_integrations.md](./docs/web3_integrations.md)
-- **Security + error handling**: [docs/security.md](./docs/security.md), [docs/error_handling.md](./docs/error_handling.md)
-- **Smart contracts**: [docs/smart_conctracts.md](./docs/smart_conctracts.md)
-- **Angular patterns**: [docs/angular-style-guide.md](./docs/angular-style-guide.md)
-
-### For AI Agents
-
-- **Agent instructions**: [AGENTS.md](./AGENTS.md) - Workflow, patterns, and critical rules
-- **Project history**: [docs/project_history.md](./docs/project_history.md)
+| Topic | Link |
+|-------|------|
+| Architecture | [docs/bridge_architecture.md](docs/bridge_architecture.md) |
+| Backend API | [docs/backend_api.md](docs/backend_api.md) |
+| Web3 Integration | [docs/web3_integrations.md](docs/web3_integrations.md) |
+| Testing | [docs/testing.md](docs/testing.md) |
+| Security | [docs/security.md](docs/security.md) |
 
 ## Contributing
 
-This project uses:
+- **Workflow**: Feature branches → PR → merge to master
+- **Commits**: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`)
+- **Issues**: [bd (beads)](https://github.com/steveyegge/beads) - `bd ready` to see open work
 
-- **Issue tracking**: [bd (beads)](https://github.com/steveyegge/beads) - AI-native issue tracking that lives in your repo (`.beads/`)
-- **Commit style**: Conventional Commits (feat:, fix:, docs:, chore:, refactor:)
-- **Branching**: Feature branches merged to `master` via pull requests
+For AI agents and developers: See [AGENTS.md](AGENTS.md) for critical rules and workflows.
 
-### For Developers & AI Agents
+## Related
 
-- **Agent instructions**: [AGENTS.md](./AGENTS.md) - Critical workflows, patterns, and "Landing the Plane" rules
-- **Detailed workflows**: [.agent/workflows/](./.agent/workflows/) - Comprehensive guides for:
-  - Testing (`test.md`) - Unit & E2E testing
-  - Deployment (`deploy.md`) - GitHub Actions & manual deployment
-  - Debugging (`debug.md`) - Browser DevTools, Angular, Web3
-  - Releases (`release.md`) - Versioning & changelog
-  - Hotfixes (`hotfix.md`) - Emergency fix procedures
-  - And more (review, scaffold, submit, update-packages)
-
-**Quick start:** Run `bd onboard` to get started with beads issue tracking.
-
-## Related Repositories
-
-- **Backend API**: [conceal-wswap](https://github.com/ConcealNetwork/conceal-wswap) - Express.js swap engine
-- **Conceal Network**: [ConcealNetwork](https://github.com/ConcealNetwork) - Privacy-focused cryptocurrency
+- [conceal-wswap](https://github.com/ConcealNetwork/conceal-wswap) - Backend API
+- [ConcealNetwork](https://github.com/ConcealNetwork) - Conceal ecosystem
 
 ## License
 
-[Add license information here]
-
-## Support
-
-For issues or questions:
-
-- Open an issue in this repository
-- Visit the Conceal Network community channels
+This project is licensed under the [MIT License](LICENSE).

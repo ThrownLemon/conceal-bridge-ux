@@ -1,248 +1,152 @@
 ---
-description: Emergency hotfix workflow for critical production issues
+description: Emergency hotfix workflow for critical production bugs
 ---
 
 # Hotfix Workflow
 
-> **Purpose**: Quickly fix and deploy critical production bugs with minimal process overhead.
+> **Purpose**: Emergency process for fixing critical bugs in production.
 
-## When to Use This Workflow
+## When to Use
 
-Use hotfix workflow when:
+Use this workflow when:
 
-- ✅ Production site is broken or severely degraded
-- ✅ Security vulnerability discovered
-- ✅ Data loss or corruption risk
-- ✅ Critical feature completely broken
-
-**Do NOT use for:**
-
-- ❌ Minor bugs
-- ❌ UI polish
-- ❌ Performance improvements
-- ❌ New features
+- Production site is broken
+- Critical security vulnerability discovered
+- Data loss or corruption occurring
+- Major user-facing functionality is broken
 
 ## Hotfix Process
 
-### 1. Assess Severity
-
-**Critical (Deploy ASAP):**
-
-- Site won't load
-- Wallet connection completely broken
-- Transactions failing
-- Security vulnerability
-- Data loss
-
-**High (Deploy within hours):**
-
-- Major feature broken
-- Error affecting >50% of users
-- Workaround available but poor UX
-
-**Medium (Can wait for normal cycle):**
-
-- Minor bug with workaround
-- UI glitch
-- Non-critical feature broken
-
-### 2. Create Hotfix Branch from Master
+### 1. Assess the Situation
 
 ```bash
-# Ensure master is up to date
-git checkout master
-git pull origin master
+# Check current production state
+git log --oneline -5
 
-# Create hotfix branch
-git checkout -b hotfix/describe-the-fix
-
-# Example
-git checkout -b hotfix/wallet-connection-error
+# Identify the problematic commit (if recent deployment)
+git log v1.0.0..HEAD --oneline
 ```
 
-### 3. Make Minimal Changes
+**Questions to answer:**
 
-**Key principle:** Change ONLY what's necessary to fix the issue.
+- [ ] What is broken?
+- [ ] When did it start? (After which deployment?)
+- [ ] How many users affected?
+- [ ] Is rollback sufficient, or is a fix needed?
 
-- ❌ Don't refactor
-- ❌ Don't add features
-- ❌ Don't update dependencies (unless that's the fix)
-- ✅ Fix the immediate problem
-- ✅ Add regression test if possible
+### 2. Quick Rollback (If Possible)
 
-### 4. Fast-Track Testing
-
-Run critical tests only:
+If the issue was introduced by a recent commit:
 
 ```bash
-# Lint the changed files only
-npm run lint -- <changed-file>.ts
+# Revert the problematic commit
+git revert HEAD
+git push origin master
+```
 
-# Run affected tests only
-npm test -- <test-file>.spec.ts
+This triggers automatic redeployment. Monitor GitHub Actions.
 
-# Quick build check
+### 3. Create Hotfix Branch
+
+If a code fix is needed:
+
+```bash
+# Create hotfix branch from master
+git checkout master
+git pull origin master
+git checkout -b hotfix/describe-the-fix
+```
+
+### 4. Implement Fix
+
+- **Focus**: Fix ONLY the critical issue
+- **Avoid**: Refactoring, cleanup, or unrelated changes
+- **Test**: Verify the fix locally
+
+```bash
+npm start  # Test in browser
+npm test   # Run unit tests
+```
+
+### 5. Fast-Track Quality Gates
+
+Minimal verification (speed over completeness):
+
+```bash
+npm run lint
 npm run build
 ```
 
-### 5. Manual Verification
+Skip E2E if the fix is obvious and low-risk.
 
-Test the specific bug fix:
-
-```bash
-npm start
-```
-
-Verify:
-
-- [ ] The specific bug is fixed
-- [ ] No new errors in console
-- [ ] Core functionality still works
-- [ ] No obvious regressions
-
-### 6. Commit with Hotfix Tag
+### 6. Commit and Deploy
 
 ```bash
 git add .
-git commit -m "hotfix: fix wallet connection error
+git commit -m "fix: critical hotfix for [issue description]"
 
-Critical fix for production issue where wallet connection
-fails in MetaMask due to incorrect chain ID validation.
+# Bump patch version
+npm version patch
 
-Fixes: #<issue-number>
-Severity: Critical"
+# Push with tags
+git push origin hotfix/describe-the-fix --follow-tags
+
+# Create PR for fast merge
+gh pr create --title "HOTFIX: [issue]" --body "Critical fix for production issue."
 ```
 
-### 7. Push and Deploy
+### 7. Merge and Monitor
 
 ```bash
-# Push hotfix branch
-git push -u origin hotfix/describe-the-fix
-
-# Merge to master immediately
-git checkout master
-git merge hotfix/describe-the-fix --no-ff
-git push origin master
+# Merge immediately after CI passes (solo workflow)
+gh pr merge --squash --delete-branch
 ```
 
-This triggers automatic deployment via GitHub Actions.
+1. Wait for CI to pass (or merge if confident)
+2. Monitor GitHub Actions deployment
+3. Verify fix on production: <https://bridge.conceal.network>
 
-### 8. Monitor Deployment
+### 8. Post-Hotfix Tasks
 
-Watch GitHub Actions:
-
-```text
-https://github.com/ThrownLemon/conceal-bridge-ux/actions
-```
-
-Verify live site within 5 minutes:
-
-```text
-https://thrownlemon.github.io/conceal-bridge-ux/
-```
-
-### 9. Post-Hotfix Actions
-
-After deployment:
-
-1. **Verify Fix Live:**
-   - Test on production site
-   - Check error monitoring (if available)
-   - Confirm with user who reported (if applicable)
-
-2. **Create Retrospective Issue:**
-
-   ```bash
-   bd create "Retrospective: <hotfix-name>" --priority P2
-   ```
-
-3. **Document in Project History:**
-   Add entry to `docs/project_history.md`:
-
-   ```markdown
-   - **2025-12-21**: Hotfix - Fixed wallet connection error affecting MetaMask users
-   ```
-
-4. **Clean Up Branch:**
-
-   ```bash
-   git branch -d hotfix/describe-the-fix
-   git push origin --delete hotfix/describe-the-fix
-   ```
-
-## Hotfix Checklist
-
-- [ ] Issue is truly critical
-- [ ] Created hotfix branch from master
-- [ ] Made minimal necessary changes
-- [ ] Ran fast-track tests
-- [ ] Manually verified fix
-- [ ] Committed with "hotfix:" prefix
-- [ ] Merged to master
-- [ ] Deployment successful
-- [ ] Verified fix live
-- [ ] Created retrospective issue
-- [ ] Documented in project history
-- [ ] Cleaned up branch
-
-## Common Hotfix Scenarios
-
-### Wallet Connection Broken
-
-1. Check `EvmWalletService`
-2. Verify chain configurations in `evm-networks.ts`
-3. Test with MetaMask, Trust Wallet, Binance Wallet
-
-### API Calls Failing
-
-1. Check `BridgeApiService`
-2. Verify environment variables
-3. Check backend status (<https://github.com/ConcealNetwork/conceal-wswap>)
-
-### Build Failing on Deploy
-
-1. Check GitHub Actions logs
-2. Verify dependencies in `package.json`
-3. Test build locally: `npm run build`
-
-### Routes Not Working
-
-1. Check `app.routes.ts`
-2. Verify lazy loading
-3. Check for typos in route paths
-
-## Rollback Plan
-
-If hotfix makes things worse:
+After the fire is out:
 
 ```bash
-# Revert the merge commit
-git checkout master
-git log --oneline -5  # Find the hotfix merge commit
-git revert <merge-commit-hash>
-git push origin master
+# Update bd issue if one existed
+bd close <issue-id> --reason "Hotfix deployed in v1.0.X"
 ```
 
-This triggers re-deployment of previous working version.
+- [ ] Create follow-up issue for proper fix (if hotfix was a workaround)
+- [ ] Document in `docs/project_history.md`
+- [ ] Conduct brief postmortem: What caused it? How to prevent?
+
+## Hotfix vs Normal Fix
+
+| Aspect | Hotfix | Normal Fix |
+|--------|--------|------------|
+| Timeline | Hours | Days |
+| Testing | Minimal | Full suite |
+| Review | Expedited | Standard |
+| Scope | Single issue | Can include related cleanup |
+| Branch | `hotfix/...` | `feature/...` or `fix/...` |
 
 ## Quick Reference
 
 ```bash
+# Emergency rollback (direct to master - exception for emergencies)
+git revert HEAD && git push origin master
+
 # Hotfix workflow
-git checkout master && git pull
-git checkout -b hotfix/issue-name
-# Make minimal fix
-npm run lint && npm test -- <file>
-git commit -m "hotfix: description"
-git push -u origin hotfix/issue-name
-git checkout master
-git merge hotfix/issue-name --no-ff
-git push origin master
-# Monitor deployment, verify live, document
+git checkout -b hotfix/fix-name
+# ... make fix ...
+npm run lint && npm run build
+git add . && git commit -m "fix: critical hotfix"
+npm version patch
+git push origin hotfix/fix-name --follow-tags
+gh pr create --title "HOTFIX: ..." --body "Critical fix"
+gh pr merge --squash --delete-branch
 ```
 
-## Related Workflows
+## Related Documentation
 
-- [deploy.md](./deploy.md) - Full deployment process
-- [test.md](./test.md) - Testing strategies
-- [submit.md](./submit.md) - Normal commit workflow
+- [deploy.md](./deploy.md) - Deployment workflow
+- [release.md](./release.md) - Release workflow
