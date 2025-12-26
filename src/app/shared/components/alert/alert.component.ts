@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, input, TemplateRef, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  TemplateRef,
+  ViewEncapsulation,
+} from '@angular/core';
 
 import type { ClassValue } from 'clsx';
 
@@ -58,13 +65,17 @@ export class ZardAlertComponent {
   readonly zIcon = input<ZardIcon | TemplateRef<void>>();
   readonly zType = input<ZardAlertVariants['zType']>('default');
 
-  protected readonly classes = computed(() => mergeClasses(alertVariants({ zType: this.zType() }), this.class()));
+  protected readonly classes = computed(() =>
+    mergeClasses(alertVariants({ zType: this.zType() }), this.class()),
+  );
 
   protected readonly iconClasses = computed(() => alertIconVariants());
 
   protected readonly titleClasses = computed(() => alertTitleVariants());
 
-  protected readonly descriptionClasses = computed(() => alertDescriptionVariants({ zType: this.zType() }));
+  protected readonly descriptionClasses = computed(() =>
+    alertDescriptionVariants({ zType: this.zType() }),
+  );
 
   protected readonly iconName = computed((): ZardIcon | null => {
     const customIcon = this.zIcon();

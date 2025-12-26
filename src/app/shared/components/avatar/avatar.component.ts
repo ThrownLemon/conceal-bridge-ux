@@ -1,6 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  signal,
+  ViewEncapsulation,
+} from '@angular/core';
 
-import { avatarVariants, imageVariants, type ZardImageVariants, type ZardAvatarVariants } from './avatar.variants';
+import {
+  avatarVariants,
+  imageVariants,
+  type ZardImageVariants,
+  type ZardAvatarVariants,
+} from './avatar.variants';
 
 import { mergeClasses } from '@/shared/utils/merge-classes';
 
@@ -131,7 +143,9 @@ export class ZardAvatarComponent {
     return typeof size === 'number' ? `${size}px` : null;
   });
 
-  protected readonly imgClasses = computed(() => mergeClasses(imageVariants({ zShape: this.zShape() })));
+  protected readonly imgClasses = computed(() =>
+    mergeClasses(imageVariants({ zShape: this.zShape() })),
+  );
 
   protected onImageLoad(): void {
     this.imageLoaded.set(true);

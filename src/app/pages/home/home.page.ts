@@ -39,9 +39,7 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
   ],
   template: `
     <section class="mx-auto max-w-3xl">
-      <h1 class="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-        Conceal Bridge
-      </h1>
+      <h1 class="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Conceal Bridge</h1>
       <p class="mt-3 text-pretty text-muted-foreground">
         Swap between Conceal (CCX) and wrapped CCX (wCCX) on Ethereum, BSC, or Polygon.
       </p>
@@ -260,7 +258,10 @@ export class HomePage {
   }
 
   openUserGuide(): void {
-    window.open('https://concealnetwork.medium.com/conceal-bridge-user-guide-2ad03eee4963', '_blank');
+    window.open(
+      'https://concealnetwork.medium.com/conceal-bridge-user-guide-2ad03eee4963',
+      '_blank',
+    );
   }
 
   openMetaMask(): void {

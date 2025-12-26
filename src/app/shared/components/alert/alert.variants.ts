@@ -1,16 +1,19 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
-export const alertVariants = cva('relative w-full rounded-lg border px-4 py-3 text-sm flex items-center gap-3', {
-  variants: {
-    zType: {
-      default: 'bg-card text-card-foreground',
-      destructive: 'text-destructive bg-card',
+export const alertVariants = cva(
+  'relative w-full rounded-lg border px-4 py-3 text-sm flex items-center gap-3',
+  {
+    variants: {
+      zType: {
+        default: 'bg-card text-card-foreground',
+        destructive: 'text-destructive bg-card',
+      },
+    },
+    defaultVariants: {
+      zType: 'default',
     },
   },
-  defaultVariants: {
-    zType: 'default',
-  },
-});
+);
 
 export const alertIconVariants = cva('shrink-0 self-start !text-base');
 

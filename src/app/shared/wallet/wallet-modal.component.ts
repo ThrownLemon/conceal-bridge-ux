@@ -53,13 +53,7 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
                 }
               </h2>
             </div>
-            <button
-              z-button
-              zType="ghost"
-              zSize="sm"
-              (click)="close()"
-              aria-label="Close modal"
-            >
+            <button z-button zType="ghost" zSize="sm" (click)="close()" aria-label="Close modal">
               <z-icon zType="x" />
             </button>
           </div>

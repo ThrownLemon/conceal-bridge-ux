@@ -64,17 +64,18 @@ bd close <issue-id>
 
 ### What "Complete" Means
 
-| Task Type | Complete When |
-|-----------|---------------|
-| Feature | PR merged to master (CI must pass) |
-| Bug fix | PR merged to master |
-| Hotfix | PR merged and verified on production |
-| Docs only | Push directly to master |
-| Release | Push directly to master (version + changelog) |
+| Task Type | Complete When                                 |
+| --------- | --------------------------------------------- |
+| Feature   | PR merged to master (CI must pass)            |
+| Bug fix   | PR merged to master                           |
+| Hotfix    | PR merged and verified on production          |
+| Docs only | Push directly to master                       |
+| Release   | Push directly to master (version + changelog) |
 
 ### Why PRs for Solo Work?
 
 PRs aren't for waiting on reviewers - they validate your work:
+
 - **CI gate**: GitHub Actions runs lint/test/build before merge
 - **Self-review**: Seeing diff in PR view catches mistakes
 - **Clean history**: Easy to revert merge commits if needed
@@ -100,14 +101,14 @@ See [README.md](./README.md) for full details.
 
 ### Quick Commands
 
-| Command | Purpose |
-|---------|---------|
-| `npm start` | Dev server at localhost:4200 |
-| `npm test` | Unit tests (Vitest) |
-| `npm run e2e` | E2E tests (Playwright) |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint check |
-| `npm run format` | Prettier format |
+| Command          | Purpose                      |
+| ---------------- | ---------------------------- |
+| `npm start`      | Dev server at localhost:4200 |
+| `npm test`       | Unit tests (Vitest)          |
+| `npm run e2e`    | E2E tests (Playwright)       |
+| `npm run build`  | Production build             |
+| `npm run lint`   | ESLint check                 |
+| `npm run format` | Prettier format              |
 
 ---
 
@@ -189,12 +190,12 @@ const amount = parseFloat(userInput) * 1_000_000; // NO!
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
+| File                                 | Purpose                       |
+| ------------------------------------ | ----------------------------- |
 | `src/app/core/evm-wallet.service.ts` | Wallet connection, tx sending |
-| `src/app/core/bridge-api.service.ts` | Backend API calls |
-| `src/app/core/bridge-types.ts` | TypeScript interfaces |
-| `src/app/core/evm-networks.ts` | Chain configurations |
+| `src/app/core/bridge-api.service.ts` | Backend API calls             |
+| `src/app/core/bridge-types.ts`       | TypeScript interfaces         |
+| `src/app/core/evm-networks.ts`       | Chain configurations          |
 
 ---
 
@@ -213,23 +214,23 @@ bd close bd-42 --reason "Completed"                # Complete work
 
 ### Issue Types
 
-| Type | Use For |
-|------|---------|
-| `bug` | Something broken |
-| `feature` | New functionality |
-| `task` | Tests, docs, refactoring |
-| `epic` | Large feature with subtasks |
-| `chore` | Dependencies, tooling |
+| Type      | Use For                     |
+| --------- | --------------------------- |
+| `bug`     | Something broken            |
+| `feature` | New functionality           |
+| `task`    | Tests, docs, refactoring    |
+| `epic`    | Large feature with subtasks |
+| `chore`   | Dependencies, tooling       |
 
 ### Priorities
 
-| Priority | Meaning |
-|----------|---------|
-| `0` | Critical (security, data loss, broken builds) |
-| `1` | High (major features, important bugs) |
-| `2` | Medium (default) |
-| `3` | Low (polish, optimization) |
-| `4` | Backlog (future ideas) |
+| Priority | Meaning                                       |
+| -------- | --------------------------------------------- |
+| `0`      | Critical (security, data loss, broken builds) |
+| `1`      | High (major features, important bugs)         |
+| `2`      | Medium (default)                              |
+| `3`      | Low (polish, optimization)                    |
+| `4`      | Backlog (future ideas)                        |
 
 ### Rules
 
@@ -243,19 +244,19 @@ bd close bd-42 --reason "Completed"                # Complete work
 
 ## Workflows (.agent/workflows/)
 
-| Workflow | Purpose |
-|----------|---------|
-| `beads.md` | Issue tracking with bd |
-| `setup.md` | Environment setup |
-| `test.md` | Unit & E2E testing |
-| `review.md` | Code review checklist |
-| `cleanup.md` | Pre-commit verification |
-| `submit.md` | Commit and push (Landing the Plane) |
-| `deploy.md` | GitHub Pages deployment |
-| `release.md` | Version releases |
-| `hotfix.md` | Emergency production fixes |
-| `update.md` | Package updates |
-| `debug.md` | Troubleshooting |
+| Workflow     | Purpose                             |
+| ------------ | ----------------------------------- |
+| `beads.md`   | Issue tracking with bd              |
+| `setup.md`   | Environment setup                   |
+| `test.md`    | Unit & E2E testing                  |
+| `review.md`  | Code review checklist               |
+| `cleanup.md` | Pre-commit verification             |
+| `submit.md`  | Commit and push (Landing the Plane) |
+| `deploy.md`  | GitHub Pages deployment             |
+| `release.md` | Version releases                    |
+| `hotfix.md`  | Emergency production fixes          |
+| `update.md`  | Package updates                     |
+| `debug.md`   | Troubleshooting                     |
 
 ---
 
@@ -263,26 +264,26 @@ bd close bd-42 --reason "Completed"                # Complete work
 
 Load domain-specific context before working in an area:
 
-| Command | When to Use |
-|---------|-------------|
-| `prime.md` | General context loading |
-| `prime-wallets.md` | Wallet/Web3 changes |
-| `prime-smart-contracts.md` | Contract interactions |
-| `prime-architecture.md` | Structural changes |
-| `prime-backend-api.md` | API integration work |
-| `prime-testing.md` | Test development |
-| `prime-security.md` | Security-sensitive changes |
+| Command                    | When to Use                |
+| -------------------------- | -------------------------- |
+| `prime.md`                 | General context loading    |
+| `prime-wallets.md`         | Wallet/Web3 changes        |
+| `prime-smart-contracts.md` | Contract interactions      |
+| `prime-architecture.md`    | Structural changes         |
+| `prime-backend-api.md`     | API integration work       |
+| `prime-testing.md`         | Test development           |
+| `prime-security.md`        | Security-sensitive changes |
 
 ---
 
 ## Documentation Map
 
-| Topic | File |
-|-------|------|
-| Build & Architecture | [docs/build_guide.md](docs/build_guide.md) |
-| Backend API Contract | [docs/backend_api.md](docs/backend_api.md) |
-| Wallet Integration | [docs/wallets.md](docs/wallets.md) |
-| Web3 Patterns | [docs/web3_integrations.md](docs/web3_integrations.md) |
-| Style Guide | [docs/style_guide.md](docs/style_guide.md) |
-| Security | [docs/security.md](docs/security.md) |
-| Testing | [docs/testing.md](docs/testing.md) |
+| Topic                | File                                                   |
+| -------------------- | ------------------------------------------------------ |
+| Build & Architecture | [docs/build_guide.md](docs/build_guide.md)             |
+| Backend API Contract | [docs/backend_api.md](docs/backend_api.md)             |
+| Wallet Integration   | [docs/wallets.md](docs/wallets.md)                     |
+| Web3 Patterns        | [docs/web3_integrations.md](docs/web3_integrations.md) |
+| Style Guide          | [docs/style_guide.md](docs/style_guide.md)             |
+| Security             | [docs/security.md](docs/security.md)                   |
+| Testing              | [docs/testing.md](docs/testing.md)                     |

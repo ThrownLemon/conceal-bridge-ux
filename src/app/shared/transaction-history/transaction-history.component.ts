@@ -12,7 +12,13 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
 @Component({
   selector: 'app-transaction-history',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DecimalPipe, ZardBadgeComponent, ZardButtonComponent, ZardCardComponent, ZardIconComponent],
+  imports: [
+    DecimalPipe,
+    ZardBadgeComponent,
+    ZardButtonComponent,
+    ZardCardComponent,
+    ZardIconComponent,
+  ],
   template: `
     <!-- Backdrop -->
     @if (service.isOpen()) {

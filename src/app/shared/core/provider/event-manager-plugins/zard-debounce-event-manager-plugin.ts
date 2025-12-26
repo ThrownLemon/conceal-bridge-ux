@@ -11,8 +11,7 @@ export class ZardDebounceEventManagerPlugin extends EventManagerPlugin {
     eventName: string,
     handler: (event: Event) => void,
     options?: ListenerOptions,
-    // eslint-disable-next-line
-  ): Function {
+  ): () => void {
     // Expected format: "event.debounce.delay" (e.g., "input.debounce.150")
     // If delay is omitted or invalid, defaults to 300ms
     const [event, , delay] = eventName.split('.');

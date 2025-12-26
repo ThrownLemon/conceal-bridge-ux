@@ -13,6 +13,7 @@ git branch --show-current
 ```
 
 **Branching rules:**
+
 - ❌ Do NOT commit directly to `master` (except docs-only changes)
 - ✅ Feature work: `feature/your-feature-name`
 - ✅ Bug fixes: `fix/issue-description`
@@ -45,15 +46,15 @@ git commit -m "feat: description"
 
 **Conventional Commits format:** `<type>(<scope>): <subject>`
 
-| Type | Use for |
-|------|---------|
-| `feat` | New functionality |
-| `fix` | Bug fixes |
-| `docs` | Documentation only |
-| `chore` | Dependencies, tooling |
+| Type       | Use for                          |
+| ---------- | -------------------------------- |
+| `feat`     | New functionality                |
+| `fix`      | Bug fixes                        |
+| `docs`     | Documentation only               |
+| `chore`    | Dependencies, tooling            |
 | `refactor` | Code changes without feature/fix |
-| `test` | Adding/updating tests |
-| `ci` | CI/CD changes |
+| `test`     | Adding/updating tests            |
+| `ci`       | CI/CD changes                    |
 
 ## 4. Push Branch to Remote
 
@@ -70,6 +71,7 @@ gh pr create --title "feat: your change" --body "Description of changes"
 ```
 
 **Why PRs for solo work?**
+
 - CI runs lint/test/build before merge is allowed
 - Self-review in PR diff view catches mistakes
 - Clean revert path via merge commits
@@ -90,13 +92,13 @@ bd close <issue-id> --reason "Merged in PR #123"
 
 ## What "Complete" Means
 
-| Task Type | Complete When |
-|-----------|---------------|
-| Feature | PR merged to master |
-| Bug fix | PR merged to master |
-| Hotfix | PR merged and verified on production |
-| Docs only | Push directly to master |
-| Release | Push directly to master (version + changelog) |
+| Task Type | Complete When                                 |
+| --------- | --------------------------------------------- |
+| Feature   | PR merged to master                           |
+| Bug fix   | PR merged to master                           |
+| Hotfix    | PR merged and verified on production          |
+| Docs only | Push directly to master                       |
+| Release   | Push directly to master (version + changelog) |
 
 ## Critical Rules
 

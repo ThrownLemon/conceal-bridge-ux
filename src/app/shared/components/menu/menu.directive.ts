@@ -23,8 +23,7 @@ import { MENU_POSITIONS_MAP, type ZardMenuPlacement } from './menu-positions';
 export type ZardMenuTrigger = 'click' | 'hover';
 
 @Directive({
-  selector: '[z-menu]',
-  standalone: true,
+  selector: '[zMenu]',
   host: {
     role: 'button',
     '[attr.aria-haspopup]': "'menu'",
@@ -41,7 +40,7 @@ export type ZardMenuTrigger = 'click' | 'hover';
   ],
 })
 export class ZardMenuDirective implements OnInit, OnDestroy {
-  private static readonly MENU_CONTENT_SELECTOR = '.cdk-overlay-pane [z-menu-content]';
+  private static readonly MENU_CONTENT_SELECTOR = '.cdk-overlay-pane [zMenuContent]';
 
   protected readonly cdkTrigger = inject(CdkMenuTrigger, { host: true });
   private readonly elementRef = inject(ElementRef);
@@ -49,7 +48,7 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
   private readonly platformId = inject(PLATFORM_ID);
 
   private closeTimeout: ReturnType<typeof setTimeout> | null = null;
-  private readonly cleanupFunctions: Array<() => void> = [];
+  private readonly cleanupFunctions: (() => void)[] = [];
 
   readonly zMenuTriggerFor = input.required<TemplateRef<void>>();
   readonly zDisabled = input<boolean, BooleanInput>(false, { transform: booleanAttribute });
@@ -85,7 +84,7 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.cancelScheduledClose();
     this.menuManager.unregisterHoverMenu(this);
-    this.cleanupFunctions.forEach(cleanup => cleanup());
+    this.cleanupFunctions.forEach((cleanup) => cleanup());
     this.cleanupFunctions.length = 0;
   }
 
@@ -112,7 +111,9 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
       this.cdkTrigger.open();
     });
 
-    this.addEventListenerWithCleanup(element, 'mouseleave', event => this.scheduleCloseIfNeeded(event as MouseEvent));
+    this.addEventListenerWithCleanup(element, 'mouseleave', (event) =>
+      this.scheduleCloseIfNeeded(event as MouseEvent),
+    );
   }
 
   private setupMenuOpenListener(): void {
@@ -137,7 +138,7 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
     }
 
     this.addEventListenerWithCleanup(menuContent, 'mouseenter', () => this.cancelScheduledClose());
-    this.addEventListenerWithCleanup(menuContent, 'mouseleave', event =>
+    this.addEventListenerWithCleanup(menuContent, 'mouseleave', (event) =>
       this.scheduleCloseIfNeeded(event as MouseEvent),
     );
   }
@@ -165,7 +166,7 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
     const isMovingToTrigger = this.elementRef.nativeElement.contains(relatedTarget);
     const isMovingToMenu = relatedTarget.closest(ZardMenuDirective.MENU_CONTENT_SELECTOR);
     const isMovingToOtherTrigger =
-      relatedTarget.matches('[z-menu]') && !this.elementRef.nativeElement.contains(relatedTarget);
+      relatedTarget.matches('[zMenu]') && !this.elementRef.nativeElement.contains(relatedTarget);
 
     if (isMovingToOtherTrigger) {
       return false;

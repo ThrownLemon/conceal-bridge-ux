@@ -1,4 +1,9 @@
-import { Overlay, OverlayModule, OverlayPositionBuilder, type OverlayRef } from '@angular/cdk/overlay';
+import {
+  Overlay,
+  OverlayModule,
+  OverlayPositionBuilder,
+  type OverlayRef,
+} from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { isPlatformBrowser } from '@angular/common';
 import {
@@ -30,7 +35,12 @@ import { mergeClasses, transform } from '@/shared/utils/merge-classes';
   imports: [OverlayModule],
   template: `
     <!-- Dropdown Trigger -->
-    <div class="trigger-container" (click)="toggle()" (keydown.{enter,space}.prevent)="toggle()" tabindex="0">
+    <div
+      class="trigger-container"
+      (click)="toggle()"
+      (keydown.{enter,space}.prevent)="toggle()"
+      tabindex="0"
+    >
       <ng-content select="[dropdown-trigger]" />
     </div>
 
@@ -40,7 +50,9 @@ import { mergeClasses, transform } from '@/shared/utils/merge-classes';
         [class]="contentClasses()"
         role="menu"
         [attr.data-state]="'open'"
-        (keydown.{arrowdown,arrowup,enter,space,escape,home,end}.prevent)="onDropdownKeydown($event)"
+        (keydown.{arrowdown,arrowup,enter,space,escape,home,end}.prevent)="
+          onDropdownKeydown($event)
+        "
         tabindex="-1"
       >
         <ng-content />
@@ -76,7 +88,9 @@ export class ZardDropdownMenuComponent implements OnInit, OnDestroy {
   readonly isOpen = signal(false);
   readonly focusedIndex = signal<number>(-1);
 
-  protected readonly contentClasses = computed(() => mergeClasses(dropdownContentVariants(), this.class()));
+  protected readonly contentClasses = computed(() =>
+    mergeClasses(dropdownContentVariants(), this.class()),
+  );
 
   ngOnInit() {
     setTimeout(() => {
@@ -220,7 +234,7 @@ export class ZardDropdownMenuComponent implements OnInit, OnDestroy {
     const dropdownElement = this.overlayRef.overlayElement;
     return Array.from(
       dropdownElement.querySelectorAll<HTMLElement>('z-dropdown-menu-item, [z-dropdown-menu-item]'),
-    ).filter(item => item.dataset['disabled'] === undefined);
+    ).filter((item) => item.dataset['disabled'] === undefined);
   }
 
   private navigateItems(direction: number, items: HTMLElement[]) {
@@ -277,7 +291,9 @@ export class ZardDropdownMenuComponent implements OnInit, OnDestroy {
 
   private focusDropdown() {
     if (this.overlayRef?.hasAttached()) {
-      const dropdownElement = this.overlayRef.overlayElement.querySelector('[role="menu"]') as HTMLElement;
+      const dropdownElement = this.overlayRef.overlayElement.querySelector(
+        '[role="menu"]',
+      ) as HTMLElement;
       if (dropdownElement) {
         dropdownElement.focus();
       }

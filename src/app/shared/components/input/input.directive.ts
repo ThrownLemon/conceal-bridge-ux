@@ -1,4 +1,13 @@
-import { computed, Directive, effect, ElementRef, inject, input, linkedSignal, model } from '@angular/core';
+import {
+  computed,
+  Directive,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  linkedSignal,
+  model,
+} from '@angular/core';
 
 import type { ClassValue } from 'clsx';
 
@@ -12,7 +21,7 @@ import {
 import { mergeClasses, transform } from '@/shared/utils/merge-classes';
 
 @Directive({
-  selector: 'input[z-input], textarea[z-input]',
+  selector: 'input[zInput], textarea[zInput]',
   host: {
     '[class]': 'classes()',
     '(input)': 'updateValue($event.target)',

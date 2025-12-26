@@ -11,7 +11,7 @@ const enum eTriggerAction {
   OK = 'ok',
 }
 
-export class ZardSheetRef<T = any, R = any, U = any> {
+export class ZardSheetRef<T = unknown, R = unknown, U = unknown> {
   private destroy$ = new Subject<void>();
   private isClosing = false;
   protected result?: R;
@@ -36,7 +36,7 @@ export class ZardSheetRef<T = any, R = any, U = any> {
     if (isPlatformBrowser(this.platformId)) {
       fromEvent<KeyboardEvent>(document, 'keydown')
         .pipe(
-          filter(event => event.key === 'Escape'),
+          filter((event) => event.key === 'Escape'),
           takeUntil(this.destroy$),
         )
         .subscribe(() => this.close());

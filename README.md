@@ -11,11 +11,11 @@ Angular 21 SPA for bridging native ₡CCX and wrapped $wCCX on EVM networks.
 
 Seamless 1:1 conversions between privacy-focused ₡CCX and DeFi-compatible $wCCX tokens.
 
-| Network | Max Supply | Contract |
-|---------|------------|----------|
-| Ethereum | 500k wCCX | [View on Etherscan](https://etherscan.io/token/0x21686f8ce003a95c99acd297e302faacf742f7d4) |
-| BSC | 350k wCCX | [View on BscScan](https://bscscan.com/token/0x988c11625472340b7B36FF1534893780E0d8d841) |
-| Polygon | 500k wCCX | [View on PolygonScan](https://polygonscan.com/token/0x137Ee749f0F8c2eD34cA00dE33BB59E3dafA494A) |
+| Network  | Max Supply | Contract                                                                                        |
+| -------- | ---------- | ----------------------------------------------------------------------------------------------- |
+| Ethereum | 500k wCCX  | [View on Etherscan](https://etherscan.io/token/0x21686f8ce003a95c99acd297e302faacf742f7d4)      |
+| BSC      | 350k wCCX  | [View on BscScan](https://bscscan.com/token/0x988c11625472340b7B36FF1534893780E0d8d841)         |
+| Polygon  | 500k wCCX  | [View on PolygonScan](https://polygonscan.com/token/0x137Ee749f0F8c2eD34cA00dE33BB59E3dafA494A) |
 
 **Supported Wallets**: MetaMask, Trust Wallet, Binance Wallet
 
@@ -30,14 +30,14 @@ npm start         # Dev server at http://localhost:4200
 
 ## Commands
 
-| Command | Purpose |
-|---------|---------|
-| `npm start` | Dev server with hot reload |
-| `npm test` | Unit tests (Vitest) |
-| `npm run e2e` | E2E tests (Playwright) |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint check |
-| `npm run format` | Prettier format |
+| Command          | Purpose                    |
+| ---------------- | -------------------------- |
+| `npm start`      | Dev server with hot reload |
+| `npm test`       | Unit tests (Vitest)        |
+| `npm run e2e`    | E2E tests (Playwright)     |
+| `npm run build`  | Production build           |
+| `npm run lint`   | ESLint check               |
+| `npm run format` | Prettier format            |
 
 ## Tech Stack
 
@@ -59,10 +59,10 @@ See [docs/build_guide.md](docs/build_guide.md) for detailed architecture.
 
 ## Configuration
 
-| Environment | Backend URL | File |
-|-------------|-------------|------|
+| Environment | Backend URL                              | File                                          |
+| ----------- | ---------------------------------------- | --------------------------------------------- |
 | Development | `bridge.conceal.network/testing/backend` | `src/environments/environment.development.ts` |
-| Production | `bridge.conceal.network/backend` | `src/environments/environment.ts` |
+| Production  | `bridge.conceal.network/backend`         | `src/environments/environment.ts`             |
 
 ## Deployment
 
@@ -75,13 +75,13 @@ See [docs/deployment.md](docs/deployment.md) for manual deployment and rollback 
 
 ## Documentation
 
-| Topic | Link |
-|-------|------|
-| Architecture | [docs/bridge_architecture.md](docs/bridge_architecture.md) |
-| Backend API | [docs/backend_api.md](docs/backend_api.md) |
-| Web3 Integration | [docs/web3_integrations.md](docs/web3_integrations.md) |
-| Testing | [docs/testing.md](docs/testing.md) |
-| Security | [docs/security.md](docs/security.md) |
+| Topic            | Link                                                       |
+| ---------------- | ---------------------------------------------------------- |
+| Architecture     | [docs/bridge_architecture.md](docs/bridge_architecture.md) |
+| Backend API      | [docs/backend_api.md](docs/backend_api.md)                 |
+| Web3 Integration | [docs/web3_integrations.md](docs/web3_integrations.md)     |
+| Testing          | [docs/testing.md](docs/testing.md)                         |
+| Security         | [docs/security.md](docs/security.md)                       |
 
 ## Contributing
 

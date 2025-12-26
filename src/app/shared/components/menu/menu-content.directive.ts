@@ -9,7 +9,7 @@ import { mergeClasses } from '@/shared/utils/merge-classes';
 import { menuContentVariants } from './menu.variants';
 
 @Directive({
-  selector: '[z-menu-content]',
+  selector: '[zMenuContent]',
   host: {
     '[class]': 'classes()',
     tabindex: '0',

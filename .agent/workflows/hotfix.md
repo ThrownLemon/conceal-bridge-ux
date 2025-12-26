@@ -121,13 +121,13 @@ bd close <issue-id> --reason "Hotfix deployed in v1.0.X"
 
 ## Hotfix vs Normal Fix
 
-| Aspect | Hotfix | Normal Fix |
-|--------|--------|------------|
-| Timeline | Hours | Days |
-| Testing | Minimal | Full suite |
-| Review | Expedited | Standard |
-| Scope | Single issue | Can include related cleanup |
-| Branch | `hotfix/...` | `feature/...` or `fix/...` |
+| Aspect   | Hotfix       | Normal Fix                  |
+| -------- | ------------ | --------------------------- |
+| Timeline | Hours        | Days                        |
+| Testing  | Minimal      | Full suite                  |
+| Review   | Expedited    | Standard                    |
+| Scope    | Single issue | Can include related cleanup |
+| Branch   | `hotfix/...` | `feature/...` or `fix/...`  |
 
 ## Quick Reference
 

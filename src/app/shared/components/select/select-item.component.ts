@@ -81,7 +81,9 @@ export class ZardSelectItemComponent {
 
   protected readonly strokeWidth = computed(() => (this.zMode() === 'compact' ? 3 : 2));
 
-  protected readonly isSelected = computed(() => this.select()?.selectedValue().includes(this.zValue()) ?? false);
+  protected readonly isSelected = computed(
+    () => this.select()?.selectedValue().includes(this.zValue()) ?? false,
+  );
 
   setSelectHost(selectHost: SelectHost) {
     this.select.set(selectHost);

@@ -91,14 +91,7 @@ const erc20Abi = [
   ],
   template: `
     <div class="mx-auto max-w-3xl">
-      <a
-        z-button
-        zType="ghost"
-        zSize="sm"
-        routerLink="/"
-        class="!px-0"
-        aria-label="Back to home"
-      >
+      <a z-button zType="ghost" zSize="sm" routerLink="/" class="!px-0" aria-label="Back to home">
         <z-icon zType="arrow-left" zSize="sm" />
         Back
       </a>
@@ -159,7 +152,7 @@ const erc20Abi = [
                   <div class="grid gap-2">
                     <label class="text-sm font-medium" for="ccxFrom">Your CCX address</label>
                     <input
-                      z-input
+                      zInput
                       id="ccxFrom"
                       class="font-mono text-sm"
                       formControlName="ccxFromAddress"
@@ -176,7 +169,7 @@ const erc20Abi = [
                   <div class="grid gap-2">
                     <label class="text-sm font-medium" for="evmTo">Your EVM address</label>
                     <input
-                      z-input
+                      zInput
                       id="evmTo"
                       class="font-mono text-sm"
                       formControlName="evmToAddress"
@@ -215,7 +208,7 @@ const erc20Abi = [
                     <div class="grid gap-2">
                       <label class="text-sm font-medium" for="amount1">Amount</label>
                       <input
-                        z-input
+                        zInput
                         id="amount1"
                         formControlName="amount"
                         placeholder="0.0"
@@ -237,7 +230,7 @@ const erc20Abi = [
                     <div class="grid gap-2">
                       <label class="text-sm font-medium" for="email1">Email (optional)</label>
                       <input
-                        z-input
+                        zInput
                         id="email1"
                         formControlName="email"
                         placeholder="you@example.com"
@@ -375,7 +368,7 @@ const erc20Abi = [
                   <div class="grid gap-2">
                     <label class="text-sm font-medium" for="ccxTo">Your CCX address</label>
                     <input
-                      z-input
+                      zInput
                       id="ccxTo"
                       class="font-mono text-sm"
                       formControlName="ccxToAddress"
@@ -390,7 +383,7 @@ const erc20Abi = [
                     <div class="grid gap-2">
                       <label class="text-sm font-medium" for="amount2">Amount</label>
                       <input
-                        z-input
+                        zInput
                         id="amount2"
                         formControlName="amount"
                         placeholder="0.0"
@@ -412,7 +405,7 @@ const erc20Abi = [
                     <div class="grid gap-2">
                       <label class="text-sm font-medium" for="email2">Email (optional)</label>
                       <input
-                        z-input
+                        zInput
                         id="email2"
                         formControlName="email"
                         placeholder="you@example.com"

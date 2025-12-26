@@ -29,7 +29,9 @@
           type="button"
           (click)="darkMode.toggleTheme()"
           [attr.aria-label]="
-            darkMode.themeMode() === EDarkModes.DARK ? 'Switch to light mode' : 'Switch to dark mode'
+            darkMode.themeMode() === EDarkModes.DARK
+              ? 'Switch to light mode'
+              : 'Switch to dark mode'
           "
         >
           @if (darkMode.themeMode() === EDarkModes.DARK) {

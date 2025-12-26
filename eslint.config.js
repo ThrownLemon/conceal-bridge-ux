@@ -34,17 +34,6 @@ module.exports = defineConfig([
       ],
     },
   },
-  // ZardUI library components - relax strict linting rules
-  {
-    files: ['src/app/shared/components/**/*.ts'],
-    rules: {
-      '@angular-eslint/directive-selector': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/array-type': 'off',
-      '@typescript-eslint/consistent-indexed-object-style': 'off',
-    },
-  },
   {
     files: ['**/*.html'],
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],

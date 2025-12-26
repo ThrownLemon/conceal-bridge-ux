@@ -1,6 +1,15 @@
 import type { BooleanInput } from '@angular/cdk/coercion';
 import { CdkMenuItem } from '@angular/cdk/menu';
-import { booleanAttribute, computed, Directive, effect, inject, input, signal, untracked } from '@angular/core';
+import {
+  booleanAttribute,
+  computed,
+  Directive,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 
 import type { ClassValue } from 'clsx';
 
@@ -9,7 +18,7 @@ import { mergeClasses } from '@/shared/utils/merge-classes';
 import { menuItemVariants, type ZardMenuItemTypeVariants } from './menu.variants';
 
 @Directive({
-  selector: 'button[z-menu-item], [z-menu-item]',
+  selector: 'button[zMenuItem], [zMenuItem]',
   host: {
     '[class]': 'classes()',
     '[attr.data-orientation]': "'horizontal'",

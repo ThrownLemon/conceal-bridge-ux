@@ -118,9 +118,7 @@ type Variant = 'header' | 'primary';
             {{ copyStatus() ?? 'Copy address' }}
           </z-dropdown-menu-item>
           <z-divider zSpacing="sm" class="-mx-1" />
-          <z-dropdown-menu-item (click)="disconnect()">
-            Disconnect
-          </z-dropdown-menu-item>
+          <z-dropdown-menu-item (click)="disconnect()"> Disconnect </z-dropdown-menu-item>
         </z-dropdown-menu-content>
       }
     }
