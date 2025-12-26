@@ -14,8 +14,8 @@ export class ZardDebounceEventManagerPlugin extends EventManagerPlugin {
   ): () => void {
     // Expected format: "event.debounce.delay" (e.g., "input.debounce.150")
     // If delay is omitted or invalid, defaults to 300ms
-    const [event, , delay] = eventName.split('.');
-    const parsedDelay = Number.parseInt(delay);
+    const [event, delayString] = eventName.split('.debounce');
+    const parsedDelay = Number.parseInt(delayString?.substring(1) ?? '');
     const resolvedDelay = Number.isNaN(parsedDelay) ? 300 : parsedDelay;
 
     let timeoutId!: ReturnType<typeof setTimeout>;
