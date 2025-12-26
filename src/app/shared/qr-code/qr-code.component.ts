@@ -20,7 +20,7 @@ import { QrCode } from './qr-code.utils';
           <path [attr.d]="qr.path" fill="#0f172a" />
         </svg>
       } @else {
-        <div class="text-sm text-[var(--cb-color-muted)]">No QR data.</div>
+        <div class="text-sm text-muted-foreground">No QR data.</div>
       }
     </div>
   `,

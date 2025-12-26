@@ -1,13 +1,9 @@
-<div
-  class="min-h-dvh bg-[var(--cb-color-bg)] text-[var(--cb-color-text)] transition-colors duration-300"
->
-  <header
-    class="sticky top-0 z-10 border-b border-[var(--cb-color-border)]/10 bg-[var(--cb-color-bg)]/80 backdrop-blur"
-  >
+<div class="min-h-dvh bg-background text-foreground transition-colors duration-300">
+  <header class="sticky top-0 z-10 border-b border-border/50 bg-background/80 backdrop-blur">
     <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
       <a
         routerLink="/"
-        class="text-sm font-semibold tracking-tight hover:text-[var(--cb-color-accent-2)] transition-colors"
+        class="text-sm font-semibold tracking-tight hover:text-primary transition-colors"
         aria-label="Conceal Bridge Home"
       >
         Conceal Bridge
@@ -52,14 +48,14 @@
     <router-outlet />
   </main>
 
-  <footer class="border-t border-[var(--cb-color-border)]/10 bg-[var(--cb-color-bg)] px-4 py-8">
+  <footer class="border-t border-border/50 bg-background px-4 py-8">
     <div
-      class="mx-auto flex max-w-5xl flex-col gap-3 text-xs text-[var(--cb-color-muted)] sm:flex-row sm:items-center sm:justify-between"
+      class="mx-auto flex max-w-5xl flex-col gap-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
     >
       <div>© {{ year }} Conceal Network. All rights reserved.</div>
       <div class="flex flex-wrap gap-3">
         <a
-          class="hover:text-[var(--cb-color-text)] transition-colors"
+          class="hover:text-foreground transition-colors"
           href="https://conceal.network/support/"
           target="_blank"
           rel="noopener"
@@ -67,7 +63,7 @@
           >Support</a
         >
         <a
-          class="hover:text-[var(--cb-color-text)] transition-colors"
+          class="hover:text-foreground transition-colors"
           href="https://github.com/ConcealNetwork"
           target="_blank"
           rel="noopener"
@@ -75,7 +71,7 @@
           >GitHub</a
         >
         <a
-          class="hover:text-[var(--cb-color-text)] transition-colors"
+          class="hover:text-foreground transition-colors"
           href="http://discord.conceal.network"
           target="_blank"
           rel="noopener"
