@@ -4,6 +4,12 @@ import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { startWith } from 'rxjs';
 
+import { ZardAvatarComponent } from '@/shared/components/avatar/avatar.component';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardCardComponent } from '@/shared/components/card/card.component';
+import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
+import { ZardIconComponent } from '@/shared/components/icon/icon.component';
+
 import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 import type { EvmNetworkKey, SwapDirection } from '../../core/bridge-types';
@@ -22,217 +28,148 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
 @Component({
   selector: 'app-home-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, WalletButtonComponent],
+  imports: [
+    ReactiveFormsModule,
+    WalletButtonComponent,
+    ZardAvatarComponent,
+    ZardButtonComponent,
+    ZardCardComponent,
+    ZardDropdownImports,
+    ZardIconComponent,
+  ],
   template: `
     <section class="mx-auto max-w-3xl">
-      <h1
-        class="text-balance text-3xl font-semibold tracking-tight text-[var(--cb-color-text)] sm:text-4xl"
-      >
-        Conceal Bridge
-      </h1>
-      <p class="mt-3 text-pretty text-[var(--cb-color-muted)]">
+      <h1 class="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Conceal Bridge</h1>
+      <p class="mt-3 text-pretty text-muted-foreground">
         Swap between Conceal (CCX) and wrapped CCX (wCCX) on Ethereum, BSC, or Polygon.
       </p>
 
-      <div
-        class="mt-8 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)]/50 p-5 shadow-sm backdrop-blur"
-      >
+      <z-card class="mt-8">
         <form class="grid gap-5" [formGroup]="form" (ngSubmit)="go()">
           <fieldset class="grid gap-3">
-            <legend class="text-sm font-medium text-[var(--cb-color-text)]">Networks</legend>
-
-            @if (isFromMenuOpen() || isToMenuOpen()) {
-              <div class="fixed inset-0 z-40" (click)="closeMenus()" aria-hidden="true"></div>
-            }
+            <legend class="text-sm font-medium">Networks</legend>
 
             <div class="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
+              <!-- From network dropdown -->
               <div class="grid gap-2">
-                <div class="text-sm font-medium text-[var(--cb-color-text-secondary)]">From</div>
-                <div class="relative">
-                  <button
-                    type="button"
-                    class="flex w-full items-center gap-3 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 text-left hover:border-[var(--cb-color-border)]/50"
-                    (click)="toggleFromMenu()"
-                    aria-haspopup="listbox"
-                    [attr.aria-expanded]="isFromMenuOpen()"
-                    aria-label="Select source network"
-                  >
-                    @if (fromDisplay(); as n) {
-                      <img
-                        class="h-7 w-7 rounded-full"
-                        [src]="n.logoUri"
-                        [alt]="n.label + ' logo'"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <div class="min-w-0 flex-1">
-                        <div class="truncate text-sm font-semibold text-[var(--cb-color-text)]">
-                          {{ n.label }}
-                        </div>
-                        <div class="truncate text-xs text-[var(--cb-color-muted)]">
-                          {{ n.subtitle }}
-                        </div>
-                      </div>
-                    }
-                    <span class="text-[var(--cb-color-text-secondary)]">▾</span>
-                  </button>
-
-                  @if (isFromMenuOpen()) {
-                    <div
-                      class="absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] shadow-lg"
-                      role="listbox"
-                      aria-label="From network"
-                    >
-                      @for (o of networkOptions(); track o.key) {
-                        <button
-                          type="button"
-                          class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-[var(--cb-color-text)] hover:bg-black/5 dark:hover:bg-white/5"
-                          (click)="setFromNetwork(o.key)"
-                          role="option"
-                          [attr.aria-selected]="fromKey() === o.key"
-                        >
-                          <img
-                            class="h-6 w-6 rounded-full"
-                            [src]="o.logoUri"
-                            [alt]="o.label + ' logo'"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                          <span class="flex-1">{{ o.label }}</span>
-                        </button>
-                      }
+                <div class="text-sm font-medium text-muted-foreground">From</div>
+                <button
+                  z-button
+                  zType="outline"
+                  type="button"
+                  z-dropdown
+                  [zDropdownMenu]="fromMenu"
+                  class="flex w-full items-center gap-3 !justify-start !px-3 !py-6"
+                  aria-label="Select source network"
+                >
+                  @if (fromDisplay(); as n) {
+                    <z-avatar class="h-7 w-7" [zSrc]="n.logoUri" [zAlt]="n.label + ' logo'" />
+                    <div class="min-w-0 flex-1 text-left">
+                      <div class="truncate text-sm font-semibold">{{ n.label }}</div>
+                      <div class="truncate text-xs text-muted-foreground">{{ n.subtitle }}</div>
                     </div>
                   }
-                </div>
+                </button>
+
+                <z-dropdown-menu-content #fromMenu="zDropdownMenuContent" class="w-full">
+                  @for (o of networkOptions(); track o.key) {
+                    <z-dropdown-menu-item (click)="setFromNetwork(o.key)">
+                      <div class="flex items-center gap-3">
+                        <z-avatar class="h-6 w-6" [zSrc]="o.logoUri" [zAlt]="o.label + ' logo'" />
+                        <span>{{ o.label }}</span>
+                      </div>
+                    </z-dropdown-menu-item>
+                  }
+                </z-dropdown-menu-content>
               </div>
 
+              <!-- Swap button -->
               <div class="flex justify-center">
                 <button
+                  z-button
+                  zType="outline"
+                  zShape="circle"
                   type="button"
-                  class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                   (click)="swapNetworks()"
                   aria-label="Swap networks"
                 >
-                  ⇄
+                  <z-icon zType="arrow-left-right" />
                 </button>
               </div>
 
+              <!-- To network dropdown -->
               <div class="grid gap-2">
-                <div class="text-sm font-medium text-[var(--cb-color-text-secondary)]">To</div>
-                <div class="relative">
-                  <button
-                    type="button"
-                    class="flex w-full items-center gap-3 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 text-left hover:border-[var(--cb-color-border)]/50"
-                    (click)="toggleToMenu()"
-                    aria-haspopup="listbox"
-                    [attr.aria-expanded]="isToMenuOpen()"
-                    aria-label="Select destination network"
-                  >
-                    @if (toDisplay(); as n) {
-                      <img
-                        class="h-7 w-7 rounded-full"
-                        [src]="n.logoUri"
-                        [alt]="n.label + ' logo'"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <div class="min-w-0 flex-1">
-                        <div class="truncate text-sm font-semibold text-[var(--cb-color-text)]">
-                          {{ n.label }}
-                        </div>
-                        <div class="truncate text-xs text-[var(--cb-color-muted)]">
-                          {{ n.subtitle }}
-                        </div>
-                      </div>
-                    }
-                    <span class="text-[var(--cb-color-text-secondary)]">▾</span>
-                  </button>
-
-                  @if (isToMenuOpen()) {
-                    <div
-                      class="absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] shadow-lg"
-                      role="listbox"
-                      aria-label="To network"
-                    >
-                      @for (o of networkOptions(); track o.key) {
-                        <button
-                          type="button"
-                          class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-[var(--cb-color-text)] hover:bg-[var(--cb-color-text)]/5"
-                          (click)="setToNetwork(o.key)"
-                          role="option"
-                          [attr.aria-selected]="toKey() === o.key"
-                        >
-                          <img
-                            class="h-6 w-6 rounded-full"
-                            [src]="o.logoUri"
-                            [alt]="o.label + ' logo'"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                          <span class="flex-1">{{ o.label }}</span>
-                        </button>
-                      }
+                <div class="text-sm font-medium text-muted-foreground">To</div>
+                <button
+                  z-button
+                  zType="outline"
+                  type="button"
+                  z-dropdown
+                  [zDropdownMenu]="toMenu"
+                  class="flex w-full items-center gap-3 !justify-start !px-3 !py-6"
+                  aria-label="Select destination network"
+                >
+                  @if (toDisplay(); as n) {
+                    <z-avatar class="h-7 w-7" [zSrc]="n.logoUri" [zAlt]="n.label + ' logo'" />
+                    <div class="min-w-0 flex-1 text-left">
+                      <div class="truncate text-sm font-semibold">{{ n.label }}</div>
+                      <div class="truncate text-xs text-muted-foreground">{{ n.subtitle }}</div>
                     </div>
                   }
-                </div>
+                </button>
+
+                <z-dropdown-menu-content #toMenu="zDropdownMenuContent" class="w-full">
+                  @for (o of networkOptions(); track o.key) {
+                    <z-dropdown-menu-item (click)="setToNetwork(o.key)">
+                      <div class="flex items-center gap-3">
+                        <z-avatar class="h-6 w-6" [zSrc]="o.logoUri" [zAlt]="o.label + ' logo'" />
+                        <span>{{ o.label }}</span>
+                      </div>
+                    </z-dropdown-menu-item>
+                  }
+                </z-dropdown-menu-content>
               </div>
             </div>
 
-            <p class="text-xs text-[var(--cb-color-muted)]">
+            <p class="text-xs text-muted-foreground">
               One side must be Conceal (CCX). Logos/names are loaded from a public chain metadata
               API.
             </p>
             @if (networkSwitchStatus(); as status) {
-              <p class="text-xs text-amber-200" aria-live="polite">{{ status }}</p>
+              <p class="text-xs text-amber-400" aria-live="polite">{{ status }}</p>
             }
           </fieldset>
 
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="text-xs text-[var(--cb-color-muted)]">
+            <div class="text-xs text-muted-foreground">
               By continuing, you agree to the bridge Terms &amp; Conditions.
             </div>
 
             @if (!wallet.isConnected()) {
               <app-wallet-button variant="primary" />
             } @else {
-              <button
-                class="inline-flex items-center justify-center rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
-                type="submit"
-                aria-label="Continue to swap"
-              >
-                Continue
-              </button>
+              <button z-button type="submit" aria-label="Continue to swap">Continue</button>
             }
           </div>
         </form>
-      </div>
+      </z-card>
 
-      <div class="mt-10 grid gap-3 text-sm text-[var(--cb-color-muted)] sm:grid-cols-2">
-        <a
-          class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-4 hover:border-[var(--cb-color-border)]/50"
-          href="https://concealnetwork.medium.com/conceal-bridge-user-guide-2ad03eee4963"
-          target="_blank"
-          rel="noopener"
-          aria-label="Open User guide"
-        >
-          <div class="font-medium text-[var(--cb-color-text)]">User guide</div>
-          <div class="mt-1 text-[var(--cb-color-muted)]">
-            How the bridge works and how to complete swaps safely.
-          </div>
-        </a>
+      <div class="mt-10 grid gap-3 text-sm sm:grid-cols-2">
+        <z-card
+          class="hover:border-primary/30 transition-colors"
+          zTitle="User guide"
+          zDescription="How the bridge works and how to complete swaps safely."
+          zAction="Open"
+          (zActionClick)="openUserGuide()"
+        />
 
-        <a
-          class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-4 hover:border-[var(--cb-color-border)]/50"
-          href="https://metamask.io/download.html"
-          target="_blank"
-          rel="noopener"
-          aria-label="Get MetaMask"
-        >
-          <div class="font-medium text-[var(--cb-color-text)]">Get MetaMask</div>
-          <div class="mt-1 text-[var(--cb-color-muted)]">
-            You’ll need an EVM wallet to send gas fees or wCCX.
-          </div>
-        </a>
+        <z-card
+          class="hover:border-primary/30 transition-colors"
+          zTitle="Get MetaMask"
+          zDescription="You'll need an EVM wallet to send gas fees or wCCX."
+          zAction="Download"
+          (zActionClick)="openMetaMask()"
+        />
       </div>
     </section>
   `,
@@ -298,9 +235,6 @@ export class HomePage {
 
   readonly toDisplay = computed(() => this.displayFor(this.toKey()));
 
-  readonly isFromMenuOpen = signal(false);
-  readonly isToMenuOpen = signal(false);
-
   swapNetworks(): void {
     const from = this.form.controls.fromNetwork.value;
     const to = this.form.controls.toNetwork.value;
@@ -323,35 +257,28 @@ export class HomePage {
     return { label: this.networkLabel(key), subtitle: 'EVM network', logoUri: NETWORK_LOGOS[key] };
   }
 
-  toggleFromMenu(): void {
-    this.isFromMenuOpen.update((v) => !v);
-    this.isToMenuOpen.set(false);
+  openUserGuide(): void {
+    window.open(
+      'https://concealnetwork.medium.com/conceal-bridge-user-guide-2ad03eee4963',
+      '_blank',
+    );
   }
 
-  toggleToMenu(): void {
-    this.isToMenuOpen.update((v) => !v);
-    this.isFromMenuOpen.set(false);
-  }
-
-  closeMenus(): void {
-    this.isFromMenuOpen.set(false);
-    this.isToMenuOpen.set(false);
+  openMetaMask(): void {
+    window.open('https://metamask.io/download.html', '_blank');
   }
 
   setFromNetwork(next: NetworkKey): void {
     const otherBefore = this.form.controls.toNetwork.value;
     if (next === otherBefore) {
       this.networkSwitchStatus.set('From and To networks cannot be the same.');
-      // Auto-fix by keeping the "one side is CCX" rule.
       if (next === 'ccx') {
         this.form.controls.toNetwork.setValue(this.#lastEvm());
         this.form.controls.direction.setValue('ccx-to-evm');
-        this.closeMenus();
         return;
       }
       this.form.controls.toNetwork.setValue('ccx');
       this.form.controls.direction.setValue('evm-to-ccx');
-      this.closeMenus();
       return;
     }
 
@@ -368,7 +295,6 @@ export class HomePage {
     }
 
     this.networkSwitchStatus.set(null);
-    this.closeMenus();
     this.normalizeNetworks();
   }
 
@@ -376,16 +302,13 @@ export class HomePage {
     const otherBefore = this.form.controls.fromNetwork.value;
     if (next === otherBefore) {
       this.networkSwitchStatus.set('From and To networks cannot be the same.');
-      // Auto-fix by keeping the "one side is CCX" rule.
       if (next === 'ccx') {
         this.form.controls.fromNetwork.setValue(this.#lastEvm());
         this.form.controls.direction.setValue('evm-to-ccx');
-        this.closeMenus();
         return;
       }
       this.form.controls.fromNetwork.setValue('ccx');
       this.form.controls.direction.setValue('ccx-to-evm');
-      this.closeMenus();
       return;
     }
 
@@ -402,7 +325,6 @@ export class HomePage {
     }
 
     this.networkSwitchStatus.set(null);
-    this.closeMenus();
     this.normalizeNetworks();
   }
 

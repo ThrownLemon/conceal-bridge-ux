@@ -1,12 +1,17 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
+import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardCardComponent } from '@/shared/components/card/card.component';
+import { ZardIconComponent } from '@/shared/components/icon/icon.component';
+
 import { WalletModalService } from '../../core/wallet-modal.service';
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
 
 @Component({
   selector: 'app-wallet-modal',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ZardButtonComponent, ZardCardComponent, ZardAlertComponent, ZardIconComponent],
   template: `
     @if (modalService.isOpen()) {
       <div
@@ -19,24 +24,25 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
         role="button"
         aria-label="Close modal"
       >
-        <div
-          class="w-full max-w-md rounded-2xl bg-[var(--cb-color-surface)] p-6 text-[var(--cb-color-text)] shadow-xl"
+        <z-card
+          class="w-full max-w-md"
           role="dialog"
           aria-modal="true"
           aria-label="Connect wallet"
           (click)="$event.stopPropagation()"
           (keydown)="$event.stopPropagation()"
         >
-          <div class="flex items-start justify-between gap-4">
+          <div class="flex items-start justify-between gap-4 mb-4">
             <div class="flex items-center gap-2">
               @if (modalService.activeConnector(); as c) {
                 <button
-                  type="button"
-                  class="rounded-lg p-2 text-[var(--cb-color-muted)] hover:bg-[var(--cb-color-border)]/50 hover:text-[var(--cb-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
+                  z-button
+                  zType="ghost"
+                  zSize="sm"
                   (click)="backToList()"
                   aria-label="Back to wallet list"
                 >
-                  ←
+                  <z-icon zType="arrow-left" />
                 </button>
               }
               <h2 class="text-xl font-semibold">
@@ -47,18 +53,13 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
                 }
               </h2>
             </div>
-            <button
-              type="button"
-              class="rounded-lg p-2 text-[var(--cb-color-muted)] hover:bg-[var(--cb-color-border)]/50 hover:text-[var(--cb-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--cb-color-accent)]/40"
-              (click)="close()"
-              aria-label="Close modal"
-            >
-              ✕
+            <button z-button zType="ghost" zSize="sm" (click)="close()" aria-label="Close modal">
+              <z-icon zType="x" />
             </button>
           </div>
 
           @if (modalService.activeConnector(); as c) {
-            <div class="mt-6 grid place-items-center gap-4">
+            <div class="grid place-items-center gap-4">
               <img
                 class="h-16 w-16"
                 [src]="connectorLogo(c)"
@@ -70,13 +71,16 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
               @if (modalService.needsInstall()) {
                 <div class="text-center">
                   <div class="text-lg font-semibold">Install {{ connectorName(c) }}</div>
-                  <div class="mt-2 text-sm text-slate-600">
+                  <div class="mt-2 text-sm text-muted-foreground">
                     To connect your {{ connectorName(c) }}, install the browser extension.
                   </div>
                 </div>
 
                 <a
-                  class="mt-2 inline-flex w-full items-center justify-center rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-4 py-3 text-sm font-semibold text-[var(--cb-color-text)] hover:bg-[var(--cb-color-border)]/30"
+                  z-button
+                  zType="outline"
+                  zFull
+                  class="mt-2"
                   [href]="connectorInstallUrl(c)"
                   target="_blank"
                   rel="noopener"
@@ -88,29 +92,27 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
                 <div class="text-center">
                   @if (modalService.isConnecting()) {
                     <div class="text-lg font-semibold">Requesting Connection</div>
-                    <div class="mt-2 text-sm text-[var(--cb-color-muted)]">
+                    <div class="mt-2 text-sm text-muted-foreground">
                       {{ connectorConnectingHint(c) }}
                     </div>
                   } @else {
                     <div class="text-lg font-semibold">Connect {{ connectorName(c) }}</div>
-                    <div class="mt-2 text-sm text-[var(--cb-color-muted)]">
+                    <div class="mt-2 text-sm text-muted-foreground">
                       Click below to connect your wallet.
                     </div>
                   }
                 </div>
 
                 @if (modalService.error(); as err) {
-                  <div
-                    class="w-full rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
-                  >
-                    {{ err }}
-                  </div>
+                  <z-alert class="w-full" zType="destructive" [zTitle]="err" />
                 }
 
                 <button
-                  type="button"
-                  class="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-[var(--cb-color-accent)] px-4 py-3 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 disabled:opacity-60"
-                  [disabled]="modalService.isConnecting()"
+                  z-button
+                  zFull
+                  class="mt-1"
+                  [zLoading]="modalService.isConnecting()"
+                  [zDisabled]="modalService.isConnecting()"
                   (click)="connect(c)"
                   aria-label="Connect wallet"
                 >
@@ -124,15 +126,14 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
             </div>
           } @else {
             @if (modalService.error(); as err) {
-              <div class="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                {{ err }}
-              </div>
+              <z-alert class="mb-4" zType="destructive" [zTitle]="err" />
             }
 
-            <div class="mt-5 grid gap-3">
+            <div class="grid gap-3">
               <button
-                type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-[var(--cb-color-border)] px-4 py-3 text-left hover:bg-[var(--cb-color-border)]/20"
+                z-button
+                zType="outline"
+                class="flex w-full items-center justify-between !px-4 !py-3"
                 (click)="selectConnector('metamask')"
                 aria-label="Connect with MetaMask"
               >
@@ -146,12 +147,13 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
                   />
                   <span class="font-medium">MetaMask</span>
                 </span>
-                <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
+                <span class="text-xs text-muted-foreground">Browser extension</span>
               </button>
 
               <button
-                type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-[var(--cb-color-border)] px-4 py-3 text-left hover:bg-[var(--cb-color-border)]/20"
+                z-button
+                zType="outline"
+                class="flex w-full items-center justify-between !px-4 !py-3"
                 (click)="selectConnector('trust')"
                 aria-label="Connect with Trust Wallet"
               >
@@ -165,12 +167,13 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
                   />
                   <span class="font-medium">Trust Wallet</span>
                 </span>
-                <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
+                <span class="text-xs text-muted-foreground">Browser extension</span>
               </button>
 
               <button
-                type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-[var(--cb-color-border)] px-4 py-3 text-left hover:bg-[var(--cb-color-border)]/20"
+                z-button
+                zType="outline"
+                class="flex w-full items-center justify-between !px-4 !py-3"
                 (click)="selectConnector('binance')"
                 aria-label="Connect with Binance Wallet"
               >
@@ -184,11 +187,11 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
                   />
                   <span class="font-medium">Binance Wallet</span>
                 </span>
-                <span class="text-xs text-[var(--cb-color-muted)]">Browser extension</span>
+                <span class="text-xs text-muted-foreground">Browser extension</span>
               </button>
             </div>
           }
-        </div>
+        </z-card>
       </div>
     }
   `,

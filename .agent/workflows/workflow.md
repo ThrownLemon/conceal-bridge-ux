@@ -18,19 +18,19 @@ description: Project workflow
 
 ## Workflow Quick Reference
 
-| Workflow | When to Use |
-|----------|-------------|
-| `beads.md` | Check or manage issues with bd |
-| `setup.md` | Initial environment setup |
-| `test.md` | Run unit or E2E tests |
-| `review.md` | Code quality checklist |
-| `cleanup.md` | Pre-commit verification |
-| `submit.md` | Commit, push, create PR, merge |
-| `update.md` | Update npm dependencies |
-| `deploy.md` | Deploy to GitHub Pages |
-| `release.md` | Create version release |
-| `hotfix.md` | Emergency production fixes |
-| `debug.md` | Troubleshoot issues |
+| Workflow     | When to Use                    |
+| ------------ | ------------------------------ |
+| `beads.md`   | Check or manage issues with bd |
+| `setup.md`   | Initial environment setup      |
+| `test.md`    | Run unit or E2E tests          |
+| `review.md`  | Code quality checklist         |
+| `cleanup.md` | Pre-commit verification        |
+| `submit.md`  | Commit, push, create PR, merge |
+| `update.md`  | Update npm dependencies        |
+| `deploy.md`  | Deploy to GitHub Pages         |
+| `release.md` | Create version release         |
+| `hotfix.md`  | Emergency production fixes     |
+| `debug.md`   | Troubleshoot issues            |
 
 ## Related Documentation
 

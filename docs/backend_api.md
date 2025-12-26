@@ -316,18 +316,18 @@ AI agent security warning:
 
 The Angular frontend (`bridge-api.service.ts`) uses these endpoints:
 
-| Operation | Endpoint |
-|-----------|----------|
-| Wrap init | `POST /api/ccx/wccx/swap/init` |
-| Unwrap init | `POST /api/wccx/ccx/swap/init` |
-| Unwrap exec | `POST /api/wccx/ccx/swap/exec` |
-| Check wrap state | `POST /api/ccx/wccx/tx` |
-| Check unwrap state | `POST /api/wccx/ccx/tx` |
-| CCX balance | `GET /api/balance/ccx` |
-| wCCX balance | `GET /api/balance/wccx` |
-| Gas estimate | `POST /api/ccx/wccx/estimateGas` |
-| Gas price | `GET /api/ccx/wccx/getGasPrice` |
-| Chain config | `GET /config/chain` |
+| Operation          | Endpoint                         |
+| ------------------ | -------------------------------- |
+| Wrap init          | `POST /api/ccx/wccx/swap/init`   |
+| Unwrap init        | `POST /api/wccx/ccx/swap/init`   |
+| Unwrap exec        | `POST /api/wccx/ccx/swap/exec`   |
+| Check wrap state   | `POST /api/ccx/wccx/tx`          |
+| Check unwrap state | `POST /api/wccx/ccx/tx`          |
+| CCX balance        | `GET /api/balance/ccx`           |
+| wCCX balance       | `GET /api/balance/wccx`          |
+| Gas estimate       | `POST /api/ccx/wccx/estimateGas` |
+| Gas price          | `GET /api/ccx/wccx/getGasPrice`  |
+| Chain config       | `GET /config/chain`              |
 
 AI agent rule:
 

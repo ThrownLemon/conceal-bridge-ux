@@ -18,13 +18,8 @@ npm run e2e           # Run E2E tests with Playwright
 ### Run All Tests
 
 ```bash
-npm test
-```
-
-### Run Tests in Watch Mode
-
-```bash
-npm test -- --watch
+npm test -- --watch=false  # Single run
+npm test                   # Default (often watch mode or single run depending on config)
 ```
 
 Vitest will re-run tests when files change.
@@ -44,7 +39,7 @@ npm test -- --grep "BridgeApiService"
 ### Run with Coverage
 
 ```bash
-npm test -- --coverage
+npm test -- --code-coverage
 ```
 
 Coverage report will be in `coverage/` directory.
@@ -208,12 +203,10 @@ req.flush({ data: 'test' });
 httpMock.verify();
 ```
 
-## 5. CI/CD Testing
-
 For headless CI environments:
 
 ```bash
-npm test -- --run --reporter=verbose
+ng test --no-watch --progress=false
 npm run e2e -- --reporter=list
 ```
 
@@ -221,9 +214,9 @@ npm run e2e -- --reporter=list
 
 ```bash
 # Unit tests
-npm test                    # Run all
-npm test -- --watch         # Watch mode
-npm test -- --coverage      # With coverage
+npm test                    # Run all (default)
+ng test --no-watch          # Single run (preferred for verification)
+npm test -- --code-coverage # With coverage
 
 # E2E tests
 npm run e2e                 # Run all

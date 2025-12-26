@@ -13,6 +13,7 @@ description: Verification & Cleanup Routine
 1. **Linting**:
    - Run `npm run lint` to check for code style and potential errors.
    - **Action**: Fix any errors found. If they are auto-fixable, use `npm run lint:fix`.
+   - **STRICTLY FORBIDDEN**: Never modify `eslint.config.js` or add `// eslint-disable` comments to bypass errors.
 
 2. **Formatting**:
    - Run `npm run format` to ensure all code follows Prettier standards.
@@ -20,6 +21,7 @@ description: Verification & Cleanup Routine
 3. **Unit Tests**:
    - **Command**: `npm test`
    - **Action**: Fix any failing tests immediately. Ensure strict type changes (e.g., `any` -> `unknown`) didn't break implementation logic.
+   - **STRICTLY FORBIDDEN**: Never use `@ts-ignore`, `@ts-expect-error`, or `@ts-nocheck` to bypass type errors.
 
 4. **Build Check (Performance & Integrity)**:
    - **CRITICAL**: Run this _after_ lint/format fixes to catch missing imports or broken types.

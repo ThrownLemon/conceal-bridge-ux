@@ -13,6 +13,7 @@ git branch --show-current
 ```
 
 **Branching rules:**
+
 - ❌ Do NOT commit directly to `master` (except docs-only changes)
 - ✅ Feature work: `feature/your-feature-name`
 - ✅ Bug fixes: `fix/issue-description`
@@ -30,9 +31,40 @@ Before committing, ALL gates must pass:
 
 ```bash
 npm run lint        # Fix with: npm run lint:fix
+npm run format      # Prettier formatting
 npm test            # All tests must pass
 npm run build       # Production build must succeed
 ```
+
+**Note**: These are automatically enforced by Husky pre-commit hooks. If any check fails, the commit will be blocked.
+
+**CRITICAL**: Run `npm run format` BEFORE `npm run build`. Formatting changes can trigger new lint/build errors.
+
+### STRICTLY FORBIDDEN - Quality Gate Anti-Patterns
+
+❌ **NEVER modify lint rules** to make code pass - fix the code instead
+❌ **NEVER add inline eslint-disable** comments to bypass errors
+❌ **NEVER modify eslint.config.js** or tsconfig.json to silence errors
+❌ **NEVER use `@ts-ignore`, `@ts-expect-error`, or `@ts-nocheck`**
+❌ **NEVER skip quality gates** to "save time"
+❌ **NEVER commit with failing tests** - fix the test or the code
+❌ **NEVER assume a build error is "harmless"** - all errors must be resolved
+
+### When Quality Gates Fail
+
+1. Read the error message carefully
+2. Understand **why** the rule exists (security, maintainability, consistency)
+3. Fix the actual code to satisfy the rule
+4. If the rule seems wrong for this case, discuss with the team first - don't disable it
+
+### Examples of Correct vs Incorrect Approaches
+
+| Incorrect (Shortcut)                      | Correct (Proper Fix)                        |
+| ----------------------------------------- | ------------------------------------------- |
+| Add `// eslint-disable-next-line`         | Change code to satisfy the rule             |
+| Modify `eslint.config.js` to disable rule | Fix the underlying code issue               |
+| Cast with `as any`                        | Use proper type (`unknown`, `Record`, etc.) |
+| `@ts-ignore` on a line                    | Fix the type error properly                 |
 
 ## 3. Stage and Commit
 
@@ -45,15 +77,15 @@ git commit -m "feat: description"
 
 **Conventional Commits format:** `<type>(<scope>): <subject>`
 
-| Type | Use for |
-|------|---------|
-| `feat` | New functionality |
-| `fix` | Bug fixes |
-| `docs` | Documentation only |
-| `chore` | Dependencies, tooling |
+| Type       | Use for                          |
+| ---------- | -------------------------------- |
+| `feat`     | New functionality                |
+| `fix`      | Bug fixes                        |
+| `docs`     | Documentation only               |
+| `chore`    | Dependencies, tooling            |
 | `refactor` | Code changes without feature/fix |
-| `test` | Adding/updating tests |
-| `ci` | CI/CD changes |
+| `test`     | Adding/updating tests            |
+| `ci`       | CI/CD changes                    |
 
 ## 4. Push Branch to Remote
 
@@ -70,6 +102,7 @@ gh pr create --title "feat: your change" --body "Description of changes"
 ```
 
 **Why PRs for solo work?**
+
 - CI runs lint/test/build before merge is allowed
 - Self-review in PR diff view catches mistakes
 - Clean revert path via merge commits
@@ -90,13 +123,13 @@ bd close <issue-id> --reason "Merged in PR #123"
 
 ## What "Complete" Means
 
-| Task Type | Complete When |
-|-----------|---------------|
-| Feature | PR merged to master |
-| Bug fix | PR merged to master |
-| Hotfix | PR merged and verified on production |
-| Docs only | Push directly to master |
-| Release | Push directly to master (version + changelog) |
+| Task Type | Complete When                                 |
+| --------- | --------------------------------------------- |
+| Feature   | PR merged to master                           |
+| Bug fix   | PR merged to master                           |
+| Hotfix    | PR merged and verified on production          |
+| Docs only | Push directly to master                       |
+| Release   | Push directly to master (version + changelog) |
 
 ## Critical Rules
 
