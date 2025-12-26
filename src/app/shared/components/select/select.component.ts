@@ -48,7 +48,7 @@ import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
 type OnTouchedType = () => void;
-type OnChangeType = (value: string) => void;
+type OnChangeType = (value: string | string[] | null) => void;
 
 const COMPACT_MODE_WIDTH_THRESHOLD = 100;
 
@@ -279,16 +279,23 @@ export class ZardSelectComponent implements ControlValueAccessor, AfterContentIn
     }
 
     this.zValue.update((selectedValues) => {
-      if (Array.isArray(selectedValues)) {
-        return selectedValues.includes(value)
-          ? selectedValues.filter((v) => v !== value)
-          : [...selectedValues, value];
+      if (this.zMultiple()) {
+        const normalized = Array.isArray(selectedValues)
+          ? selectedValues
+          : selectedValues
+            ? [selectedValues]
+            : [];
+
+        return normalized.includes(value)
+          ? normalized.filter((v) => v !== value)
+          : [...normalized, value];
       }
 
       return value;
     });
-    this.onChange(value);
-    this.zSelectionChange.emit(this.zValue());
+    const newValue = this.zValue();
+    this.onChange(newValue);
+    this.zSelectionChange.emit(newValue);
 
     if (this.zMultiple()) {
       // in multiple mode it can happen that button changes size because of selection badges,
@@ -629,15 +636,24 @@ export class ZardSelectComponent implements ControlValueAccessor, AfterContentIn
   }
 
   // ControlValueAccessor implementation
-  writeValue(value: string | string[] | null): void {
-    if (this.zMultiple() && Array.isArray(value)) {
-      this.zValue.set(value);
+  writeValue(value: string | string[] | null | undefined): void {
+    if (this.zMultiple()) {
+      if (Array.isArray(value)) {
+        this.zValue.set(value);
+      } else {
+        this.zValue.set(value ? [value] : []);
+      }
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      this.zValue.set(value[0] ?? '');
     } else {
       this.zValue.set(value ?? '');
     }
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  registerOnChange(fn: (value: string | string[] | null) => void): void {
     this.onChange = fn;
   }
 
