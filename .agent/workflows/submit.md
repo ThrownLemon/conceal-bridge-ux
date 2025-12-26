@@ -31,9 +31,12 @@ Before committing, ALL gates must pass:
 
 ```bash
 npm run lint        # Fix with: npm run lint:fix
+npm run format      # Prettier formatting
 npm test            # All tests must pass
 npm run build       # Production build must succeed
 ```
+
+**CRITICAL**: Run `npm run format` BEFORE `npm run build`. Formatting changes can trigger new lint/build errors.
 
 ### STRICTLY FORBIDDEN - Quality Gate Anti-Patterns
 

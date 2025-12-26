@@ -11,7 +11,8 @@
     "lint:fix": "ng lint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "prepare": "husky"
   },
   "prettier": {
     "printWidth": 100,
@@ -54,6 +55,7 @@
     "angular-eslint": "21.1.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
     "jsdom": "^27.3.0",
     "playwright-ng-schematics": "^21.0.3",
     "postcss": "^8.5.6",
