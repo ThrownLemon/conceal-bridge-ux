@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -11,6 +11,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
 
 @Component({
   selector: 'app-transaction-history',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DecimalPipe, ZardBadgeComponent, ZardButtonComponent, ZardCardComponent, ZardIconComponent],
   template: `
     <!-- Backdrop -->
@@ -105,7 +106,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
                         zSize="sm"
                         class="opacity-0 group-hover:opacity-100 transition-opacity !p-1 !h-auto"
                         (click)="copy(tx.depositHash)"
-                        title="Copy Hash"
+                        [title]="getCopyLabel(tx.depositHash)"
                       >
                         <z-icon zType="copy" zSize="sm" />
                       </button>
@@ -126,7 +127,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
                         zSize="sm"
                         class="opacity-0 group-hover:opacity-100 transition-opacity !p-1 !h-auto"
                         (click)="copy(tx.swapHash)"
-                        title="Copy Hash"
+                        [title]="getCopyLabel(tx.swapHash)"
                       >
                         <z-icon zType="copy" zSize="sm" />
                       </button>
@@ -143,6 +144,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
 })
 export class TransactionHistoryComponent {
   readonly service = inject(TransactionHistoryService);
+  readonly copyStatus = signal<{ hash: string; status: 'copied' | 'failed' } | null>(null);
 
   getRelativeTime(timestamp: number): string {
     return formatDistanceToNow(timestamp, { addSuffix: true });
@@ -151,9 +153,22 @@ export class TransactionHistoryComponent {
   async copy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      // Optional: Toast notification here if desired
-    } catch (err) {
-      console.error('Failed to copy:', err);
+      this.copyStatus.set({ hash: text, status: 'copied' });
+    } catch {
+      this.copyStatus.set({ hash: text, status: 'failed' });
     }
+    setTimeout(() => {
+      if (this.copyStatus()?.hash === text) {
+        this.copyStatus.set(null);
+      }
+    }, 2000);
+  }
+
+  getCopyLabel(hash: string): string {
+    const status = this.copyStatus();
+    if (status?.hash === hash) {
+      return status.status === 'copied' ? 'Copied!' : 'Copy failed';
+    }
+    return 'Copy Hash';
   }
 }

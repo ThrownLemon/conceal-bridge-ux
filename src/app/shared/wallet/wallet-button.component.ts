@@ -241,7 +241,12 @@ export class WalletButtonComponent {
         }
       }, 1000);
     } catch {
-      // Clipboard unavailable
+      this.copyStatus.set('Copy failed - select manually');
+      setTimeout(() => {
+        if (this.copyStatus() === 'Copy failed - select manually') {
+          this.copyStatus.set(null);
+        }
+      }, 3000);
     }
   }
 }

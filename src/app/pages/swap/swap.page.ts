@@ -138,6 +138,14 @@ const erc20Abi = [
         <z-alert class="mt-6" [zTitle]="msg" />
       }
 
+      @if (balanceFetchError(); as err) {
+        <z-alert class="mt-6" zType="destructive" [zTitle]="err" zIcon="triangle-alert" />
+      }
+
+      @if (pollingError(); as err) {
+        <z-alert class="mt-6" zType="destructive" [zTitle]="err" zIcon="triangle-alert" />
+      }
+
       @if (direction(); as d) {
         @if (d === 'ccx-to-evm') {
           <ng-container [formGroup]="ccxToEvmForm">
@@ -557,9 +565,12 @@ export class SwapPage {
 
   readonly pageError = signal<string | null>(null);
   readonly statusMessage = signal<string | null>(null);
+  readonly balanceFetchError = signal<string | null>(null);
+  readonly pollingError = signal<string | null>(null);
 
   // Track polling subscription to cancel previous ones when starting new polling
   readonly #pollingCancel$ = new Subject<void>();
+  #pollingErrorCount = 0;
 
   readonly ccxToEvmForm = this.#fb.group({
     ccxFromAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
@@ -617,25 +628,41 @@ export class SwapPage {
       .pipe(
         switchMap((network) =>
           this.api.getCcxSwapBalance(network).pipe(
-            catchError(() => of({ result: false, balance: 0 })),
+            catchError(() => {
+              this.balanceFetchError.set(
+                'Unable to verify available liquidity. Proceed with caution.',
+              );
+              return of({ result: false, balance: 0 });
+            }),
             map((r) => (r.result ? r.balance : null)),
           ),
         ),
         takeUntilDestroyed(this.#destroyRef),
       )
-      .subscribe((balance) => this.ccxSwapBalance.set(balance));
+      .subscribe((balance) => {
+        if (balance !== null) this.balanceFetchError.set(null);
+        this.ccxSwapBalance.set(balance);
+      });
 
     network$
       .pipe(
         switchMap((network) =>
           this.api.getWccxSwapBalance(network).pipe(
-            catchError(() => of({ result: false, balance: 0 })),
+            catchError(() => {
+              this.balanceFetchError.set(
+                'Unable to verify available liquidity. Proceed with caution.',
+              );
+              return of({ result: false, balance: 0 });
+            }),
             map((r) => (r.result ? r.balance : null)),
           ),
         ),
         takeUntilDestroyed(this.#destroyRef),
       )
-      .subscribe((balance) => this.wccxSwapBalance.set(balance));
+      .subscribe((balance) => {
+        if (balance !== null) this.balanceFetchError.set(null);
+        this.wccxSwapBalance.set(balance);
+      });
 
     // Validate direction param.
     const dir = this.direction();
@@ -962,15 +989,33 @@ export class SwapPage {
   startPolling(network: EvmNetworkKey, direction: 'wccx' | 'ccx', paymentId: string): void {
     // Cancel any previous polling before starting new one
     this.#pollingCancel$.next();
+    this.#pollingErrorCount = 0;
+    this.pollingError.set(null);
 
     timer(0, 10_000)
       .pipe(
         switchMap(() =>
-          this.api
-            .checkSwapState(network, direction, paymentId)
-            .pipe(catchError(() => of({ result: false } as BridgeSwapStateResponse))),
+          this.api.checkSwapState(network, direction, paymentId).pipe(
+            catchError(() => {
+              this.#pollingErrorCount++;
+              if (this.#pollingErrorCount >= 3) {
+                this.pollingError.set(
+                  `Unable to check swap status. Your transaction may still be processing. ` +
+                    `Save your payment ID for support: ${paymentId}`,
+                );
+              }
+              return of({ result: false } as BridgeSwapStateResponse);
+            }),
+          ),
         ),
-        filter((r) => r.result === true),
+        filter((r) => {
+          if (r.result === true) {
+            this.#pollingErrorCount = 0;
+            this.pollingError.set(null);
+            return true;
+          }
+          return false;
+        }),
         take(1),
         takeUntil(this.#pollingCancel$),
         takeUntilDestroyed(this.#destroyRef),
