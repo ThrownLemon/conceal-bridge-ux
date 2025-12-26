@@ -33,12 +33,7 @@ export class ZardSheetService {
 
     if (!overlayRef) {
       // Return a mock sheet ref for SSR environments
-      return new ZardSheetRef(
-        undefined as unknown as OverlayRef,
-        config,
-        undefined as unknown as ZardSheetComponent<T, U>,
-        this.platformId,
-      );
+      return new ZardSheetRef<T>(null, config, null, this.platformId);
     }
 
     const sheetContainer = this.attachSheetContainer<T, U>(overlayRef, config);

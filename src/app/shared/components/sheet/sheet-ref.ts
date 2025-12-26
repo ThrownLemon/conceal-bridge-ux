@@ -18,15 +18,17 @@ export class ZardSheetRef<T = unknown, R = unknown, U = unknown> {
   componentInstance: T | null = null;
 
   constructor(
-    private overlayRef: OverlayRef,
+    private overlayRef: OverlayRef | null,
     private config: ZardSheetOptions<T, U>,
-    private containerInstance: ZardSheetComponent<T, U>,
+    private containerInstance: ZardSheetComponent<T, U> | null,
     @Inject(PLATFORM_ID) private platformId: object,
   ) {
-    this.containerInstance.cancelTriggered.subscribe(() => this.trigger(eTriggerAction.CANCEL));
-    this.containerInstance.okTriggered.subscribe(() => this.trigger(eTriggerAction.OK));
+    // In SSR, the service returns a "no-op" ref (no overlay/container).
+    // Guard against accessing outputs on a missing container instance.
+    this.containerInstance?.cancelTriggered.subscribe(() => this.trigger(eTriggerAction.CANCEL));
+    this.containerInstance?.okTriggered.subscribe(() => this.trigger(eTriggerAction.OK));
 
-    if ((this.config.zMaskClosable ?? true) && isPlatformBrowser(this.platformId)) {
+    if ((this.config.zMaskClosable ?? true) && isPlatformBrowser(this.platformId) && this.overlayRef) {
       this.overlayRef
         .outsidePointerEvents()
         .pipe(takeUntil(this.destroy$))
@@ -50,6 +52,11 @@ export class ZardSheetRef<T = unknown, R = unknown, U = unknown> {
 
     this.isClosing = true;
     this.result = result;
+    if (!this.containerInstance) {
+      this.closeCleanup();
+      return;
+    }
+
     this.containerInstance.state.set('closed');
 
     if (isPlatformBrowser(this.platformId)) {
@@ -97,12 +104,10 @@ export class ZardSheetRef<T = unknown, R = unknown, U = unknown> {
   }
 
   private closeCleanup(): void {
-    if (this.overlayRef) {
-      if (this.overlayRef.hasAttached()) {
-        this.overlayRef.detachBackdrop();
-      }
-      this.overlayRef.dispose();
+    if (this.overlayRef?.hasAttached()) {
+      this.overlayRef.detachBackdrop();
     }
+    this.overlayRef?.dispose();
 
     if (!this.destroy$.closed) {
       this.destroy$.next();
