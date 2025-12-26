@@ -3,7 +3,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
+import { provideZard } from '@/shared/core/provider/providezard';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideBrowserGlobalErrorListeners(), provideHttpClient(), provideRouter(routes)],
+  providers: [provideBrowserGlobalErrorListeners(), provideHttpClient(), provideRouter(routes),
+    provideZard(),],
 };
