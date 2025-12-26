@@ -109,11 +109,21 @@ gh pr create --title "feat: your change" --body "Description of changes"
 
 ## 6. Merge PR (After CI Passes)
 
+> [!IMPORTANT]
+> The task is NOT complete until the code is in the `master` branch and your local repo is synced.
+
 ```bash
 gh pr merge --squash --delete-branch
+git checkout master
+git pull origin master
 ```
 
-Or merge via GitHub web UI.
+**Why merge immediately?**
+- Prevents branch rot and stale PRs.
+- Ensures the next task starts from a clean, up-to-date `master`.
+- Validates the final squashed commit in the main history.
+
+Or merge via GitHub web UI, then manually sync your local `master`.
 
 ## 7. Update Issue Status (bd)
 
@@ -136,8 +146,13 @@ bd close <issue-id> --reason "Merged in PR #123"
 - ❌ NEVER stop before pushing - work stranded locally is lost work
 - ❌ NEVER say "ready to push when you are" - YOU must push
 - ❌ NEVER skip the PR for code changes - CI validation matters
+- ❌ NEVER leave a PR open - merge it as soon as CI passes
 - ✅ Work is complete when PR is merged (not just pushed)
 - ✅ If CI fails, fix locally and push again
+
+> [!CAUTION]
+> **Husky & Tests**: Ensure `npm test` in `.husky/pre-commit` runs with `--no-watch` (or `--watch=false`). 
+> If it runs in watch mode, the commit process will hang indefinitely in autonomous environments.
 
 ## Quick Reference
 

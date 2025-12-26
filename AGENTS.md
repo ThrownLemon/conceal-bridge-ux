@@ -51,10 +51,13 @@ Work is NOT complete until code is pushed AND a PR is created (or merged). This 
 
 ### Branching Strategy
 
-- ❌ NEVER commit directly to `master`
+- ❌ NEVER commit directly to `master` (except docs-only changes)
 - ✅ Feature work: `feature/your-feature-name`
 - ✅ Bug fixes: `fix/issue-description`
 - ✅ Hotfixes: `hotfix/critical-fix` (emergency only)
+
+> [!IMPORTANT]
+> **Sync First**: Always `git pull origin master` before starting new work or creating a PR. Verify the existing code state to ensure your planned task hasn't already been implemented.
 
 ### Required Steps
 
@@ -136,9 +139,12 @@ Run these before EVERY commit:
 ```bash
 npm run lint        # ESLint (fix: npm run lint:fix)
 npm run format      # Prettier formatting
-npm test            # Vitest unit tests
+npm test -- --no-watch # Vitest unit tests (Single run)
 npm run build       # Production build (run AFTER lint/format)
 ```
+
+> [!CAUTION]
+> **Robust Scripting**: When writing scripts that search for forbidden patterns (like Git hooks), ensure the script itself doesn't match the pattern (use obfuscation like `"eslint""-disable"`) or exclude the script file.
 
 All gates MUST pass before pushing. Do not skip.
 
