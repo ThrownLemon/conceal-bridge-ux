@@ -1,5 +1,9 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+HUSKY_SH="$(dirname "$0")/_/husky.sh"
+# Allow running the hook even if Husky bootstrap isn't present (e.g. minimal CI/checkouts).
+if [ -f "$HUSKY_SH" ]; then
+  . "$HUSKY_SH"
+fi
 
 # Pre-commit hook for Conceal Bridge
 # Runs quality gates and blocks forbidden patterns
@@ -59,23 +63,61 @@ echo ""
 echo "📋 Running quality gates..."
 
 # Format first (must run before build)
-echo "→ Running npm run format..."
-npm run format
-FORMAT_EXIT=$?
+# IMPORTANT:
+# - Only format files that are part of the commit (staged files)
+# - Never touch unrelated/untracked files in the working directory
+# - Avoid breaking partial commits: skip files that are staged *and* have unstaged changes
+echo "→ Formatting staged files with Prettier..."
 
-if [ $FORMAT_EXIT -ne 0 ]; then
-  echo "${RED}❌ Format check failed!${NC}"
-  echo "Please run 'npm run format' and commit the formatting changes."
-  exit 1
-fi
+FORMATTED_FILES=""
+SKIPPED_PARTIAL_FILES=""
 
-# Check if formatting changed any files
-if ! git diff --quiet; then
-  echo "${YELLOW}⚠️  Formatting changed files. Please add them to your commit:${NC}"
-  git diff --name-only | sed 's/^/  - /'
-  echo ""
-  echo "Run: git add . && git commit --amend --no-edit"
-  exit 1
+while IFS= read -r file; do
+  [ -z "$file" ] && continue
+
+  # Safety: only operate on files that exist in the working tree
+  # (staged files can include renames; deleted files are excluded via diff-filter)
+  if [ ! -f "$file" ]; then
+    continue
+  fi
+
+  # If the file has unstaged changes, formatting would rewrite it and can break partial commits.
+  # We skip in that case and let the user decide whether to fully stage the file.
+  if ! git diff --quiet -- "$file"; then
+    SKIPPED_PARTIAL_FILES="${SKIPPED_PARTIAL_FILES}
+$file"
+    continue
+  fi
+
+  # Format the staged file only. --ignore-unknown allows non-prettier files to be skipped safely.
+  npx --no-install prettier --write --ignore-unknown -- "$file"
+  FORMAT_EXIT=$?
+  if [ $FORMAT_EXIT -ne 0 ]; then
+    echo "${RED}❌ Formatting failed for: $file${NC}"
+    exit 1
+  fi
+
+  # Re-stage in case Prettier updated the file.
+  git add -- "$file"
+
+  # Ensure Prettier didn't leave unstaged changes for this file.
+  if ! git diff --quiet -- "$file"; then
+    echo "${RED}❌ Formatting produced unstaged changes for: $file${NC}"
+    echo "This usually indicates the file has mixed staged/unstaged hunks or another process modified it."
+    echo "Please review the file, stage the intended changes, and try again."
+    exit 1
+  fi
+
+  FORMATTED_FILES="${FORMATTED_FILES}
+$file"
+done <<EOF
+$ALL_STAGED_FILES
+EOF
+
+if [ -n "$SKIPPED_PARTIAL_FILES" ]; then
+  echo "${YELLOW}⚠️  Skipped formatting for partially-staged files (to preserve partial commits):${NC}"
+  printf "%s\n" "$SKIPPED_PARTIAL_FILES" | sed '/^$/d' | sed 's/^/  - /'
+  echo "${YELLOW}    Tip: stage the whole file if you want it auto-formatted.${NC}"
 fi
 
 # Lint
