@@ -20,7 +20,7 @@ export interface ZardStringTemplateOutletContext {
 }
 
 @Directive({
-  selector: '[appZStringTemplateOutlet]',
+  selector: '[zStringTemplateOutlet]',
   exportAs: 'zStringTemplateOutlet',
 })
 export class ZardStringTemplateOutletDirective<T = unknown> implements OnDestroy {
@@ -35,8 +35,8 @@ export class ZardStringTemplateOutletDirective<T = unknown> implements OnDestroy
   #lastTemplateRef: TemplateRef<void> | null = null;
   #lastContext?: ZardStringTemplateOutletContext;
 
-  readonly appZStringTemplateOutletContext = input<ZardStringTemplateOutletContext | undefined>(undefined);
-  readonly appZStringTemplateOutlet = input.required<T | TemplateRef<void>>();
+  readonly zStringTemplateOutletContext = input<ZardStringTemplateOutletContext | undefined>(undefined);
+  readonly zStringTemplateOutlet = input.required<T | TemplateRef<void>>();
 
   #hasContextShapeChanged(context: ZardStringTemplateOutletContext | undefined): boolean {
     if (!context) {
@@ -90,8 +90,8 @@ export class ZardStringTemplateOutletDirective<T = unknown> implements OnDestroy
   }
 
   readonly #viewEffect: EffectRef = effect(() => {
-    const stringTemplateOutlet = this.appZStringTemplateOutlet();
-    const stringTemplateOutletContext = this.appZStringTemplateOutletContext();
+    const stringTemplateOutlet = this.zStringTemplateOutlet();
+    const stringTemplateOutletContext = this.zStringTemplateOutletContext();
 
     if (!this.#isFirstChange && isTemplateRef(stringTemplateOutlet)) {
       this.#isFirstChange = true;

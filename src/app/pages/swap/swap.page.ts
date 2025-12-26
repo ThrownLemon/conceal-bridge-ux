@@ -15,6 +15,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 import { isAddress, parseEther, parseUnits, type Hash } from 'viem';
 
+import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardCardComponent } from '@/shared/components/card/card.component';
+import { ZardIconComponent } from '@/shared/components/icon/icon.component';
+import { ZardInputDirective } from '@/shared/components/input/input.directive';
+
 import { BridgeApiService } from '../../core/bridge-api.service';
 import type {
   BridgeChainConfig,
@@ -72,21 +78,34 @@ const erc20Abi = [
 @Component({
   selector: 'app-swap-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink, QrCodeComponent, WalletButtonComponent],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    QrCodeComponent,
+    WalletButtonComponent,
+    ZardAlertComponent,
+    ZardButtonComponent,
+    ZardCardComponent,
+    ZardIconComponent,
+    ZardInputDirective,
+  ],
   template: `
     <div class="mx-auto max-w-3xl">
       <a
+        z-button
+        zType="ghost"
+        zSize="sm"
         routerLink="/"
-        class="text-sm font-medium text-[var(--cb-color-text-secondary)] hover:text-[var(--cb-color-text)]"
+        class="!px-0"
         aria-label="Back to home"
-        >← Back</a
       >
+        <z-icon zType="arrow-left" zSize="sm" />
+        Back
+      </a>
 
       <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div class="grid gap-1">
-          <h1
-            class="text-center text-3xl font-bold tracking-tight text-[var(--cb-color-text)] sm:text-4xl"
-          >
+          <h1 class="text-center text-3xl font-bold tracking-tight sm:text-4xl">
             @if (direction(); as d) {
               @if (d === 'ccx-to-evm') {
                 CCX → wCCX
@@ -97,7 +116,7 @@ const erc20Abi = [
               Swap
             }
           </h1>
-          <div class="text-sm text-[var(--cb-color-muted)]">
+          <div class="text-sm text-muted-foreground">
             @if (networkInfo(); as info) {
               Network: {{ info.label }}
             } @else {
@@ -112,64 +131,46 @@ const erc20Abi = [
       </div>
 
       @if (pageError(); as err) {
-        <div
-          class="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200"
-          role="alert"
-        >
-          {{ err }}
-        </div>
+        <z-alert class="mt-6" zType="destructive" [zTitle]="err" />
       }
 
       @if (statusMessage(); as msg) {
-        <div
-          class="mt-6 rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-4 text-sm text-[var(--cb-color-text)]"
-          aria-live="polite"
-        >
-          {{ msg }}
-        </div>
+        <z-alert class="mt-6" [zTitle]="msg" />
       }
 
       @if (direction(); as d) {
         @if (d === 'ccx-to-evm') {
           <ng-container [formGroup]="ccxToEvmForm">
             @if (step() === 0) {
-              <div
-                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              <z-card
+                class="mt-6"
+                zTitle="Step 1 — Pay gas & initialize"
+                zDescription="We'll estimate the required gas fee for your selected network and ask your wallet to send it."
               >
-                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">
-                  Step 1 — Pay gas &amp; initialize
-                </h2>
-                <p class="mt-1 text-sm text-[var(--cb-color-text-secondary)]">
-                  We’ll estimate the required gas fee for your selected network and ask your wallet
-                  to send it.
-                </p>
-
-                <div class="mt-5 grid gap-4">
+                <div class="grid gap-4">
                   <div class="grid gap-2">
-                    <label class="text-sm font-medium text-[var(--cb-color-text)]" for="ccxFrom"
-                      >Your CCX address</label
-                    >
+                    <label class="text-sm font-medium" for="ccxFrom">Your CCX address</label>
                     <input
+                      z-input
                       id="ccxFrom"
-                      class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 font-mono text-sm text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
+                      class="font-mono text-sm"
                       formControlName="ccxFromAddress"
                       placeholder="ccx…"
                       autocomplete="off"
                       spellcheck="false"
                       aria-label="Your CCX address"
                     />
-                    <p class="text-xs text-[var(--cb-color-muted)]">
+                    <p class="text-xs text-muted-foreground">
                       Used by the backend to associate the payment ID to your swap.
                     </p>
                   </div>
 
                   <div class="grid gap-2">
-                    <label class="text-sm font-medium text-[var(--cb-color-text)]" for="evmTo"
-                      >Your EVM address</label
-                    >
+                    <label class="text-sm font-medium" for="evmTo">Your EVM address</label>
                     <input
+                      z-input
                       id="evmTo"
-                      class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 font-mono text-sm text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
+                      class="font-mono text-sm"
                       formControlName="evmToAddress"
                       placeholder="0x…"
                       autocomplete="off"
@@ -178,19 +179,23 @@ const erc20Abi = [
                     />
                     <div class="flex flex-wrap gap-2">
                       <button
+                        z-button
+                        zType="outline"
+                        zSize="sm"
                         type="button"
-                        class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                         (click)="useConnectedWalletAsEvmTo()"
-                        [disabled]="!wallet.isConnected()"
+                        [zDisabled]="!wallet.isConnected()"
                         aria-label="Use connected wallet address"
                       >
                         Use connected wallet
                       </button>
                       <button
+                        z-button
+                        zType="outline"
+                        zSize="sm"
                         type="button"
-                        class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                         (click)="addTokenToWallet()"
-                        [disabled]="!wallet.isConnected() || !config()"
+                        [zDisabled]="!wallet.isConnected() || !config()"
                         aria-label="Add wCCX token to wallet"
                       >
                         Add wCCX token
@@ -200,194 +205,171 @@ const erc20Abi = [
 
                   <div class="grid gap-2 sm:grid-cols-2">
                     <div class="grid gap-2">
-                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="amount1"
-                        >Amount</label
-                      >
+                      <label class="text-sm font-medium" for="amount1">Amount</label>
                       <input
+                        z-input
                         id="amount1"
-                        class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-3 py-2 text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
                         formControlName="amount"
                         placeholder="0.0"
                         inputmode="decimal"
                         aria-label="Amount"
                       />
                       @if (config(); as cfg) {
-                        <p class="text-xs text-[var(--cb-color-muted)]">
+                        <p class="text-xs text-muted-foreground">
                           Min {{ cfg.common.minSwapAmount }} · Max {{ cfg.common.maxSwapAmount }}
                         </p>
                       }
                       @if (wccxSwapBalance() !== null) {
-                        <p class="text-xs text-[var(--cb-color-muted)]">
+                        <p class="text-xs text-muted-foreground">
                           Available wCCX liquidity: {{ wccxSwapBalance() }}
                         </p>
                       }
                     </div>
 
                     <div class="grid gap-2">
-                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="email1"
-                        >Email (optional)</label
-                      >
+                      <label class="text-sm font-medium" for="email1">Email (optional)</label>
                       <input
+                        z-input
                         id="email1"
-                        class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-3 py-2 text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
                         formControlName="email"
                         placeholder="you@example.com"
                         autocomplete="email"
                         aria-label="Email (optional)"
                       />
-                      <p class="text-xs text-[var(--cb-color-muted)]">
+                      <p class="text-xs text-muted-foreground">
                         Used only for notifications/support.
                       </p>
                     </div>
                   </div>
 
                   <button
+                    z-button
                     type="button"
-                    class="mt-2 inline-flex items-center justify-center rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 disabled:opacity-50"
+                    class="mt-2"
                     (click)="startCcxToEvm()"
-                    [disabled]="isBusy()"
+                    [zLoading]="isBusy()"
+                    [zDisabled]="isBusy()"
                     aria-label="Start swap"
                   >
                     Start swap
                   </button>
                 </div>
-              </div>
+              </z-card>
             } @else if (step() === 1) {
-              <div
-                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              <z-card
+                class="mt-6"
+                zTitle="Step 2 — Send CCX with payment ID"
+                zDescription="Send your CCX to the bridge address and include the payment ID shown below. We'll keep checking until it's received."
               >
-                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">
-                  Step 2 — Send CCX with payment ID
-                </h2>
-                <p class="mt-1 text-sm text-[var(--cb-color-text-secondary)]">
-                  Send your CCX to the bridge address and include the payment ID shown below. We’ll
-                  keep checking until it’s received.
-                </p>
-
-                <div class="mt-6 grid gap-6 sm:grid-cols-2">
+                <div class="grid gap-6 sm:grid-cols-2">
                   <div class="grid gap-3">
-                    <div class="text-sm font-medium text-[var(--cb-color-text)]">
-                      CCX deposit address
-                    </div>
+                    <div class="text-sm font-medium">CCX deposit address</div>
                     @if (config(); as cfg) {
-                      <div
-                        class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 font-mono text-xs text-[var(--cb-color-text)]"
-                      >
+                      <div class="rounded-xl border border-border bg-muted p-3 font-mono text-xs">
                         {{ cfg.ccx.accountAddress }}
                       </div>
                       <button
+                        z-button
+                        zType="outline"
+                        zSize="sm"
                         type="button"
-                        class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                         (click)="copy(cfg.ccx.accountAddress)"
                         aria-label="Copy CCX deposit address"
                       >
+                        <z-icon zType="copy" zSize="sm" />
                         Copy address
                       </button>
                       <app-qr-code [data]="cfg.ccx.accountAddress" alt="CCX deposit address QR" />
                     } @else {
-                      <div class="text-sm text-[var(--cb-color-muted)]">Loading…</div>
+                      <div class="text-sm text-muted-foreground">Loading…</div>
                     }
                   </div>
 
                   <div class="grid gap-3">
-                    <div class="text-sm font-medium text-[var(--cb-color-text)]">Payment ID</div>
-                    <div
-                      class="rounded-xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-3 font-mono text-xs text-[var(--cb-color-text)]"
-                    >
+                    <div class="text-sm font-medium">Payment ID</div>
+                    <div class="rounded-xl border border-border bg-muted p-3 font-mono text-xs">
                       {{ paymentId() }}
                     </div>
                     <button
+                      z-button
+                      zType="outline"
+                      zSize="sm"
                       type="button"
-                      class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                       (click)="copy(paymentId())"
-                      [disabled]="!paymentId()"
+                      [zDisabled]="!paymentId()"
                       aria-label="Copy payment ID"
                     >
+                      <z-icon zType="copy" zSize="sm" />
                       Copy payment ID
                     </button>
                     <app-qr-code [data]="paymentId()" alt="Payment ID QR" />
                   </div>
                 </div>
 
-                <div class="mt-6 flex flex-wrap gap-2">
+                <div card-footer class="mt-6">
                   <button
+                    z-button
+                    zType="outline"
+                    zSize="sm"
                     type="button"
-                    class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                     (click)="reset()"
-                    [disabled]="isBusy()"
+                    [zDisabled]="isBusy()"
                     aria-label="Start over"
                   >
                     Start over
                   </button>
                 </div>
-              </div>
+              </z-card>
             } @else {
-              <div
-                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
-              >
-                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">Complete</h2>
-                <p class="mt-1 text-sm text-[var(--cb-color-muted)]">
-                  Your swap has been processed.
-                </p>
+              <z-card class="mt-6" zTitle="Complete" zDescription="Your swap has been processed.">
                 @if (swapState(); as s) {
-                  <div class="mt-5 grid gap-3 text-sm text-[var(--cb-color-text)]">
+                  <div class="grid gap-3 text-sm">
                     <div>
                       Swapped: <span class="font-semibold">{{ s.txdata?.swaped }}</span>
                     </div>
                     <div>
                       Recipient:
-                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                      <span class="font-mono text-xs text-muted-foreground">{{
                         s.txdata?.address
                       }}</span>
                     </div>
                     <div>
                       Swap TX:
-                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                      <span class="font-mono text-xs text-muted-foreground">{{
                         s.txdata?.swapHash
                       }}</span>
                     </div>
                     <div>
                       Deposit TX:
-                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                      <span class="font-mono text-xs text-muted-foreground">{{
                         s.txdata?.depositHash
                       }}</span>
                     </div>
                   </div>
                 }
-                <div class="mt-6">
-                  <button
-                    type="button"
-                    class="rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80"
-                    (click)="reset()"
-                    aria-label="Start a new swap"
-                  >
+                <div card-footer class="mt-6">
+                  <button z-button type="button" (click)="reset()" aria-label="Start a new swap">
                     New swap
                   </button>
                 </div>
-              </div>
+              </z-card>
             }
           </ng-container>
         } @else {
           <ng-container [formGroup]="evmToCcxForm">
             @if (step() === 0) {
-              <div
-                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              <z-card
+                class="mt-6"
+                zTitle="Step 1 — Send wCCX"
+                zDescription="You'll send wCCX from your connected wallet to the bridge address."
               >
-                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">
-                  Step 1 — Send wCCX
-                </h2>
-                <p class="mt-1 text-sm text-[var(--cb-color-muted)]">
-                  You’ll send wCCX from your connected wallet to the bridge address.
-                </p>
-
-                <div class="mt-5 grid gap-4">
+                <div class="grid gap-4">
                   <div class="grid gap-2">
-                    <label class="text-sm font-medium text-[var(--cb-color-text)]" for="ccxTo"
-                      >Your CCX address</label
-                    >
+                    <label class="text-sm font-medium" for="ccxTo">Your CCX address</label>
                     <input
+                      z-input
                       id="ccxTo"
-                      class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 font-mono text-sm text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
+                      class="font-mono text-sm"
                       formControlName="ccxToAddress"
                       placeholder="ccx…"
                       autocomplete="off"
@@ -398,36 +380,32 @@ const erc20Abi = [
 
                   <div class="grid gap-2 sm:grid-cols-2">
                     <div class="grid gap-2">
-                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="amount2"
-                        >Amount</label
-                      >
+                      <label class="text-sm font-medium" for="amount2">Amount</label>
                       <input
+                        z-input
                         id="amount2"
-                        class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-3 py-2 text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
                         formControlName="amount"
                         placeholder="0.0"
                         inputmode="decimal"
                         aria-label="Amount"
                       />
                       @if (config(); as cfg) {
-                        <p class="text-xs text-[var(--cb-color-muted)]">
+                        <p class="text-xs text-muted-foreground">
                           Min {{ cfg.common.minSwapAmount }} · Max {{ cfg.common.maxSwapAmount }}
                         </p>
                       }
                       @if (ccxSwapBalance() !== null) {
-                        <p class="text-xs text-[var(--cb-color-muted)]">
+                        <p class="text-xs text-muted-foreground">
                           Available CCX liquidity: {{ ccxSwapBalance() }}
                         </p>
                       }
                     </div>
 
                     <div class="grid gap-2">
-                      <label class="text-sm font-medium text-[var(--cb-color-text)]" for="email2"
-                        >Email (optional)</label
-                      >
+                      <label class="text-sm font-medium" for="email2">Email (optional)</label>
                       <input
+                        z-input
                         id="email2"
-                        class="w-full rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-bg)] px-3 py-2 text-[var(--cb-color-text)] outline-none focus:border-[var(--cb-color-accent)] focus:ring-2 focus:ring-[var(--cb-color-accent)]/30"
                         formControlName="email"
                         placeholder="you@example.com"
                         autocomplete="email"
@@ -438,10 +416,12 @@ const erc20Abi = [
 
                   <div class="flex flex-wrap gap-2">
                     <button
+                      z-button
+                      zType="outline"
+                      zSize="sm"
                       type="button"
-                      class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                       (click)="addTokenToWallet()"
-                      [disabled]="!wallet.isConnected() || !config()"
+                      [zDisabled]="!wallet.isConnected() || !config()"
                       aria-label="Add wCCX token to wallet"
                     >
                       Add wCCX token
@@ -449,95 +429,82 @@ const erc20Abi = [
                   </div>
 
                   <button
+                    z-button
                     type="button"
-                    class="mt-2 inline-flex items-center justify-center rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80 disabled:opacity-50"
+                    class="mt-2"
                     (click)="startEvmToCcx()"
-                    [disabled]="isBusy()"
+                    [zLoading]="isBusy()"
+                    [zDisabled]="isBusy()"
                     aria-label="Start swap"
                   >
                     Start swap
                   </button>
                 </div>
-              </div>
+              </z-card>
             } @else if (step() === 1) {
-              <div
-                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
+              <z-card
+                class="mt-6"
+                zTitle="Processing"
+                zDescription="Deposit accepted. We're processing your swap."
               >
-                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">Processing</h2>
-                <p class="mt-1 text-sm text-[var(--cb-color-muted)]">
-                  Deposit accepted. We’re processing your swap.
-                </p>
-                <div class="mt-4 grid gap-3 text-sm text-[var(--cb-color-text)]">
+                <div class="grid gap-3 text-sm">
                   <div>
                     Payment ID:
-                    <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
-                      paymentId()
-                    }}</span>
+                    <span class="font-mono text-xs text-muted-foreground">{{ paymentId() }}</span>
                   </div>
                   <div>
                     EVM TX:
-                    <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
-                      evmTxHash()
-                    }}</span>
+                    <span class="font-mono text-xs text-muted-foreground">{{ evmTxHash() }}</span>
                   </div>
                 </div>
 
-                <div class="mt-6 flex flex-wrap gap-2">
+                <div card-footer class="mt-6">
                   <button
+                    z-button
+                    zType="outline"
+                    zSize="sm"
                     type="button"
-                    class="rounded-lg border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] px-3 py-2 text-xs font-medium text-[var(--cb-color-text)] hover:border-[var(--cb-color-border)]/50"
                     (click)="reset()"
-                    [disabled]="isBusy()"
+                    [zDisabled]="isBusy()"
                     aria-label="Start over"
                   >
                     Start over
                   </button>
                 </div>
-              </div>
+              </z-card>
             } @else {
-              <div
-                class="mt-6 rounded-2xl border border-[var(--cb-color-border)] bg-[var(--cb-color-surface)] p-5"
-              >
-                <h2 class="text-base font-semibold text-[var(--cb-color-text)]">Complete</h2>
-                <p class="mt-1 text-sm text-[var(--cb-color-muted)]">
-                  Your swap has been processed.
-                </p>
+              <z-card class="mt-6" zTitle="Complete" zDescription="Your swap has been processed.">
                 @if (swapState(); as s) {
-                  <div class="mt-5 grid gap-3 text-sm text-[var(--cb-color-text)]">
+                  <div class="grid gap-3 text-sm">
                     <div>
                       Swapped: <span class="font-semibold">{{ s.txdata?.swaped }}</span>
                     </div>
                     <div>
                       Recipient:
-                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                      <span class="font-mono text-xs text-muted-foreground">{{
                         s.txdata?.address
                       }}</span>
                     </div>
                     <div>
                       Swap TX:
-                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                      <span class="font-mono text-xs text-muted-foreground">{{
                         s.txdata?.swapHash
                       }}</span>
                     </div>
                     <div>
                       Deposit TX:
-                      <span class="font-mono text-xs text-[var(--cb-color-muted)]">{{
+                      <span class="font-mono text-xs text-muted-foreground">{{
                         s.txdata?.depositHash
                       }}</span>
                     </div>
                   </div>
                 }
-                <div class="mt-6">
-                  <button
-                    type="button"
-                    class="rounded-lg bg-[var(--cb-color-accent)] px-4 py-2 text-sm font-semibold text-black hover:bg-[var(--cb-color-accent)]/80"
-                    (click)="reset()"
-                    aria-label="Start a new swap"
-                  >
+                <div card-footer class="mt-6">
+                  <button z-button type="button" (click)="reset()" aria-label="Start a new swap">
                     New swap
                   </button>
                 </div>
-              </div>
+              </z-card>
             }
           </ng-container>
         }
