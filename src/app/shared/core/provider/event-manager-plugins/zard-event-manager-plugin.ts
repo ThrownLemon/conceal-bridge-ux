@@ -25,6 +25,11 @@ import { EventManagerPlugin } from '@angular/platform-browser';
  */
 export class ZardEventManagerPlugin extends EventManagerPlugin {
   #keywords = ['prevent', 'stop', 'stop-immediate', 'prevent-with-stop'];
+  #singleKeyAliases = new Map<string, string>([
+    ['enter', 'enter'],
+    ['escape', 'escape'],
+    ['space', ' '],
+  ]);
 
   override supports(eventName: string): boolean {
     return this.#keywords.some((keyword) => eventName.endsWith(`.${keyword}`));
@@ -89,6 +94,16 @@ export class ZardEventManagerPlugin extends EventManagerPlugin {
       } else if (keywords.includes(substring)) {
         keyword = substring;
         break;
+      } else if (
+        (event === 'keydown' || event === 'keyup' || event === 'keypress') &&
+        this.#singleKeyAliases.has(substring.toLowerCase())
+      ) {
+        // Support single-key filters like "keydown.enter.prevent" in addition to "{enter,space}" syntax.
+        const normalized = this.#singleKeyAliases.get(substring.toLowerCase());
+        if (normalized) {
+          keys = [...keys, normalized];
+        }
+        continue;
       } else if (!event) {
         event = substring;
       } else {
