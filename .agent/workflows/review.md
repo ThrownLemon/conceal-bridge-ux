@@ -64,7 +64,7 @@ To run the automated parts of this review:
 2. **Testing**:
 
    ```bash
-   npm test
+   ng test --no-watch
    ```
 
 3. **Build Check**:

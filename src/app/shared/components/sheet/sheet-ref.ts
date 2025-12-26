@@ -28,7 +28,11 @@ export class ZardSheetRef<T = unknown, R = unknown, U = unknown> {
     this.containerInstance?.cancelTriggered.subscribe(() => this.trigger(eTriggerAction.CANCEL));
     this.containerInstance?.okTriggered.subscribe(() => this.trigger(eTriggerAction.OK));
 
-    if ((this.config.zMaskClosable ?? true) && isPlatformBrowser(this.platformId) && this.overlayRef) {
+    if (
+      (this.config.zMaskClosable ?? true) &&
+      isPlatformBrowser(this.platformId) &&
+      this.overlayRef
+    ) {
       this.overlayRef
         .outsidePointerEvents()
         .pipe(takeUntil(this.destroy$))
