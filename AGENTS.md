@@ -10,6 +10,23 @@
 - ✅ Run quality gates before every commit: `npm run lint && npm test && npm run build`
 - ✅ Use conventional commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`
 
+### Quality Gate Anti-Patterns (STRICTLY FORBIDDEN)
+
+❌ **NEVER modify lint rules** to make code pass - fix the code instead
+❌ **NEVER add inline eslint-disable** comments to bypass errors
+❌ **NEVER modify eslint.config.js** or tsconfig.json to silence errors
+❌ **NEVER use `@ts-ignore`, `@ts-expect-error`, or `@ts-nocheck`**
+❌ **NEVER skip quality gates** to "save time"
+❌ **NEVER commit with failing tests** - fix the test or the code
+❌ **NEVER assume a build error is "harmless"** - all errors must be resolved
+
+### When Quality Gates Fail
+
+1. Read the error message carefully
+2. Understand **why** the rule exists (security, maintainability, consistency)
+3. Fix the actual code to satisfy the rule
+4. If the rule seems wrong for this case, discuss with the team first - don't disable it
+
 ### Web3 / Wallets
 
 - ❌ NEVER handle secrets (no private keys / seed phrases; never log them)
@@ -124,6 +141,32 @@ npm run build       # Production build (run AFTER lint/format)
 ```
 
 All gates MUST pass before pushing. Do not skip.
+
+### Quality Gate Anti-Patterns (STRICTLY FORBIDDEN)
+
+❌ **NEVER modify lint rules** to make code pass - fix the code instead
+❌ **NEVER add inline eslint-disable** comments to bypass errors
+❌ **NEVER modify eslint.config.js** or tsconfig.json to silence errors
+❌ **NEVER use `@ts-ignore`, `@ts-expect-error`, or `@ts-nocheck`**
+❌ **NEVER skip quality gates** to "save time"
+❌ **NEVER commit with failing tests** - fix the test or the code
+❌ **NEVER assume a build error is "harmless"** - all errors must be resolved
+
+### When Quality Gates Fail
+
+1. Read the error message carefully
+2. Understand **why** the rule exists (security, maintainability, consistency)
+3. Fix the actual code to satisfy the rule
+4. If the rule seems wrong for this case, discuss with the team first - don't disable it
+
+### Examples of Correct vs Incorrect Approaches
+
+| Incorrect (Shortcut) | Correct (Proper Fix) |
+|---------------------|---------------------|
+| Add `// eslint-disable-next-line` | Change code to satisfy the rule |
+| Modify `eslint.config.js` to disable rule | Fix the underlying code issue |
+| Cast with `as any` | Use proper type (`unknown`, `Record`, etc.) |
+| `@ts-ignore` on a line | Fix the type error properly |
 
 ---
 
