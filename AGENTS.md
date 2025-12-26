@@ -179,6 +179,13 @@ All gates MUST pass before pushing. Do not skip.
 - Use `inject()` function, not constructor injection
 - Private fields use `#` syntax (e.g., `#http`, `#walletService`)
 
+### UI Library (ZardUI)
+
+- Use ZardUI components for UI elements (buttons, inputs, etc.)
+- Directives follow camelCase naming (e.g., `zInput`, `zButton`)
+- Use `zType`, `zSize`, etc. for inputs instead of classes where possible
+- Refer to `src/app/shared/components/` for available components
+
 ### Signals (State Management)
 
 - Use `signal()`, `computed()`, `effect()` for state

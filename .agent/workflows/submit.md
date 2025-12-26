@@ -36,6 +36,8 @@ npm test            # All tests must pass
 npm run build       # Production build must succeed
 ```
 
+**Note**: These are automatically enforced by Husky pre-commit hooks. If any check fails, the commit will be blocked.
+
 **CRITICAL**: Run `npm run format` BEFORE `npm run build`. Formatting changes can trigger new lint/build errors.
 
 ### STRICTLY FORBIDDEN - Quality Gate Anti-Patterns

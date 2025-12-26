@@ -42,9 +42,11 @@ npm start         # Dev server at http://localhost:4200
 ## Tech Stack
 
 - **Framework**: Angular 21 (Standalone Components, Signals, OnPush)
+- **UI Library**: ZardUI (Shadcn-like components for Angular)
 - **Styling**: Tailwind CSS v4
 - **Web3**: Viem
 - **Testing**: Vitest + Playwright
+- **Quality**: ESLint + Prettier + Husky (Pre-commit hooks)
 
 ## Project Structure
 

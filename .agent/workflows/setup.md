@@ -20,6 +20,8 @@ description: Workflow to setup the development environment
 npm install
 ```
 
+Husky pre-commit hooks will be automatically installed via the `prepare` script.
+
 ### 2. Install Playwright Browsers (For E2E Testing)
 
 ```bash
