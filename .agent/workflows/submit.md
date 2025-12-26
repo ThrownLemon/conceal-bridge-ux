@@ -59,12 +59,12 @@ npm run build       # Production build must succeed
 
 ### Examples of Correct vs Incorrect Approaches
 
-| Incorrect (Shortcut) | Correct (Proper Fix) |
-|---------------------|---------------------|
-| Add `// eslint-disable-next-line` | Change code to satisfy the rule |
-| Modify `eslint.config.js` to disable rule | Fix the underlying code issue |
-| Cast with `as any` | Use proper type (`unknown`, `Record`, etc.) |
-| `@ts-ignore` on a line | Fix the type error properly |
+| Incorrect (Shortcut)                      | Correct (Proper Fix)                        |
+| ----------------------------------------- | ------------------------------------------- |
+| Add `// eslint-disable-next-line`         | Change code to satisfy the rule             |
+| Modify `eslint.config.js` to disable rule | Fix the underlying code issue               |
+| Cast with `as any`                        | Use proper type (`unknown`, `Record`, etc.) |
+| `@ts-ignore` on a line                    | Fix the type error properly                 |
 
 ## 3. Stage and Commit
 
