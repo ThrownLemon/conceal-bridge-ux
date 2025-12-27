@@ -56,6 +56,8 @@ Thumbs.db
 .jules/
 .Jules/
 .letta/
+.claude-flow/
+.swarm/
 
 # Playwright
 /test-results/

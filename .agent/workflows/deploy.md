@@ -219,14 +219,6 @@ Check `src/environments/environment.ts` is being used for production build.
 # - PR is merged to master (code changes)
 # - Push directly to master (docs/releases only)
 
-# Manual verification before merge
-npm run lint && npm test && npm run build
-npx http-server dist/conceal-bridge-ux/browser
-
-# Manual deploy (if GitHub Actions fails)
-npm run build
-npx gh-pages -d dist/conceal-bridge-ux/browser
-
 # Rollback (emergency - direct push allowed)
 git revert HEAD && git push origin master
 ```

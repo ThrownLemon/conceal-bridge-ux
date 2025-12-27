@@ -139,7 +139,7 @@ Run these before EVERY commit:
 ```bash
 npm run lint        # ESLint (fix: npm run lint:fix)
 npm run format      # Prettier formatting
-npm test --no-watch # Vitest unit tests (Single run)
+npm test            # Vitest unit tests (Single run)
 npm run build       # Production build (run AFTER lint/format)
 ```
 
@@ -317,7 +317,6 @@ bd close bd-42 --reason "Completed"                # Complete work
 | ------------ | ----------------------------------- |
 | `beads.md`   | Issue tracking with bd              |
 | `setup.md`   | Environment setup                   |
-| `test.md`    | Unit & E2E testing                  |
 | `review.md`  | Code review checklist               |
 | `cleanup.md` | Pre-commit verification             |
 | `submit.md`  | Commit and push (Landing the Plane) |
@@ -325,7 +324,6 @@ bd close bd-42 --reason "Completed"                # Complete work
 | `release.md` | Version releases                    |
 | `hotfix.md`  | Emergency production fixes          |
 | `update.md`  | Package updates                     |
-| `debug.md`   | Troubleshooting                     |
 
 ---
 

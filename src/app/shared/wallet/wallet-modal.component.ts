@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 
 import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
@@ -7,6 +7,14 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
 import { WalletModalService } from '../../core/wallet-modal.service';
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
+
+interface ConnectorOption {
+  id: WalletConnectorId;
+  name: string;
+  logo: string;
+  isAvailable: boolean;
+  installUrl: string;
+}
 
 @Component({
   selector: 'app-wallet-modal',
@@ -18,11 +26,7 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
         (click)="close()"
         (keydown.escape)="close()"
-        (keyup.escape)="close()"
-        (keyup.enter)="close()"
-        tabindex="0"
-        role="button"
-        aria-label="Close modal"
+        tabindex="-1"
       >
         <z-card
           class="w-full max-w-md"
@@ -83,7 +87,7 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
                   class="mt-2"
                   [href]="connectorInstallUrl(c)"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   aria-label="Install browser extension"
                 >
                   Install the Extension
@@ -130,65 +134,44 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
             }
 
             <div class="grid gap-3">
-              <button
-                z-button
-                zType="outline"
-                class="flex w-full items-center justify-between !px-4 !py-3"
-                (click)="selectConnector('metamask')"
-                aria-label="Connect with MetaMask"
-              >
-                <span class="flex items-center gap-3">
-                  <img
-                    class="h-7 w-7"
-                    src="images/wallets/metamask.png"
-                    alt="MetaMask logo"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span class="font-medium">MetaMask</span>
-                </span>
-                <span class="text-xs text-muted-foreground">Browser extension</span>
-              </button>
+              @for (option of connectorOptions(); track option.id) {
+                <div
+                  class="flex w-full items-center justify-between rounded-lg border border-slate-200 dark:border-slate-800 transition-colors"
+                >
+                  <button
+                    type="button"
+                    class="flex flex-1 items-center gap-3 px-4 py-3 rounded-l-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left"
+                    (click)="selectConnector(option.id)"
+                    [attr.aria-label]="'Connect with ' + option.name"
+                  >
+                    <img
+                      class="h-7 w-7"
+                      [src]="option.logo"
+                      [alt]="option.name + ' logo'"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span class="font-medium">{{ option.name }}</span>
+                  </button>
 
-              <button
-                z-button
-                zType="outline"
-                class="flex w-full items-center justify-between !px-4 !py-3"
-                (click)="selectConnector('trust')"
-                aria-label="Connect with Trust Wallet"
-              >
-                <span class="flex items-center gap-3">
-                  <img
-                    class="h-7 w-7"
-                    src="images/wallets/trustwallet.png"
-                    alt="Trust Wallet logo"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span class="font-medium">Trust Wallet</span>
-                </span>
-                <span class="text-xs text-muted-foreground">Browser extension</span>
-              </button>
-
-              <button
-                z-button
-                zType="outline"
-                class="flex w-full items-center justify-between !px-4 !py-3"
-                (click)="selectConnector('binance')"
-                aria-label="Connect with Binance Wallet"
-              >
-                <span class="flex items-center gap-3">
-                  <img
-                    class="h-7 w-7"
-                    src="images/wallets/binance.svg"
-                    alt="Binance logo"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span class="font-medium">Binance Wallet</span>
-                </span>
-                <span class="text-xs text-muted-foreground">Browser extension</span>
-              </button>
+                  @if (option.isAvailable) {
+                    <span class="px-4 py-3 text-xs text-emerald-500 font-medium">Available</span>
+                  } @else {
+                    <a
+                      z-button
+                      zType="ghost"
+                      zSize="sm"
+                      class="h-7 px-2 mr-2 text-xs"
+                      [href]="option.installUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      [attr.aria-label]="'Download ' + option.name + ' extension'"
+                    >
+                      Download
+                    </a>
+                  }
+                </div>
+              }
             </div>
           }
         </z-card>
@@ -197,8 +180,45 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
   `,
 })
 export class WalletModalComponent {
+  private static readonly CONNECTOR_METADATA: Record<
+    WalletConnectorId,
+    { name: string; logo: string; installUrl: string }
+  > = {
+    metamask: {
+      name: 'MetaMask',
+      logo: 'images/wallets/metamask.png',
+      installUrl: 'https://metamask.io/download/',
+    },
+    trust: {
+      name: 'Trust Wallet',
+      logo: 'images/wallets/trustwallet.png',
+      installUrl: 'https://trustwallet.com/download',
+    },
+    binance: {
+      name: 'Binance Wallet',
+      logo: 'images/wallets/binance.svg',
+      installUrl: 'https://www.binance.com/en/web3wallet',
+    },
+  };
+
+  private static readonly SUPPORTED_CONNECTORS: WalletConnectorId[] = [
+    'metamask',
+    'trust',
+    'binance',
+  ];
+
   readonly modalService = inject(WalletModalService);
   readonly wallet = inject(EvmWalletService);
+
+  readonly connectorOptions = computed<ConnectorOption[]>(() => {
+    return WalletModalComponent.SUPPORTED_CONNECTORS.map((id) => ({
+      id,
+      name: this.connectorName(id),
+      logo: this.connectorLogo(id),
+      isAvailable: this.wallet.isConnectorAvailable(id),
+      installUrl: this.connectorInstallUrl(id),
+    }));
+  });
 
   close(): void {
     this.modalService.close();
@@ -227,6 +247,7 @@ export class WalletModalComponent {
       await this.wallet.refreshChainId();
       this.modalService.close();
     } catch (e: unknown) {
+      console.error('[WalletModal] Connection failed:', e);
       const errorMessage = this.friendlyError(e);
       this.modalService.setError(errorMessage);
       // If we failed due to missing wallet, show install view.
@@ -246,30 +267,19 @@ export class WalletModalComponent {
     const raw = e instanceof Error ? e.message : 'Failed to connect wallet.';
     if (raw.includes('No injected EVM wallet'))
       return 'No wallet extension detected in this browser.';
-    if (raw.includes('No injected EVM wallet detected'))
-      return 'No wallet extension detected in this browser.';
     return raw;
   }
 
   connectorName(connector: WalletConnectorId): string {
-    if (connector === 'metamask') return 'MetaMask';
-    if (connector === 'trust') return 'Trust Wallet';
-    if (connector === 'binance') return 'Binance Wallet';
-    return 'WalletConnect';
+    return WalletModalComponent.CONNECTOR_METADATA[connector].name;
   }
 
   connectorLogo(connector: WalletConnectorId): string {
-    if (connector === 'metamask') return 'images/wallets/metamask.png';
-    if (connector === 'trust') return 'images/wallets/trustwallet.png';
-    if (connector === 'binance') return 'images/wallets/binance.svg';
-    return 'images/wallets/walletconnect.svg';
+    return WalletModalComponent.CONNECTOR_METADATA[connector].logo;
   }
 
   connectorInstallUrl(connector: WalletConnectorId): string {
-    if (connector === 'metamask') return 'https://metamask.io/download/';
-    if (connector === 'trust') return 'https://trustwallet.com/download';
-    if (connector === 'binance') return 'https://www.binance.com/en/web3wallet';
-    return 'https://walletconnect.com/';
+    return WalletModalComponent.CONNECTOR_METADATA[connector].installUrl;
   }
 
   connectorConnectingHint(connector: WalletConnectorId): string {
