@@ -136,15 +136,14 @@ interface ConnectorOption {
             <div class="grid gap-3">
               @for (option of connectorOptions(); track option.id) {
                 <div
-                  class="flex w-full items-center justify-between px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-colors"
-                  (click)="selectConnector(option.id)"
-                  (keydown.enter)="selectConnector(option.id)"
-                  (keydown.space)="selectConnector(option.id)"
-                  tabindex="0"
-                  role="button"
-                  [aria-label]="'Connect with ' + option.name"
+                  class="flex w-full items-center justify-between rounded-lg border border-slate-200 dark:border-slate-800 transition-colors"
                 >
-                  <span class="flex items-center gap-3">
+                  <button
+                    type="button"
+                    class="flex flex-1 items-center gap-3 px-4 py-3 rounded-l-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-left"
+                    (click)="selectConnector(option.id)"
+                    [attr.aria-label]="'Connect with ' + option.name"
+                  >
                     <img
                       class="h-7 w-7"
                       [src]="option.logo"
@@ -153,20 +152,19 @@ interface ConnectorOption {
                       decoding="async"
                     />
                     <span class="font-medium">{{ option.name }}</span>
-                  </span>
+                  </button>
 
                   @if (option.isAvailable) {
-                    <span class="text-xs text-emerald-500 font-medium">Available</span>
+                    <span class="px-4 py-3 text-xs text-emerald-500 font-medium">Available</span>
                   } @else {
                     <a
                       z-button
                       zType="ghost"
                       zSize="sm"
-                      class="h-7 px-2 text-xs"
+                      class="h-7 px-2 mr-2 text-xs"
                       [href]="option.installUrl"
                       target="_blank"
                       rel="noopener noreferrer"
-                      (click)="$event.stopPropagation()"
                     >
                       Download
                     </a>
@@ -181,12 +179,17 @@ interface ConnectorOption {
   `,
 })
 export class WalletModalComponent {
+  private static readonly SUPPORTED_CONNECTORS: WalletConnectorId[] = [
+    'metamask',
+    'trust',
+    'binance',
+  ];
+
   readonly modalService = inject(WalletModalService);
   readonly wallet = inject(EvmWalletService);
 
   readonly connectorOptions = computed<ConnectorOption[]>(() => {
-    const ids: WalletConnectorId[] = ['metamask', 'trust', 'binance'];
-    return ids.map((id) => ({
+    return WalletModalComponent.SUPPORTED_CONNECTORS.map((id) => ({
       id,
       name: this.connectorName(id),
       logo: this.connectorLogo(id),
