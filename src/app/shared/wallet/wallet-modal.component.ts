@@ -162,7 +162,7 @@ interface ConnectorOption {
                       z-button
                       zType="ghost"
                       zSize="sm"
-                      class="!h-7 !px-2 text-xs"
+                      class="h-7 px-2 text-xs"
                       [href]="option.installUrl"
                       target="_blank"
                       rel="noopener noreferrer"
