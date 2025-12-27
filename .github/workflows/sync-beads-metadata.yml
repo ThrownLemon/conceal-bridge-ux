@@ -1,0 +1,30 @@
+name: Sync Beads Metadata
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Full history
+
+      - name: Install bd
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
+
+      - name: Pull changes
+        run: |
+          git fetch origin beads-sync
+          bd sync --no-push
+
+      - name: Merge to main (if changes)
+        run: |
+          if bd sync --status | grep -q 'ahead'; then
+            bd sync --merge
+            git push origin main
+          fi
