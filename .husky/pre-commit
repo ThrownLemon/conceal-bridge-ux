@@ -133,7 +133,7 @@ fi
 
 # Tests
 echo "→ Running npm test..."
-npm test -- --no-watch
+npm test
 TEST_EXIT=$?
 
 if [ $TEST_EXIT -ne 0 ]; then

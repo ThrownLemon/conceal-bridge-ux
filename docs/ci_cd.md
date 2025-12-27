@@ -28,7 +28,7 @@ The workflow has two separate jobs for better organization and security:
 1. **Checkout** - Uses `actions/checkout@v4` to check out the repository code
 2. **Setup Node.js** - Uses `actions/setup-node@v4` with Node.js 22 and npm caching
 3. **Install Dependencies** - Runs `npm ci` for deterministic builds
-4. **Run Tests** - Runs `npm run test -- --run --reporter=verbose`
+4. **Run Tests** - Runs `npm run test`
 5. **Build Production Bundle** - Runs `npm run build`
 6. **Setup Pages** - Configures GitHub Pages using `actions/configure-pages@v4`
 7. **Upload Artifact** - Uploads the build output using `actions/upload-pages-artifact@v3`
@@ -168,7 +168,7 @@ npm run build
 
 **Solution:**
 
-1. Run tests with the same flags as CI: `npm run test -- --run`
+1. Run tests with the same flags as CI: `npm run test`
 2. Check for hardcoded paths or environment-specific code
 3. Review test logs in the Actions tab
 
@@ -183,24 +183,13 @@ Add a lint step:
   run: npm run lint
 ```
 
-Add this **before** the "Run tests" step.
-
-### Type Checking
-
-Add an explicit TypeScript type check:
-
-```yaml
-- name: Type check
-  run: npx tsc --noEmit
-```
-
 ### Build Size Analysis
 
 Add a step to check bundle size:
 
 ```yaml
 - name: Analyze bundle size
-  run: npm run build -- --stats-json
+  run: npm run build
 ```
 
 ## Branch Strategy
@@ -242,7 +231,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
-      - run: npm run test -- --run
+      - run: npm run test
       - run: npm run build
 ```
 

@@ -34,6 +34,7 @@ interface ConnectorOption {
           aria-modal="true"
           aria-label="Connect wallet"
           (click)="$event.stopPropagation()"
+          (keydown)="$event.stopPropagation()"
         >
           <div class="flex items-start justify-between gap-4 mb-4">
             <div class="flex items-center gap-2">
@@ -86,7 +87,7 @@ interface ConnectorOption {
                   class="mt-2"
                   [href]="connectorInstallUrl(c)"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   aria-label="Install browser extension"
                 >
                   Install the Extension
@@ -164,7 +165,7 @@ interface ConnectorOption {
                       class="!h-7 !px-2 text-xs"
                       [href]="option.installUrl"
                       target="_blank"
-                      rel="noopener"
+                      rel="noopener noreferrer"
                       (click)="$event.stopPropagation()"
                     >
                       Download
@@ -193,6 +194,7 @@ export class WalletModalComponent {
       installUrl: this.connectorInstallUrl(id),
     }));
   });
+
   close(): void {
     this.modalService.close();
   }

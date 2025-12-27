@@ -139,7 +139,7 @@ Run these before EVERY commit:
 ```bash
 npm run lint        # ESLint (fix: npm run lint:fix)
 npm run format      # Prettier formatting
-npm test --no-watch # Vitest unit tests (Single run)
+npm test            # Vitest unit tests (Single run)
 npm run build       # Production build (run AFTER lint/format)
 ```
 
