@@ -165,6 +165,7 @@ interface ConnectorOption {
                       [href]="option.installUrl"
                       target="_blank"
                       rel="noopener noreferrer"
+                      [attr.aria-label]="'Download ' + option.name + ' extension'"
                     >
                       Download
                     </a>
@@ -179,6 +180,27 @@ interface ConnectorOption {
   `,
 })
 export class WalletModalComponent {
+  private static readonly CONNECTOR_METADATA: Record<
+    WalletConnectorId,
+    { name: string; logo: string; installUrl: string }
+  > = {
+    metamask: {
+      name: 'MetaMask',
+      logo: 'images/wallets/metamask.png',
+      installUrl: 'https://metamask.io/download/',
+    },
+    trust: {
+      name: 'Trust Wallet',
+      logo: 'images/wallets/trustwallet.png',
+      installUrl: 'https://trustwallet.com/download',
+    },
+    binance: {
+      name: 'Binance Wallet',
+      logo: 'images/wallets/binance.svg',
+      installUrl: 'https://www.binance.com/en/web3wallet',
+    },
+  };
+
   private static readonly SUPPORTED_CONNECTORS: WalletConnectorId[] = [
     'metamask',
     'trust',
@@ -225,6 +247,7 @@ export class WalletModalComponent {
       await this.wallet.refreshChainId();
       this.modalService.close();
     } catch (e: unknown) {
+      console.error('[WalletModal] Connection failed:', e);
       const errorMessage = this.friendlyError(e);
       this.modalService.setError(errorMessage);
       // If we failed due to missing wallet, show install view.
@@ -244,30 +267,19 @@ export class WalletModalComponent {
     const raw = e instanceof Error ? e.message : 'Failed to connect wallet.';
     if (raw.includes('No injected EVM wallet'))
       return 'No wallet extension detected in this browser.';
-    if (raw.includes('No injected EVM wallet detected'))
-      return 'No wallet extension detected in this browser.';
     return raw;
   }
 
   connectorName(connector: WalletConnectorId): string {
-    if (connector === 'metamask') return 'MetaMask';
-    if (connector === 'trust') return 'Trust Wallet';
-    if (connector === 'binance') return 'Binance Wallet';
-    return 'WalletConnect';
+    return WalletModalComponent.CONNECTOR_METADATA[connector].name;
   }
 
   connectorLogo(connector: WalletConnectorId): string {
-    if (connector === 'metamask') return 'images/wallets/metamask.png';
-    if (connector === 'trust') return 'images/wallets/trustwallet.png';
-    if (connector === 'binance') return 'images/wallets/binance.svg';
-    return 'images/wallets/walletconnect.svg';
+    return WalletModalComponent.CONNECTOR_METADATA[connector].logo;
   }
 
   connectorInstallUrl(connector: WalletConnectorId): string {
-    if (connector === 'metamask') return 'https://metamask.io/download/';
-    if (connector === 'trust') return 'https://trustwallet.com/download';
-    if (connector === 'binance') return 'https://www.binance.com/en/web3wallet';
-    return 'https://walletconnect.com/';
+    return WalletModalComponent.CONNECTOR_METADATA[connector].installUrl;
   }
 
   connectorConnectingHint(connector: WalletConnectorId): string {
