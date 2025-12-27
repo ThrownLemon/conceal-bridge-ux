@@ -21,6 +21,13 @@ interface ConnectorOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ZardButtonComponent, ZardCardComponent, ZardAlertComponent, ZardIconComponent],
   template: `
+    <!-- Screen reader live region for wallet connection status -->
+    <div class="sr-only" aria-live="polite" aria-atomic="true">
+      @if (modalService.isConnecting()) {
+        Connecting to wallet, please check your wallet extension.
+      }
+    </div>
+
     @if (modalService.isOpen()) {
       <div
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
@@ -155,7 +162,10 @@ interface ConnectorOption {
                   </button>
 
                   @if (option.isAvailable) {
-                    <span class="px-4 py-3 text-xs text-emerald-500 font-medium">Available</span>
+                    <span
+                      class="px-4 py-3 text-xs text-emerald-700 dark:text-emerald-400 font-medium"
+                      >Available</span
+                    >
                   } @else {
                     <a
                       z-button

@@ -94,7 +94,10 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
               <div class="space-y-2 text-xs text-muted-foreground border-t border-border/50 pt-3">
                 <div class="flex justify-between">
                   <span>Status</span>
-                  <z-badge zType="outline" class="text-green-500 border-green-500/30">
+                  <z-badge
+                    zType="outline"
+                    class="text-green-700 dark:text-green-400 border-green-700/30 dark:border-green-400/30"
+                  >
                     Completed
                   </z-badge>
                 </div>
