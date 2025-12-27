@@ -91,7 +91,7 @@ $file"
   fi
 
   # Re-stage in case Prettier updated the file.
-  git add -- "$file"
+  git add -f -- "$file"
 
   # Ensure Prettier didn't leave unstaged changes for this file.
   if ! git diff --quiet -- "$file"; then
