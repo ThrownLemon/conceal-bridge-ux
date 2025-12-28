@@ -37,6 +37,10 @@ import { mergeClasses, transform } from '@/shared/utils/merge-classes';
     <!-- Dropdown Trigger -->
     <div
       class="trigger-container rounded-md outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+      role="button"
+      aria-haspopup="menu"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-disabled]="disabled() || null"
       (click)="toggle()"
       (keydown.{enter,space}.prevent)="toggle()"
       tabindex="0"

@@ -1,3 +1,4 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 
 import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
@@ -19,7 +20,13 @@ interface ConnectorOption {
 @Component({
   selector: 'app-wallet-modal',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ZardButtonComponent, ZardCardComponent, ZardAlertComponent, ZardIconComponent],
+  imports: [
+    A11yModule,
+    ZardButtonComponent,
+    ZardCardComponent,
+    ZardAlertComponent,
+    ZardIconComponent,
+  ],
   template: `
     @if (modalService.isOpen()) {
       <div
@@ -32,7 +39,9 @@ interface ConnectorOption {
           class="w-full max-w-md"
           role="dialog"
           aria-modal="true"
-          aria-label="Connect wallet"
+          aria-labelledby="wallet-modal-title"
+          cdkTrapFocus
+          [cdkTrapFocusAutoCapture]="true"
           (click)="$event.stopPropagation()"
           (keydown)="$event.stopPropagation()"
         >
@@ -49,7 +58,7 @@ interface ConnectorOption {
                   <z-icon zType="arrow-left" />
                 </button>
               }
-              <h2 class="text-xl font-semibold">
+              <h2 id="wallet-modal-title" class="text-xl font-semibold">
                 @if (modalService.activeConnector(); as c) {
                   {{ connectorName(c) }}
                 } @else {
@@ -60,6 +69,16 @@ interface ConnectorOption {
             <button z-button zType="ghost" zSize="sm" (click)="close()" aria-label="Close modal">
               <z-icon zType="x" />
             </button>
+          </div>
+
+          <!-- ARIA live region for status announcements -->
+          <div class="sr-only" aria-live="polite" aria-atomic="true">
+            @if (modalService.isConnecting()) {
+              Connecting to wallet, please check your wallet extension.
+            }
+            @if (modalService.error(); as err) {
+              Error: {{ err }}
+            }
           </div>
 
           @if (modalService.activeConnector(); as c) {

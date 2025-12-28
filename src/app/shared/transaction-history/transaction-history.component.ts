@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { A11yModule } from '@angular/cdk/a11y';
 import { DecimalPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { formatDistanceToNow } from 'date-fns';
 
 import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
@@ -13,6 +14,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
   selector: 'app-transaction-history',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    A11yModule,
     DecimalPipe,
     ZardBadgeComponent,
     ZardButtonComponent,
@@ -26,21 +28,39 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
         class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
         (click)="service.close()"
         (keydown.escape)="service.close()"
-        tabindex="0"
-        role="button"
-        aria-label="Close history"
+        tabindex="-1"
+        aria-hidden="true"
       ></div>
     }
 
     <!-- Sidebar -->
-    <div
+    <aside
       class="fixed top-0 right-0 z-50 h-full w-full max-w-md transform border-l border-border bg-background p-6 shadow-2xl transition-transform duration-300 ease-in-out sm:w-[400px]"
       [class.translate-x-0]="service.isOpen()"
       [class.translate-x-full]="!service.isOpen()"
+      [attr.aria-hidden]="!service.isOpen()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="transaction-history-title"
+      [cdkTrapFocus]="service.isOpen()"
+      [cdkTrapFocusAutoCapture]="service.isOpen()"
     >
+      <!-- ARIA live region for copy status -->
+      <div class="sr-only" aria-live="polite" aria-atomic="true">
+        @if (copyStatus(); as status) {
+          {{ status.status === 'copied' ? 'Hash copied to clipboard' : 'Failed to copy hash' }}
+        }
+      </div>
+
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-bold">Recent Activity</h2>
-        <button z-button zType="ghost" zSize="sm" (click)="service.close()">
+        <h2 id="transaction-history-title" class="text-xl font-bold">Recent Activity</h2>
+        <button
+          z-button
+          zType="ghost"
+          zSize="sm"
+          (click)="service.close()"
+          aria-label="Close transaction history"
+        >
           <span class="sr-only">Close</span>
           <z-icon zType="x" />
         </button>
@@ -145,7 +165,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
           }
         </div>
       }
-    </div>
+    </aside>
   `,
 })
 export class TransactionHistoryComponent {
