@@ -22,11 +22,11 @@ jobs:
       - name: Pull changes
         run: |
           git fetch origin beads-sync
-          bd sync --no-push
+          bd --no-db sync --no-push
 
       - name: Merge to main (if changes)
         run: |
-          if bd sync --status | grep -q 'ahead'; then
-            bd sync --merge
+          if bd --no-db sync --status | grep -q 'ahead'; then
+            bd --no-db sync --merge
             git push origin main
           fi
