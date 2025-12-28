@@ -568,15 +568,25 @@ export class SwapPage {
 
   /** Screen reader announcement for loading states */
   readonly loadingAnnouncement = computed(() => {
-    if (this.isBusy()) {
-      const dir = this.direction();
-      if (dir === 'ccx-to-evm') {
-        return this.step() === 0
-          ? 'Processing swap initialization, please wait.'
-          : 'Checking for deposit confirmation, please wait.';
-      }
-      return 'Processing transaction, please wait.';
+    const dir = this.direction();
+    if (!dir) {
+      return '';
     }
+
+    // Step 0: Initial processing (isBusy is true)
+    if (this.isBusy()) {
+      return dir === 'ccx-to-evm'
+        ? 'Processing swap initialization, please wait.'
+        : 'Processing transaction, please wait.';
+    }
+
+    // Step 1: Polling phase (isBusy is false, but still waiting)
+    if (this.step() === 1) {
+      return dir === 'ccx-to-evm'
+        ? 'Checking for deposit confirmation, please wait.'
+        : 'Processing swap, please wait.';
+    }
+
     return '';
   });
 
