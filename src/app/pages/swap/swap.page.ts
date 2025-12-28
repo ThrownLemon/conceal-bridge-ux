@@ -160,8 +160,27 @@ const erc20Abi = [
                       autocomplete="off"
                       spellcheck="false"
                       aria-label="Your CCX address"
+                      [attr.aria-invalid]="
+                        (ccxToEvmForm.controls.ccxFromAddress.invalid &&
+                          ccxToEvmForm.controls.ccxFromAddress.touched) ||
+                        null
+                      "
+                      [attr.aria-describedby]="
+                        ccxToEvmForm.controls.ccxFromAddress.invalid &&
+                        ccxToEvmForm.controls.ccxFromAddress.touched
+                          ? 'ccxFrom-error'
+                          : 'ccxFrom-hint'
+                      "
                     />
-                    <p class="text-xs text-muted-foreground">
+                    @if (
+                      ccxToEvmForm.controls.ccxFromAddress.invalid &&
+                      ccxToEvmForm.controls.ccxFromAddress.touched
+                    ) {
+                      <p id="ccxFrom-error" class="text-xs text-destructive" role="alert">
+                        Please enter a valid CCX address (starts with ccx or CCX).
+                      </p>
+                    }
+                    <p id="ccxFrom-hint" class="text-xs text-muted-foreground">
                       Used by the backend to associate the payment ID to your swap.
                     </p>
                   </div>
@@ -177,7 +196,26 @@ const erc20Abi = [
                       autocomplete="off"
                       spellcheck="false"
                       aria-label="Your EVM address"
+                      [attr.aria-invalid]="
+                        (ccxToEvmForm.controls.evmToAddress.invalid &&
+                          ccxToEvmForm.controls.evmToAddress.touched) ||
+                        null
+                      "
+                      [attr.aria-describedby]="
+                        ccxToEvmForm.controls.evmToAddress.invalid &&
+                        ccxToEvmForm.controls.evmToAddress.touched
+                          ? 'evmTo-error'
+                          : null
+                      "
                     />
+                    @if (
+                      ccxToEvmForm.controls.evmToAddress.invalid &&
+                      ccxToEvmForm.controls.evmToAddress.touched
+                    ) {
+                      <p id="evmTo-error" class="text-xs text-destructive" role="alert">
+                        Please enter a valid EVM address (starts with 0x).
+                      </p>
+                    }
                     <div class="flex flex-wrap gap-2">
                       <button
                         z-button
@@ -214,17 +252,37 @@ const erc20Abi = [
                         placeholder="0.0"
                         inputmode="decimal"
                         aria-label="Amount"
+                        [attr.aria-invalid]="
+                          (ccxToEvmForm.controls.amount.invalid &&
+                            ccxToEvmForm.controls.amount.touched) ||
+                          null
+                        "
+                        [attr.aria-describedby]="
+                          ccxToEvmForm.controls.amount.invalid &&
+                          ccxToEvmForm.controls.amount.touched
+                            ? 'amount1-error'
+                            : 'amount1-hint'
+                        "
                       />
-                      @if (config(); as cfg) {
-                        <p class="text-xs text-muted-foreground">
-                          Min {{ cfg.common.minSwapAmount }} · Max {{ cfg.common.maxSwapAmount }}
+                      @if (
+                        ccxToEvmForm.controls.amount.invalid && ccxToEvmForm.controls.amount.touched
+                      ) {
+                        <p id="amount1-error" class="text-xs text-destructive" role="alert">
+                          Please enter a valid amount.
                         </p>
                       }
-                      @if (wccxSwapBalance() !== null) {
-                        <p class="text-xs text-muted-foreground">
-                          Available wCCX liquidity: {{ wccxSwapBalance() }}
-                        </p>
-                      }
+                      <div id="amount1-hint">
+                        @if (config(); as cfg) {
+                          <p class="text-xs text-muted-foreground">
+                            Min {{ cfg.common.minSwapAmount }} · Max {{ cfg.common.maxSwapAmount }}
+                          </p>
+                        }
+                        @if (wccxSwapBalance() !== null) {
+                          <p class="text-xs text-muted-foreground">
+                            Available wCCX liquidity: {{ wccxSwapBalance() }}
+                          </p>
+                        }
+                      </div>
                     </div>
 
                     <div class="grid gap-2">
@@ -236,8 +294,25 @@ const erc20Abi = [
                         placeholder="you@example.com"
                         autocomplete="email"
                         aria-label="Email (optional)"
+                        [attr.aria-invalid]="
+                          (ccxToEvmForm.controls.email.invalid &&
+                            ccxToEvmForm.controls.email.touched) ||
+                          null
+                        "
+                        [attr.aria-describedby]="
+                          ccxToEvmForm.controls.email.invalid && ccxToEvmForm.controls.email.touched
+                            ? 'email1-error'
+                            : 'email1-hint'
+                        "
                       />
-                      <p class="text-xs text-muted-foreground">
+                      @if (
+                        ccxToEvmForm.controls.email.invalid && ccxToEvmForm.controls.email.touched
+                      ) {
+                        <p id="email1-error" class="text-xs text-destructive" role="alert">
+                          Please enter a valid email address.
+                        </p>
+                      }
+                      <p id="email1-hint" class="text-xs text-muted-foreground">
                         Used only for notifications/support.
                       </p>
                     </div>
@@ -376,7 +451,26 @@ const erc20Abi = [
                       autocomplete="off"
                       spellcheck="false"
                       aria-label="Your CCX address"
+                      [attr.aria-invalid]="
+                        (evmToCcxForm.controls.ccxToAddress.invalid &&
+                          evmToCcxForm.controls.ccxToAddress.touched) ||
+                        null
+                      "
+                      [attr.aria-describedby]="
+                        evmToCcxForm.controls.ccxToAddress.invalid &&
+                        evmToCcxForm.controls.ccxToAddress.touched
+                          ? 'ccxTo-error'
+                          : null
+                      "
                     />
+                    @if (
+                      evmToCcxForm.controls.ccxToAddress.invalid &&
+                      evmToCcxForm.controls.ccxToAddress.touched
+                    ) {
+                      <p id="ccxTo-error" class="text-xs text-destructive" role="alert">
+                        Please enter a valid CCX address (starts with ccx or CCX).
+                      </p>
+                    }
                   </div>
 
                   <div class="grid gap-2 sm:grid-cols-2">
@@ -389,17 +483,37 @@ const erc20Abi = [
                         placeholder="0.0"
                         inputmode="decimal"
                         aria-label="Amount"
+                        [attr.aria-invalid]="
+                          (evmToCcxForm.controls.amount.invalid &&
+                            evmToCcxForm.controls.amount.touched) ||
+                          null
+                        "
+                        [attr.aria-describedby]="
+                          evmToCcxForm.controls.amount.invalid &&
+                          evmToCcxForm.controls.amount.touched
+                            ? 'amount2-error'
+                            : 'amount2-hint'
+                        "
                       />
-                      @if (config(); as cfg) {
-                        <p class="text-xs text-muted-foreground">
-                          Min {{ cfg.common.minSwapAmount }} · Max {{ cfg.common.maxSwapAmount }}
+                      @if (
+                        evmToCcxForm.controls.amount.invalid && evmToCcxForm.controls.amount.touched
+                      ) {
+                        <p id="amount2-error" class="text-xs text-destructive" role="alert">
+                          Please enter a valid amount.
                         </p>
                       }
-                      @if (ccxSwapBalance() !== null) {
-                        <p class="text-xs text-muted-foreground">
-                          Available CCX liquidity: {{ ccxSwapBalance() }}
-                        </p>
-                      }
+                      <div id="amount2-hint">
+                        @if (config(); as cfg) {
+                          <p class="text-xs text-muted-foreground">
+                            Min {{ cfg.common.minSwapAmount }} · Max {{ cfg.common.maxSwapAmount }}
+                          </p>
+                        }
+                        @if (ccxSwapBalance() !== null) {
+                          <p class="text-xs text-muted-foreground">
+                            Available CCX liquidity: {{ ccxSwapBalance() }}
+                          </p>
+                        }
+                      </div>
                     </div>
 
                     <div class="grid gap-2">
@@ -411,7 +525,24 @@ const erc20Abi = [
                         placeholder="you@example.com"
                         autocomplete="email"
                         aria-label="Email (optional)"
+                        [attr.aria-invalid]="
+                          (evmToCcxForm.controls.email.invalid &&
+                            evmToCcxForm.controls.email.touched) ||
+                          null
+                        "
+                        [attr.aria-describedby]="
+                          evmToCcxForm.controls.email.invalid && evmToCcxForm.controls.email.touched
+                            ? 'email2-error'
+                            : null
+                        "
                       />
+                      @if (
+                        evmToCcxForm.controls.email.invalid && evmToCcxForm.controls.email.touched
+                      ) {
+                        <p id="email2-error" class="text-xs text-destructive" role="alert">
+                          Please enter a valid email address.
+                        </p>
+                      }
                     </div>
                   </div>
 

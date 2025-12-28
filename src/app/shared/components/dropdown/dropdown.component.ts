@@ -36,7 +36,7 @@ import { mergeClasses, transform } from '@/shared/utils/merge-classes';
   template: `
     <!-- Dropdown Trigger -->
     <div
-      class="trigger-container"
+      class="trigger-container rounded-md outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]"
       role="button"
       aria-haspopup="menu"
       [attr.aria-expanded]="isOpen()"
