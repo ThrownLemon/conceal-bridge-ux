@@ -15,18 +15,19 @@ jobs:
         with:
           fetch-depth: 0 # Full history
 
-      - name: Install bd
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
-
-      - name: Pull changes
+      - name: Check for beads-sync changes
+        id: check
         run: |
           git fetch origin beads-sync
-          bd --no-db sync --no-push
+          # Check if beads-sync has commits not on master
+          AHEAD=$(git rev-list --count origin/master..origin/beads-sync 2>/dev/null || echo "0")
+          echo "ahead=$AHEAD" >> $GITHUB_OUTPUT
+          echo "beads-sync is $AHEAD commits ahead of master"
 
-      - name: Merge to main (if changes)
+      - name: Merge beads-sync to master
+        if: steps.check.outputs.ahead != '0'
         run: |
-          if bd --no-db sync --status | grep -q 'ahead'; then
-            bd --no-db sync --merge
-            git push origin main
-          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git merge origin/beads-sync --no-edit -m "chore: sync beads metadata from beads-sync branch"
+          git push origin master
