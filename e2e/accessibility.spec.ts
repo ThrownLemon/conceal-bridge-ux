@@ -7,8 +7,8 @@ const MAX_TAB_PRESSES = 10;
 /** Minimum expected focusable elements on the home page */
 const MIN_EXPECTED_FOCUSABLE_ELEMENTS = 3;
 
-/** Dark mode background color (slate-950) in OKLCH format (Tailwind v4) */
-const DARK_MODE_BG_COLOR = 'oklch(0.145 0 0)';
+/** Dark mode background color (slate-950) */
+const DARK_MODE_BG_COLOR = 'rgb(2, 6, 23)';
 
 /**
  * Runs axe-core accessibility analysis and logs any violations.
