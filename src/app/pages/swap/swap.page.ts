@@ -91,6 +91,11 @@ const erc20Abi = [
   ],
   template: `
     <div class="mx-auto max-w-3xl">
+      <!-- Screen reader live region for loading announcements -->
+      <div class="sr-only" aria-live="polite" aria-atomic="true">
+        {{ loadingAnnouncement() }}
+      </div>
+
       <a z-button zType="ghost" zSize="sm" routerLink="/" class="!px-0" aria-label="Back to home">
         <z-icon zType="arrow-left" zSize="sm" />
         Back
@@ -691,6 +696,30 @@ export class SwapPage {
   readonly statusMessage = signal<string | null>(null);
   readonly balanceFetchError = signal<string | null>(null);
   readonly pollingError = signal<string | null>(null);
+
+  /** Screen reader announcement for loading states */
+  readonly loadingAnnouncement = computed(() => {
+    const dir = this.direction();
+    if (!dir) {
+      return '';
+    }
+
+    // Step 0: Initial processing (isBusy is true)
+    if (this.isBusy()) {
+      return dir === 'ccx-to-evm'
+        ? 'Processing swap initialization, please wait.'
+        : 'Processing transaction, please wait.';
+    }
+
+    // Step 1: Polling phase (isBusy is false, but still waiting)
+    if (this.step() === 1) {
+      return dir === 'ccx-to-evm'
+        ? 'Checking for deposit confirmation, please wait.'
+        : 'Processing swap, please wait.';
+    }
+
+    return '';
+  });
 
   // Track polling subscription to cancel previous ones when starting new polling
   readonly #pollingCancel$ = new Subject<void>();
