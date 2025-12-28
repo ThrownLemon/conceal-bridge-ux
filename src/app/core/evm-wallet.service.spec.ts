@@ -89,6 +89,18 @@ describe('EvmWalletService', () => {
     return fn as ReturnType<typeof vi.fn>;
   }
 
+  // Helper to reconfigure TestBed with new providers and inject the service
+  // Reduces boilerplate when testing with different window configurations
+  function reconfigureAndInjectService(
+    ethereum: MockProvider | null = null,
+    binanceChain: MockProvider | null = null,
+  ): EvmWalletService {
+    setupWindow(ethereum, binanceChain);
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [EvmWalletService] });
+    return TestBed.inject(EvmWalletService);
+  }
+
   beforeEach(() => {
     vi.clearAllMocks();
     originalWindow = globalThis.window;
@@ -154,10 +166,7 @@ describe('EvmWalletService', () => {
     });
 
     it('hasInjectedProvider should return true when ethereum exists', () => {
-      setupWindow(mockProvider);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(mockProvider);
       expect(service.hasInjectedProvider()).toBe(true);
     });
 
@@ -166,10 +175,7 @@ describe('EvmWalletService', () => {
     });
 
     it('hasBinanceProvider should return true when BinanceChain exists', () => {
-      setupWindow(null, mockBinanceProvider);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(null, mockBinanceProvider);
       expect(service.hasBinanceProvider()).toBe(true);
     });
 
@@ -193,42 +199,27 @@ describe('EvmWalletService', () => {
     });
 
     it('should return true for metamask when isMetaMask flag is set', () => {
-      setupWindow(createMockProvider({ isMetaMask: true }));
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(createMockProvider({ isMetaMask: true }));
       expect(service.isConnectorAvailable('metamask')).toBe(true);
     });
 
     it('should return false for metamask when isMetaMask is false', () => {
-      setupWindow(createMockProvider({ isMetaMask: false }));
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(createMockProvider({ isMetaMask: false }));
       expect(service.isConnectorAvailable('metamask')).toBe(false);
     });
 
     it('should return true for trust when isTrust flag is set', () => {
-      setupWindow(createMockProvider({ isTrust: true }));
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(createMockProvider({ isTrust: true }));
       expect(service.isConnectorAvailable('trust')).toBe(true);
     });
 
     it('should return true for trust when isTrustWallet flag is set', () => {
-      setupWindow(createMockProvider({ isTrustWallet: true }));
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(createMockProvider({ isTrustWallet: true }));
       expect(service.isConnectorAvailable('trust')).toBe(true);
     });
 
     it('should return true for trust when not MetaMask (fallback)', () => {
-      setupWindow(createMockProvider({ isMetaMask: false }));
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(createMockProvider({ isMetaMask: false }));
       expect(service.isConnectorAvailable('trust')).toBe(true);
     });
 
@@ -238,10 +229,7 @@ describe('EvmWalletService', () => {
     });
 
     it('should return true for binance when BinanceChain exists', () => {
-      setupWindow(null, mockBinanceProvider);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(null, mockBinanceProvider);
       expect(service.isConnectorAvailable('binance')).toBe(true);
     });
   });
@@ -262,10 +250,10 @@ describe('EvmWalletService', () => {
       TestBed.configureTestingModule({ providers: [EvmWalletService] });
       service = TestBed.inject(EvmWalletService);
 
-      // Wait for hydrate to complete
-      await new Promise((resolve) => setTimeout(resolve, 10));
-
-      expect(service.address()).toBeNull();
+      // Flush the hydrate() Promise called in constructor using Vitest's flush
+      await vi.waitFor(() => {
+        expect(service.address()).toBeNull();
+      });
     });
 
     it('should set address when disconnectedByUser is false', async () => {
@@ -273,10 +261,10 @@ describe('EvmWalletService', () => {
       TestBed.configureTestingModule({ providers: [EvmWalletService] });
       service = TestBed.inject(EvmWalletService);
 
-      // Wait for hydrate to complete
-      await new Promise((resolve) => setTimeout(resolve, 10));
-
-      expect(service.address()).toBe(mockAddress);
+      // Flush the hydrate() Promise called in constructor using Vitest's flush
+      await vi.waitFor(() => {
+        expect(service.address()).toBe(mockAddress);
+      });
     });
 
     it('should set chainId from provider', async () => {
@@ -284,17 +272,13 @@ describe('EvmWalletService', () => {
       TestBed.configureTestingModule({ providers: [EvmWalletService] });
       service = TestBed.inject(EvmWalletService);
 
-      await new Promise((resolve) => setTimeout(resolve, 10));
-
-      expect(service.chainId()).toBe(1);
+      await vi.waitFor(() => {
+        expect(service.chainId()).toBe(1);
+      });
     });
 
     it('should not fail when no provider available', async () => {
-      setupWindow(null);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
-
+      service = reconfigureAndInjectService(null);
       await expect(service.hydrate()).resolves.not.toThrow();
     });
 
@@ -344,11 +328,7 @@ describe('EvmWalletService', () => {
     });
 
     it('should throw when no injected provider', async () => {
-      setupWindow(null);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
-
+      service = reconfigureAndInjectService(null);
       await expect(service.connect()).rejects.toThrow('No injected EVM wallet detected.');
     });
 
@@ -408,10 +388,10 @@ describe('EvmWalletService', () => {
     });
 
     it('should throw when MetaMask not detected for metamask connector', async () => {
-      setupWindow(createMockProvider({ isMetaMask: false }), mockBinanceProvider);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(
+        createMockProvider({ isMetaMask: false }),
+        mockBinanceProvider,
+      );
 
       await expect(service.connectWith('metamask')).rejects.toThrow(
         'MetaMask not detected. Please install MetaMask or choose another wallet.',
@@ -419,10 +399,7 @@ describe('EvmWalletService', () => {
     });
 
     it('should throw when Binance Wallet not detected', async () => {
-      setupWindow(mockProvider, null);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(mockProvider, null);
 
       await expect(service.connectWith('binance')).rejects.toThrow(
         'Binance Wallet not detected in this browser.',
@@ -430,10 +407,9 @@ describe('EvmWalletService', () => {
     });
 
     it('should throw when Trust not detected and MetaMask is present', async () => {
-      setupWindow(createMockProvider({ isMetaMask: true, isTrust: false }));
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(
+        createMockProvider({ isMetaMask: true, isTrust: false }),
+      );
 
       await expect(service.connectWith('trust')).rejects.toThrow(
         'Trust Wallet not detected. Please install Trust Wallet or choose another wallet.',
@@ -580,11 +556,7 @@ describe('EvmWalletService', () => {
     });
 
     it('should throw when no provider available', async () => {
-      setupWindow(null);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
-
+      service = reconfigureAndInjectService(null);
       await expect(service.ensureChain(mainnet)).rejects.toThrow(
         'No EVM wallet provider available.',
       );
@@ -652,11 +624,7 @@ describe('EvmWalletService', () => {
     });
 
     it('should throw when no provider available', async () => {
-      setupWindow(null);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
-
+      service = reconfigureAndInjectService(null);
       await expect(service.sendNativeTransaction(txParams)).rejects.toThrow(
         'No EVM wallet provider available.',
       );
@@ -665,10 +633,7 @@ describe('EvmWalletService', () => {
 
   describe('getClients', () => {
     beforeEach(() => {
-      setupWindow(mockProvider);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(mockProvider);
     });
 
     it('should return walletClient and publicClient', () => {
@@ -678,11 +643,7 @@ describe('EvmWalletService', () => {
     });
 
     it('should throw when no provider available', () => {
-      setupWindow(null);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
-
+      service = reconfigureAndInjectService(null);
       expect(() => service.getClients(mainnet)).toThrow('No EVM wallet provider available.');
     });
   });
@@ -720,11 +681,7 @@ describe('EvmWalletService', () => {
     });
 
     it('should throw when no provider available', async () => {
-      setupWindow(null);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
-
+      service = reconfigureAndInjectService(null);
       await expect(service.watchErc20Asset(assetParams)).rejects.toThrow(
         'No EVM wallet provider available.',
       );
@@ -733,16 +690,13 @@ describe('EvmWalletService', () => {
 
   describe('refreshChainId', () => {
     beforeEach(() => {
-      setupWindow(mockProvider);
       asMock(mockProvider.request).mockImplementation(async (args: { method: string }) => {
         if (args.method === 'eth_chainId') return '0x38';
         if (args.method === 'eth_accounts') return [];
         return null;
       });
 
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
+      service = reconfigureAndInjectService(mockProvider);
     });
 
     it('should update chainId from provider', async () => {
@@ -753,15 +707,12 @@ describe('EvmWalletService', () => {
     it('should handle invalid chainId gracefully', async () => {
       asMock(mockProvider.request).mockResolvedValue('invalid');
       await service.refreshChainId();
-      // Should not throw, chainId might be NaN which gets filtered
+      // Invalid hex string results in NaN which should be filtered out
+      expect(service.chainId()).toBeNull();
     });
 
     it('should not fail when no provider', async () => {
-      setupWindow(null);
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({ providers: [EvmWalletService] });
-      service = TestBed.inject(EvmWalletService);
-
+      service = reconfigureAndInjectService(null);
       await expect(service.refreshChainId()).resolves.not.toThrow();
     });
   });
