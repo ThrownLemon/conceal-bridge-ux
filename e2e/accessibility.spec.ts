@@ -7,8 +7,8 @@ const MAX_TAB_PRESSES = 10;
 /** Minimum expected focusable elements on the home page */
 const MIN_EXPECTED_FOCUSABLE_ELEMENTS = 3;
 
-/** Dark mode background color (slate-950) */
-const DARK_MODE_BG_COLOR = 'rgb(2, 6, 23)';
+/** Dark mode background color (oklch format from Tailwind v4) */
+const DARK_MODE_BG_COLOR = 'oklch(0.145 0 0)';
 
 /**
  * Runs axe-core accessibility analysis and logs any violations.
@@ -59,22 +59,34 @@ test.describe('Accessibility', () => {
     await checkAccessibility(page, 'dark mode');
   });
 
-  test('skip link is functional', async ({ page }) => {
+  test('skip link is functional', async ({ page, browserName }) => {
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
 
-    // Tab to the skip link
-    await page.keyboard.press('Tab');
-
-    // Verify skip link is visible when focused
     const skipLink = page.locator('a[href="#main-content"]');
-    await expect(skipLink).toBeFocused();
+
+    // Note: Safari/WebKit requires "Press Tab to highlight each item on a webpage"
+    // to be enabled in Safari Preferences > Advanced for links to be tabbable.
+    // This is a browser setting, not an accessibility bug. We test keyboard navigation
+    // in Chromium/Firefox, and verify skip link functionality in WebKit via direct focus.
+    if (browserName !== 'webkit') {
+      // Skip link should be the first focusable element when tabbing
+      await page.keyboard.press('Tab');
+      await expect(skipLink).toBeFocused({ timeout: 5000 });
+      // Skip link should become visible when focused (moves from -top-40 to top-4)
+      await expect(skipLink).toBeVisible();
+    } else {
+      // WebKit: Directly focus the skip link to test its functionality
+      await skipLink.focus();
+      await expect(skipLink).toBeFocused({ timeout: 5000 });
+    }
 
     // Activate skip link
     await page.keyboard.press('Enter');
 
     // Verify focus moved to main content
     const mainContent = page.locator('#main-content');
-    await expect(mainContent).toBeFocused();
+    await expect(mainContent).toBeFocused({ timeout: 5000 });
   });
 
   test('interactive elements are keyboard accessible', async ({ page }) => {
