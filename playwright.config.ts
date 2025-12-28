@@ -32,7 +32,7 @@ export default defineConfig({
 
   /* Run local dev server before starting the tests */
   webServer: {
-    command: 'npx serve -s dist/conceal-bridge-ux/browser -l 4200',
+    command: 'npm start',
     url: 'http://localhost:4200',
     reuseExistingServer: !process.env['CI'],
     timeout: 120000,
