@@ -65,27 +65,23 @@ test.describe('Accessibility', () => {
 
     const skipLink = page.locator('a[href="#main-content"]');
 
-    // Verify skip link is keyboard-accessible by tabbing to it
-    // Note: WebKit/Safari has a known issue where sr-only elements may not be in
-    // the tab order. We test keyboard navigation in chromium/firefox, and still
-    // verify the skip link works functionally in webkit via direct focus.
+    // Note: Safari/WebKit requires "Press Tab to highlight each item on a webpage"
+    // to be enabled in Safari Preferences > Advanced for links to be tabbable.
+    // This is a browser setting, not an accessibility bug. We test keyboard navigation
+    // in Chromium/Firefox, and verify skip link functionality in WebKit via direct focus.
     if (browserName !== 'webkit') {
-      let foundViaTab = false;
-      for (let i = 0; i < MAX_TAB_PRESSES; i++) {
-        await page.keyboard.press('Tab');
-        if (await skipLink.evaluate((el) => el === document.activeElement)) {
-          foundViaTab = true;
-          break;
-        }
-      }
-      expect(foundViaTab).toBe(true);
+      // Skip link should be the first focusable element when tabbing
+      await page.keyboard.press('Tab');
+      await expect(skipLink).toBeFocused({ timeout: 5000 });
+      // Skip link should become visible when focused (moves from -top-40 to top-4)
+      await expect(skipLink).toBeVisible();
     } else {
-      // WebKit: Use direct focus to test skip link functionality
+      // WebKit: Directly focus the skip link to test its functionality
       await skipLink.focus();
       await expect(skipLink).toBeFocused({ timeout: 5000 });
     }
 
-    // Activate skip link (skip link should now be focused)
+    // Activate skip link
     await page.keyboard.press('Enter');
 
     // Verify focus moved to main content
