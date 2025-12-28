@@ -32,7 +32,8 @@ export default defineConfig({
 
   /* Run local dev server before starting the tests */
   webServer: {
-    command: 'npx serve -s dist/conceal-bridge-ux/browser -l 4200',
+    // Use ng serve for proper SPA routing (no base-href in dev mode)
+    command: 'npx ng serve --port 4200',
     url: 'http://localhost:4200',
     reuseExistingServer: !process.env['CI'],
     timeout: 120000,
