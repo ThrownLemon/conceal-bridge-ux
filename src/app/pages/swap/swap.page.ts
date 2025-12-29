@@ -33,7 +33,22 @@ import { EVM_NETWORKS } from '../../core/evm-networks';
 import { EvmWalletService } from '../../core/evm-wallet.service';
 import { TransactionHistoryService } from '../../core/transaction-history.service';
 import { QrCodeComponent } from '../../shared/qr-code/qr-code.component';
+import { BackoffManager, type BackoffConfig } from '../../core/utils/backoff';
 import { WalletButtonComponent } from '../../shared/wallet/wallet-button.component';
+
+/** Polling configuration with exponential backoff on errors. */
+const POLLING_CONFIG = {
+  /** Interval between successful polls in milliseconds. */
+  successInterval: 10_000,
+  /** Backoff configuration for retry after errors. */
+  backoff: {
+    baseDelay: 2_000,
+    maxDelay: 30_000,
+    maxRetries: 5,
+    jitter: true,
+    jitterFactor: 0.2,
+  } satisfies Partial<BackoffConfig>,
+};
 
 const CCX_ADDRESS_RE = /^[Cc][Cc][Xx][a-zA-Z0-9]{95}$/;
 const EVM_ADDRESS_RE = /^0x[a-fA-F0-9]{40}$/;
@@ -723,7 +738,7 @@ export class SwapPage {
 
   // Track polling subscription to cancel previous ones when starting new polling
   readonly #pollingCancel$ = new Subject<void>();
-  #pollingErrorCount = 0;
+  #backoffManager: BackoffManager | null = null;
 
   readonly ccxToEvmForm = this.#fb.group({
     ccxFromAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
@@ -1142,57 +1157,106 @@ export class SwapPage {
   startPolling(network: EvmNetworkKey, direction: 'wccx' | 'ccx', paymentId: string): void {
     // Cancel any previous polling before starting new one
     this.#pollingCancel$.next();
-    this.#pollingErrorCount = 0;
+    this.#backoffManager = new BackoffManager(POLLING_CONFIG.backoff);
     this.pollingError.set(null);
 
-    timer(0, 10_000)
-      .pipe(
+    // Helper to schedule next poll with appropriate delay
+    const schedulePoll = (delayMs: number) =>
+      timer(delayMs).pipe(
         switchMap(() =>
           this.api.checkSwapState(network, direction, paymentId).pipe(
-            catchError(() => {
-              this.#pollingErrorCount++;
-              if (this.#pollingErrorCount >= 3) {
-                this.pollingError.set(
-                  `Unable to check swap status. Your transaction may still be processing. ` +
-                    `Save your payment ID for support: ${paymentId}`,
-                );
-              }
-              return of({ result: false } as BridgeSwapStateResponse);
-            }),
+            catchError(() => of(null)), // Convert error to null response
           ),
         ),
-        filter((r) => {
-          if (r.result === true) {
-            this.#pollingErrorCount = 0;
-            this.pollingError.set(null);
-            return true;
-          }
-          return false;
-        }),
+        takeUntil(this.#pollingCancel$),
+        takeUntilDestroyed(this.#destroyRef),
+      );
+
+    // Start with immediate poll (delay 0)
+    schedulePoll(0).subscribe((response) =>
+      this.#handlePollResponse(response, network, direction, paymentId),
+    );
+  }
+
+  /** Handles a poll response, scheduling the next poll if needed. */
+  #handlePollResponse(
+    response: BridgeSwapStateResponse | null,
+    network: EvmNetworkKey,
+    direction: 'wccx' | 'ccx',
+    paymentId: string,
+  ): void {
+    const backoff = this.#backoffManager;
+    if (!backoff) return;
+
+    // Handle error (null response)
+    if (!response) {
+      const nextDelay = backoff.nextDelay();
+
+      if (backoff.isExhausted()) {
+        this.pollingError.set(
+          `Unable to check swap status after ${backoff.maxRetries} attempts. ` +
+            `Your transaction may still be processing. ` +
+            `Save your payment ID for support: ${paymentId}`,
+        );
+        return; // Stop polling
+      }
+
+      this.pollingError.set(
+        `Temporary connection issue. Retrying in ${Math.round(nextDelay / 1000)}s...`,
+      );
+
+      // Schedule retry with backoff delay
+      timer(nextDelay)
+        .pipe(
+          switchMap(() =>
+            this.api.checkSwapState(network, direction, paymentId).pipe(catchError(() => of(null))),
+          ),
+          take(1),
+          takeUntil(this.#pollingCancel$),
+          takeUntilDestroyed(this.#destroyRef),
+        )
+        .subscribe((r) => this.#handlePollResponse(r, network, direction, paymentId));
+      return;
+    }
+
+    // Reset backoff on successful API response
+    backoff.reset();
+    this.pollingError.set(null);
+
+    // Check if swap is complete
+    if (response.result === true) {
+      this.swapState.set(response);
+      this.step.set(2);
+      this.statusMessage.set('Payment received!');
+
+      // Add to history
+      if (response.txdata) {
+        this.historyService.addTransaction({
+          id: paymentId,
+          timestamp: Date.now(),
+          amount: response.txdata.swaped,
+          direction: direction === 'wccx' ? 'ccx-to-evm' : 'evm-to-ccx',
+          network,
+          status: 'completed',
+          depositHash: response.txdata.depositHash,
+          swapHash: response.txdata.swapHash,
+          recipientAddress: response.txdata.address,
+        });
+      }
+      return; // Stop polling
+    }
+
+    // Schedule next poll with standard interval
+    timer(POLLING_CONFIG.successInterval)
+      .pipe(
+        switchMap(() =>
+          this.api.checkSwapState(network, direction, paymentId).pipe(catchError(() => of(null))),
+        ),
         take(1),
         takeUntil(this.#pollingCancel$),
         takeUntilDestroyed(this.#destroyRef),
       )
-      .subscribe((state) => {
-        this.swapState.set(state);
-        this.step.set(2);
-        this.statusMessage.set('Payment received!');
-
-        // Add to history
-        if (state.txdata) {
-          this.historyService.addTransaction({
-            id: paymentId,
-            timestamp: Date.now(),
-            amount: state.txdata.swaped,
-            direction: direction === 'wccx' ? 'ccx-to-evm' : 'evm-to-ccx',
-            network,
-            status: 'completed',
-            depositHash: state.txdata.depositHash,
-            swapHash: state.txdata.swapHash,
-            recipientAddress: state.txdata.address,
-          });
-        }
-      });
+      .subscribe((r) => this.#handlePollResponse(r, network, direction, paymentId));
   }
 
   async copy(text: string): Promise<void> {
