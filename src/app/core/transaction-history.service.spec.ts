@@ -8,11 +8,13 @@ const STORAGE_KEY = 'conceal_bridge_tx_history';
 describe('TransactionHistoryService', () => {
   let service: TransactionHistoryService;
   let mockLocalStorage: Record<string, string>;
+  let txCounter: number;
 
   function createMockTransaction(overrides: Partial<StoredTransaction> = {}): StoredTransaction {
+    txCounter++;
     return {
-      id: `tx-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      timestamp: Date.now(),
+      id: `tx-${txCounter}`,
+      timestamp: 1704067200000 + txCounter,
       amount: 100,
       direction: 'ccx-to-evm',
       network: 'eth',
@@ -34,6 +36,7 @@ describe('TransactionHistoryService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocalStorage = {};
+    txCounter = 0;
     setupLocalStorage();
 
     TestBed.configureTestingModule({
@@ -46,18 +49,19 @@ describe('TransactionHistoryService', () => {
   });
 
   describe('initialization', () => {
-    it('should be created', () => {
+    beforeEach(() => {
       service = TestBed.inject(TransactionHistoryService);
+    });
+
+    it('should be created', () => {
       expect(service).toBeTruthy();
     });
 
     it('should start with empty transactions when localStorage is empty', () => {
-      service = TestBed.inject(TransactionHistoryService);
       expect(service.transactions()).toEqual([]);
     });
 
     it('should start with isOpen as false', () => {
-      service = TestBed.inject(TransactionHistoryService);
       expect(service.isOpen()).toBe(false);
     });
 
@@ -125,6 +129,21 @@ describe('TransactionHistoryService', () => {
       expect(() => service.addTransaction(createMockTransaction())).not.toThrow();
       expect(warnSpy).toHaveBeenCalledWith('Failed to save transaction history', expect.any(Error));
     });
+
+    it('should handle localStorage.getItem throwing', () => {
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('SecurityError: localStorage is not available');
+      });
+
+      const warnSpy = vi.spyOn(console, 'warn').mockReturnValue(undefined);
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [TransactionHistoryService] });
+      service = TestBed.inject(TransactionHistoryService);
+
+      expect(service.transactions()).toEqual([]);
+      expect(warnSpy).toHaveBeenCalledWith('Failed to load transaction history', expect.any(Error));
+    });
   });
 
   describe('addTransaction', () => {
@@ -166,10 +185,7 @@ describe('TransactionHistoryService', () => {
       const tx = createMockTransaction({ id: 'persist-tx' });
       service.addTransaction(tx);
 
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        STORAGE_KEY,
-        expect.stringContaining('persist-tx'),
-      );
+      expect(localStorage.setItem).toHaveBeenCalledWith(STORAGE_KEY, JSON.stringify([tx]));
     });
 
     it('should preserve transaction properties correctly', () => {
