@@ -6,7 +6,7 @@
 
 - ❌ NEVER stop before pushing - work is incomplete until `git push` succeeds
 - ❌ NEVER say "ready to push when you are" - YOU must push
-- ❌ NEVER create markdown TODO lists - use bd (beads) for all task tracking
+- ✅ Use GitHub Issues for task tracking
 - ✅ Run quality gates before every commit: `npm run lint && npm test && npm run build`
 - ✅ Use conventional commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`
 
@@ -77,9 +77,6 @@ git push -u origin feature/your-feature-name
 
 # 5. Create PR
 gh pr create --title "feat: your change" --body "Description of changes"
-
-# 6. Update bd issue (if applicable)
-bd close <issue-id>
 ```
 
 ### What "Complete" Means
@@ -268,54 +265,10 @@ const amount = parseFloat(userInput) * 1_000_000; // NO!
 
 ---
 
-## Issue Tracking (bd)
-
-Use **bd (beads)** for ALL task tracking. No markdown TODOs.
-
-### Quick Reference
-
-```bash
-bd ready --json                                    # Check for work
-bd create "Title" -t bug|feature|task -p 0-4       # Create issue
-bd update bd-42 --status in_progress               # Claim work
-bd close bd-42 --reason "Completed"                # Complete work
-```
-
-### Issue Types
-
-| Type      | Use For                     |
-| --------- | --------------------------- |
-| `bug`     | Something broken            |
-| `feature` | New functionality           |
-| `task`    | Tests, docs, refactoring    |
-| `epic`    | Large feature with subtasks |
-| `chore`   | Dependencies, tooling       |
-
-### Priorities
-
-| Priority | Meaning                                       |
-| -------- | --------------------------------------------- |
-| `0`      | Critical (security, data loss, broken builds) |
-| `1`      | High (major features, important bugs)         |
-| `2`      | Medium (default)                              |
-| `3`      | Low (polish, optimization)                    |
-| `4`      | Backlog (future ideas)                        |
-
-### Rules
-
-- ✅ Always use `--json` flag for programmatic use
-- ✅ Check `bd ready` before asking "what should I work on?"
-- ✅ Link discovered work with `--deps discovered-from:bd-123`
-- ❌ Do NOT create markdown TODO lists
-- ❌ Do NOT use external issue trackers
-
----
-
 ## Workflows (.agent/workflows/)
 
 | Workflow     | Purpose                             |
 | ------------ | ----------------------------------- |
-| `beads.md`   | Issue tracking with bd              |
 | `setup.md`   | Environment setup                   |
 | `review.md`  | Code review checklist               |
 | `cleanup.md` | Pre-commit verification             |

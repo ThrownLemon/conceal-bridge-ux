@@ -69,5 +69,3 @@ playwright-report/
 .swarm/memory.db-shm
 .claude-flow/metrics/system-metrics.json
 
-# bv (beads viewer) local config and caches
-.bv/

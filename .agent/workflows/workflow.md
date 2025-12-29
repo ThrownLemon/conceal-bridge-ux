@@ -8,7 +8,7 @@ description: Project workflow
 
 ## Development Cycle
 
-1. **Start**: Check for work with `beads.md` workflow
+1. **Start**: Check GitHub Issues for work
 2. **Setup**: Use `setup.md` if environment needs configuration
 3. **Develop**: Implement features, fix bugs
 4. **Test**: Run `npm test` to verify changes
@@ -20,7 +20,6 @@ description: Project workflow
 
 | Workflow     | When to Use                    |
 | ------------ | ------------------------------ |
-| `beads.md`   | Check or manage issues with bd |
 | `setup.md`   | Initial environment setup      |
 | `review.md`  | Code quality checklist         |
 | `cleanup.md` | Pre-commit verification        |

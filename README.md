@@ -89,7 +89,7 @@ See [docs/deployment.md](docs/deployment.md) for manual deployment and rollback 
 
 - **Workflow**: Feature branches → PR → merge to master
 - **Commits**: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`)
-- **Issues**: [bd (beads)](https://github.com/steveyegge/beads) - `bd ready` to see open work
+- **Issues**: GitHub Issues - `gh issue list` to see open work
 
 For AI agents and developers: See [AGENTS.md](AGENTS.md) for critical rules and workflows.
 
