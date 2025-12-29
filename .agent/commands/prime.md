@@ -8,8 +8,8 @@
 
 - Prefer **Angular CLI MCP** for Angular-project analysis and refactors instead of running raw shell commands. Failback to web search if needed.
 - Prefer **Context7 MCP** for up-to-date library docs and code examples (resolve library ID first). Failback to web search if needed.
-- Use **GitHub MCP** for repository analysis, searching code/issues, and managing PRs/issues.
-- Use **SearXNG MCP** for external web searches and reading content from URLs.
+- Prefer **GitHub MCP** for repository analysis, searching code/issues, and managing PRs/issues.
+- Prefer **Native Search Tool** for external web searches and reading content from URLs.
 - Use any other tool you have available to you as required (e.g., built-in browser).
 
 ## Common Commands
