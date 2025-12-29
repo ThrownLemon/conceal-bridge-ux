@@ -5,8 +5,7 @@
  * problems when multiple clients retry failed requests simultaneously.
  */
 
-import { Observable, timer, throwError, of, type OperatorFunction } from 'rxjs';
-import { mergeMap, retryWhen, scan, delayWhen } from 'rxjs/operators';
+import { retry, timer, type OperatorFunction } from 'rxjs';
 
 /** Configuration options for exponential backoff. */
 export interface BackoffConfig {
@@ -34,11 +33,16 @@ export const DEFAULT_BACKOFF_CONFIG: BackoffConfig = {
 /**
  * Calculates the delay for a given retry attempt using exponential backoff.
  *
- * Formula: min(maxDelay, baseDelay * 2^attempt) + jitter
+ * Base formula: min(maxDelay, baseDelay * 2^attempt)
+ * With jitter (if enabled): base delay +/- random variance within jitterFactor%
+ *
+ * The jitter adds randomness in the range [-jitterFactor%, +jitterFactor%] of the
+ * calculated delay to prevent thundering herd problems when multiple clients retry
+ * simultaneously.
  *
  * @param attempt - The current retry attempt (0-indexed)
  * @param config - Backoff configuration
- * @returns Delay in milliseconds
+ * @returns Delay in milliseconds (never negative)
  */
 export function calculateBackoffDelay(
   attempt: number,
@@ -93,30 +97,15 @@ export interface BackoffState {
 export function retryWithBackoff<T>(config: Partial<BackoffConfig> = {}): OperatorFunction<T, T> {
   const fullConfig = { ...DEFAULT_BACKOFF_CONFIG, ...config };
 
-  return (source: Observable<T>) =>
-    source.pipe(
-      retryWhen((errors) =>
-        errors.pipe(
-          scan<unknown, BackoffState>(
-            (state, error) => {
-              const attempt = state.attempt + 1;
-              const exhausted = attempt >= fullConfig.maxRetries;
-              const delay = exhausted ? 0 : calculateBackoffDelay(attempt, fullConfig);
-
-              return { attempt, error, delay, exhausted };
-            },
-            { attempt: -1, error: null, delay: 0, exhausted: false },
-          ),
-          mergeMap((state) => {
-            if (state.exhausted) {
-              return throwError(() => state.error);
-            }
-            return of(state);
-          }),
-          delayWhen((state) => timer(state.delay)),
-        ),
-      ),
-    );
+  return retry<T>({
+    count: fullConfig.maxRetries,
+    delay: (_error, retryCount) => {
+      // retry operator uses 1-based indexing, calculateBackoffDelay expects 0-based
+      const attempt = retryCount - 1;
+      const delay = calculateBackoffDelay(attempt, fullConfig);
+      return timer(delay);
+    },
+  });
 }
 
 /**
@@ -136,8 +125,9 @@ export function retryWithBackoff<T>(config: Partial<BackoffConfig> = {}): Operat
  *       backoff.reset();
  *       return result;
  *     } catch (error) {
- *       const delay = backoff.nextDelay();
- *       await sleep(delay);
+ *       const delay = backoff.nextDelay(error);
+ *       if (delay === -1) break;
+ *       await new Promise(resolve => setTimeout(resolve, delay));
  *     }
  *   }
  *   throw new Error('Max retries exceeded');
@@ -174,14 +164,21 @@ export class BackoffManager {
   }
 
   /**
-   * Records an error and returns the delay before the next retry.
+   * Advances the backoff state and returns the delay before the next retry.
    *
-   * @param error - The error that occurred
+   * IMPORTANT: This method increments the internal attempt counter as a side effect.
+   * Call this once per retry attempt, whether or not you provide an error.
+   *
+   * @param error - Optional error to record for debugging/diagnostics
    * @returns Delay in milliseconds, or -1 if retries are exhausted
    */
   nextDelay(error?: unknown): number {
     if (error !== undefined) {
       this.#lastError = error;
+      console.error('[BackoffManager] Error captured:', {
+        error: error instanceof Error ? error.message : String(error),
+        attempt: this.#attempt,
+      });
     }
 
     if (this.isExhausted()) {

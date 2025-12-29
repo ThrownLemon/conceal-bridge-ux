@@ -775,8 +775,15 @@ export class SwapPage {
       .pipe(
         switchMap((network) =>
           this.api.getChainConfig(network).pipe(
-            catchError((e: unknown) => {
-              const msg = e instanceof Error ? e.message : 'Failed to load bridge configuration.';
+            catchError((error: unknown) => {
+              console.error('[SwapPage] Failed to load config:', {
+                network,
+                error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined,
+              });
+
+              const msg =
+                error instanceof Error ? error.message : 'Failed to load bridge configuration.';
               this.pageError.set(msg);
               return of(null);
             }),
@@ -796,7 +803,11 @@ export class SwapPage {
       .pipe(
         switchMap((network) =>
           this.api.getCcxSwapBalance(network).pipe(
-            catchError(() => {
+            catchError((error: unknown) => {
+              console.error('[SwapPage] Failed to fetch balance:', {
+                network,
+                error: error instanceof Error ? error.message : String(error),
+              });
               this.balanceFetchError.set(
                 'Unable to verify available liquidity. Proceed with caution.',
               );
@@ -816,7 +827,11 @@ export class SwapPage {
       .pipe(
         switchMap((network) =>
           this.api.getWccxSwapBalance(network).pipe(
-            catchError(() => {
+            catchError((error: unknown) => {
+              console.error('[SwapPage] Failed to fetch wCCX balance:', {
+                network,
+                error: error instanceof Error ? error.message : String(error),
+              });
               this.balanceFetchError.set(
                 'Unable to verify available liquidity. Proceed with caution.',
               );
@@ -893,6 +908,7 @@ export class SwapPage {
   reset(): void {
     // Cancel any active polling when resetting
     this.#pollingCancel$.next();
+    this.#backoffManager = null;
     this.step.set(0);
     this.isBusy.set(false);
     this.paymentId.set('');
@@ -1160,22 +1176,38 @@ export class SwapPage {
     this.#backoffManager = new BackoffManager(POLLING_CONFIG.backoff);
     this.pollingError.set(null);
 
-    // Helper to schedule next poll with appropriate delay
-    const schedulePoll = (delayMs: number) =>
-      timer(delayMs).pipe(
+    // Start with immediate poll (delay 0)
+    this.#scheduleNextPoll(0, network, direction, paymentId);
+  }
+
+  /** Schedules the next poll with the given delay. */
+  #scheduleNextPoll(
+    delayMs: number,
+    network: EvmNetworkKey,
+    direction: 'wccx' | 'ccx',
+    paymentId: string,
+  ): void {
+    timer(delayMs)
+      .pipe(
         switchMap(() =>
           this.api.checkSwapState(network, direction, paymentId).pipe(
-            catchError(() => of(null)), // Convert error to null response
+            catchError((error: unknown) => {
+              console.error('[SwapPage] Polling error:', {
+                network,
+                direction,
+                paymentId,
+                error: error instanceof Error ? error.message : String(error),
+                attempt: this.#backoffManager?.attempt ?? 0,
+              });
+              return of(null);
+            }),
           ),
         ),
+        take(1),
         takeUntil(this.#pollingCancel$),
         takeUntilDestroyed(this.#destroyRef),
-      );
-
-    // Start with immediate poll (delay 0)
-    schedulePoll(0).subscribe((response) =>
-      this.#handlePollResponse(response, network, direction, paymentId),
-    );
+      )
+      .subscribe((response) => this.#handlePollResponse(response, network, direction, paymentId));
   }
 
   /** Handles a poll response, scheduling the next poll if needed. */
@@ -1190,32 +1222,32 @@ export class SwapPage {
 
     // Handle error (null response)
     if (!response) {
-      const nextDelay = backoff.nextDelay();
-
+      // Check exhaustion BEFORE calling nextDelay to ensure all retries are scheduled
       if (backoff.isExhausted()) {
+        const lastErr = backoff.lastError;
+        console.error('[SwapPage] Polling exhausted after max retries:', {
+          network,
+          direction,
+          paymentId,
+          attempts: backoff.maxRetries,
+          lastError: lastErr instanceof Error ? lastErr.message : String(lastErr),
+        });
+
         this.pollingError.set(
           `Unable to check swap status after ${backoff.maxRetries} attempts. ` +
             `Your transaction may still be processing. ` +
             `Save your payment ID for support: ${paymentId}`,
         );
-        return; // Stop polling
+        return;
       }
 
+      const nextDelay = backoff.nextDelay();
       this.pollingError.set(
         `Temporary connection issue. Retrying in ${Math.round(nextDelay / 1000)}s...`,
       );
 
       // Schedule retry with backoff delay
-      timer(nextDelay)
-        .pipe(
-          switchMap(() =>
-            this.api.checkSwapState(network, direction, paymentId).pipe(catchError(() => of(null))),
-          ),
-          take(1),
-          takeUntil(this.#pollingCancel$),
-          takeUntilDestroyed(this.#destroyRef),
-        )
-        .subscribe((r) => this.#handlePollResponse(r, network, direction, paymentId));
+      this.#scheduleNextPoll(nextDelay, network, direction, paymentId);
       return;
     }
 
@@ -1243,20 +1275,11 @@ export class SwapPage {
           recipientAddress: response.txdata.address,
         });
       }
-      return; // Stop polling
+      return;
     }
 
     // Schedule next poll with standard interval
-    timer(POLLING_CONFIG.successInterval)
-      .pipe(
-        switchMap(() =>
-          this.api.checkSwapState(network, direction, paymentId).pipe(catchError(() => of(null))),
-        ),
-        take(1),
-        takeUntil(this.#pollingCancel$),
-        takeUntilDestroyed(this.#destroyRef),
-      )
-      .subscribe((r) => this.#handlePollResponse(r, network, direction, paymentId));
+    this.#scheduleNextPoll(POLLING_CONFIG.successInterval, network, direction, paymentId);
   }
 
   async copy(text: string): Promise<void> {
@@ -1269,7 +1292,10 @@ export class SwapPage {
       await new Promise((r) => setTimeout(r, 1200));
       // Only clear if it wasn't replaced by another message.
       if (this.statusMessage() === 'Copied to clipboard.') this.statusMessage.set(null);
-    } catch {
+    } catch (error: unknown) {
+      console.warn('[SwapPage] Clipboard copy failed:', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       this.statusMessage.set('Copy failed (clipboard unavailable).');
     }
   }
