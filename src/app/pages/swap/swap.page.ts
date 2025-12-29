@@ -33,7 +33,22 @@ import { EVM_NETWORKS } from '../../core/evm-networks';
 import { EvmWalletService } from '../../core/evm-wallet.service';
 import { TransactionHistoryService } from '../../core/transaction-history.service';
 import { QrCodeComponent } from '../../shared/qr-code/qr-code.component';
+import { BackoffManager, type BackoffConfig } from '../../core/utils/backoff';
 import { WalletButtonComponent } from '../../shared/wallet/wallet-button.component';
+
+/** Polling configuration with exponential backoff on errors. */
+const POLLING_CONFIG = {
+  /** Interval between successful polls in milliseconds. */
+  successInterval: 10_000,
+  /** Backoff configuration for retry after errors. */
+  backoff: {
+    baseDelay: 2_000,
+    maxDelay: 30_000,
+    maxRetries: 5,
+    jitter: true,
+    jitterFactor: 0.2,
+  } satisfies Partial<BackoffConfig>,
+};
 
 const CCX_ADDRESS_RE = /^[Cc][Cc][Xx][a-zA-Z0-9]{95}$/;
 const EVM_ADDRESS_RE = /^0x[a-fA-F0-9]{40}$/;
@@ -723,7 +738,7 @@ export class SwapPage {
 
   // Track polling subscription to cancel previous ones when starting new polling
   readonly #pollingCancel$ = new Subject<void>();
-  #pollingErrorCount = 0;
+  #backoffManager: BackoffManager | null = null;
 
   readonly ccxToEvmForm = this.#fb.group({
     ccxFromAddress: this.#fb.control('', [Validators.required, Validators.pattern(CCX_ADDRESS_RE)]),
@@ -760,8 +775,15 @@ export class SwapPage {
       .pipe(
         switchMap((network) =>
           this.api.getChainConfig(network).pipe(
-            catchError((e: unknown) => {
-              const msg = e instanceof Error ? e.message : 'Failed to load bridge configuration.';
+            catchError((error: unknown) => {
+              console.error('[SwapPage] Failed to load config:', {
+                network,
+                error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined,
+              });
+
+              const msg =
+                error instanceof Error ? error.message : 'Failed to load bridge configuration.';
               this.pageError.set(msg);
               return of(null);
             }),
@@ -781,7 +803,11 @@ export class SwapPage {
       .pipe(
         switchMap((network) =>
           this.api.getCcxSwapBalance(network).pipe(
-            catchError(() => {
+            catchError((error: unknown) => {
+              console.error('[SwapPage] Failed to fetch balance:', {
+                network,
+                error: error instanceof Error ? error.message : String(error),
+              });
               this.balanceFetchError.set(
                 'Unable to verify available liquidity. Proceed with caution.',
               );
@@ -801,7 +827,11 @@ export class SwapPage {
       .pipe(
         switchMap((network) =>
           this.api.getWccxSwapBalance(network).pipe(
-            catchError(() => {
+            catchError((error: unknown) => {
+              console.error('[SwapPage] Failed to fetch wCCX balance:', {
+                network,
+                error: error instanceof Error ? error.message : String(error),
+              });
               this.balanceFetchError.set(
                 'Unable to verify available liquidity. Proceed with caution.',
               );
@@ -878,6 +908,7 @@ export class SwapPage {
   reset(): void {
     // Cancel any active polling when resetting
     this.#pollingCancel$.next();
+    this.#backoffManager = null;
     this.step.set(0);
     this.isBusy.set(false);
     this.paymentId.set('');
@@ -1142,57 +1173,113 @@ export class SwapPage {
   startPolling(network: EvmNetworkKey, direction: 'wccx' | 'ccx', paymentId: string): void {
     // Cancel any previous polling before starting new one
     this.#pollingCancel$.next();
-    this.#pollingErrorCount = 0;
+    this.#backoffManager = new BackoffManager(POLLING_CONFIG.backoff);
     this.pollingError.set(null);
 
-    timer(0, 10_000)
+    // Start with immediate poll (delay 0)
+    this.#scheduleNextPoll(0, network, direction, paymentId);
+  }
+
+  /** Schedules the next poll with the given delay. */
+  #scheduleNextPoll(
+    delayMs: number,
+    network: EvmNetworkKey,
+    direction: 'wccx' | 'ccx',
+    paymentId: string,
+  ): void {
+    timer(delayMs)
       .pipe(
         switchMap(() =>
           this.api.checkSwapState(network, direction, paymentId).pipe(
-            catchError(() => {
-              this.#pollingErrorCount++;
-              if (this.#pollingErrorCount >= 3) {
-                this.pollingError.set(
-                  `Unable to check swap status. Your transaction may still be processing. ` +
-                    `Save your payment ID for support: ${paymentId}`,
-                );
-              }
-              return of({ result: false } as BridgeSwapStateResponse);
+            catchError((error: unknown) => {
+              console.error('[SwapPage] Polling error:', {
+                network,
+                direction,
+                paymentId,
+                error: error instanceof Error ? error.message : String(error),
+                attempt: this.#backoffManager?.attempt ?? 0,
+              });
+              return of(null);
             }),
           ),
         ),
-        filter((r) => {
-          if (r.result === true) {
-            this.#pollingErrorCount = 0;
-            this.pollingError.set(null);
-            return true;
-          }
-          return false;
-        }),
         take(1),
         takeUntil(this.#pollingCancel$),
         takeUntilDestroyed(this.#destroyRef),
       )
-      .subscribe((state) => {
-        this.swapState.set(state);
-        this.step.set(2);
-        this.statusMessage.set('Payment received!');
+      .subscribe((response) => this.#handlePollResponse(response, network, direction, paymentId));
+  }
 
-        // Add to history
-        if (state.txdata) {
-          this.historyService.addTransaction({
-            id: paymentId,
-            timestamp: Date.now(),
-            amount: state.txdata.swaped,
-            direction: direction === 'wccx' ? 'ccx-to-evm' : 'evm-to-ccx',
-            network,
-            status: 'completed',
-            depositHash: state.txdata.depositHash,
-            swapHash: state.txdata.swapHash,
-            recipientAddress: state.txdata.address,
-          });
-        }
-      });
+  /** Handles a poll response, scheduling the next poll if needed. */
+  #handlePollResponse(
+    response: BridgeSwapStateResponse | null,
+    network: EvmNetworkKey,
+    direction: 'wccx' | 'ccx',
+    paymentId: string,
+  ): void {
+    const backoff = this.#backoffManager;
+    if (!backoff) return;
+
+    // Handle error (null response)
+    if (!response) {
+      // Check exhaustion BEFORE calling nextDelay to ensure all retries are scheduled
+      if (backoff.isExhausted()) {
+        const lastErr = backoff.lastError;
+        console.error('[SwapPage] Polling exhausted after max retries:', {
+          network,
+          direction,
+          paymentId,
+          attempts: backoff.maxRetries,
+          lastError: lastErr instanceof Error ? lastErr.message : String(lastErr),
+        });
+
+        this.pollingError.set(
+          `Unable to check swap status after ${backoff.maxRetries} attempts. ` +
+            `Your transaction may still be processing. ` +
+            `Save your payment ID for support: ${paymentId}`,
+        );
+        return;
+      }
+
+      const nextDelay = backoff.nextDelay();
+      this.pollingError.set(
+        `Temporary connection issue. Retrying in ${Math.round(nextDelay / 1000)}s...`,
+      );
+
+      // Schedule retry with backoff delay
+      this.#scheduleNextPoll(nextDelay, network, direction, paymentId);
+      return;
+    }
+
+    // Reset backoff on successful API response
+    backoff.reset();
+    this.pollingError.set(null);
+
+    // Check if swap is complete
+    if (response.result === true) {
+      this.swapState.set(response);
+      this.step.set(2);
+      this.statusMessage.set('Payment received!');
+
+      // Add to history
+      if (response.txdata) {
+        this.historyService.addTransaction({
+          id: paymentId,
+          timestamp: Date.now(),
+          amount: response.txdata.swaped,
+          direction: direction === 'wccx' ? 'ccx-to-evm' : 'evm-to-ccx',
+          network,
+          status: 'completed',
+          depositHash: response.txdata.depositHash,
+          swapHash: response.txdata.swapHash,
+          recipientAddress: response.txdata.address,
+        });
+      }
+      return;
+    }
+
+    // Schedule next poll with standard interval
+    this.#scheduleNextPoll(POLLING_CONFIG.successInterval, network, direction, paymentId);
   }
 
   async copy(text: string): Promise<void> {
@@ -1205,7 +1292,10 @@ export class SwapPage {
       await new Promise((r) => setTimeout(r, 1200));
       // Only clear if it wasn't replaced by another message.
       if (this.statusMessage() === 'Copied to clipboard.') this.statusMessage.set(null);
-    } catch {
+    } catch (error: unknown) {
+      console.warn('[SwapPage] Clipboard copy failed:', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       this.statusMessage.set('Copy failed (clipboard unavailable).');
     }
   }
