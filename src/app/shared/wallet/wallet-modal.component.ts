@@ -280,7 +280,8 @@ export class WalletModalComponent {
       const errorMessage = this.friendlyError(e);
       this.modalService.setError(errorMessage);
       // If we failed due to missing wallet, show install view.
-      const maybeMissing = errorMessage.toLowerCase().includes('not detected');
+      // Check for "detected" (from "No wallet extension detected") to catch missing wallet errors.
+      const maybeMissing = errorMessage.toLowerCase().includes('detected');
       if (maybeMissing) this.modalService.setNeedsInstall(true);
     } finally {
       this.modalService.setIsConnecting(false);

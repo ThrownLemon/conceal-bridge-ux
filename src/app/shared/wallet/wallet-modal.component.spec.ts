@@ -113,8 +113,8 @@ describe('WalletModalComponent', () => {
 
       component.selectConnector('metamask');
 
-      // Wait for async operation
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      // Wait for Angular to stabilize after async operations
+      await fixture.whenStable();
 
       expect(connectSpy).toHaveBeenCalledWith('metamask');
     });
@@ -174,16 +174,16 @@ describe('WalletModalComponent', () => {
       expect(modalService.isOpen()).toBe(false);
     });
 
-    it('should handle missing wallet error', async () => {
+    it('should handle missing wallet error and show install view', async () => {
       walletService.connectWith.mockRejectedValue(new Error('No injected EVM wallet found'));
 
       await component.connect('metamask');
 
       const errorMsg = modalService.error();
       expect(errorMsg).toBe('No wallet extension detected in this browser.');
-      // The error message contains "detected" but the component checks for "not detected"
-      // which means needsInstall won't be set to true by this error
-      expect(modalService.isOpen()).toBe(false);
+      // When wallet is not detected, needsInstall should be set to true to show install prompt
+      expect(modalService.needsInstall()).toBe(true);
+      expect(modalService.isConnecting()).toBe(false);
     });
 
     it('should handle generic errors', async () => {

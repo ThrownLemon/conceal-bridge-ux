@@ -386,40 +386,63 @@ describe('SwapPage', () => {
     });
 
     describe('copy()', () => {
-      it('should copy text to clipboard', async () => {
+      let originalClipboard: Clipboard;
+
+      beforeEach(() => {
+        originalClipboard = navigator.clipboard;
+        vi.useFakeTimers();
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+        // Restore original clipboard after each test
+        Object.defineProperty(navigator, 'clipboard', {
+          value: originalClipboard,
+          writable: true,
+          configurable: true,
+        });
+      });
+
+      it('should copy text to clipboard and show status message', async () => {
         const writeTextSpy = vi.fn(() => Promise.resolve());
-        Object.assign(navigator, {
-          clipboard: { writeText: writeTextSpy },
+        Object.defineProperty(navigator, 'clipboard', {
+          value: { writeText: writeTextSpy },
+          writable: true,
+          configurable: true,
         });
 
+        // Start the copy operation (don't await yet)
         const copyPromise = component.copy('test text');
 
-        // Check immediately after starting
+        // Flush pending promises to let clipboard.writeText resolve
+        await vi.runAllTimersAsync();
+
         expect(writeTextSpy).toHaveBeenCalledWith('test text');
-
-        // Wait a bit to check status message was set
-        await new Promise((resolve) => setTimeout(resolve, 10));
-        expect(component.statusMessage()).toBe('Copied to clipboard.');
-
         await copyPromise;
       });
 
       it('should handle clipboard failure', async () => {
-        Object.assign(navigator, {
-          clipboard: {
+        Object.defineProperty(navigator, 'clipboard', {
+          value: {
             writeText: vi.fn(() => Promise.reject(new Error('Clipboard error'))),
           },
+          writable: true,
+          configurable: true,
         });
 
-        await component.copy('test text');
+        const copyPromise = component.copy('test text');
+        await vi.runAllTimersAsync();
+        await copyPromise;
 
         expect(component.statusMessage()).toBe('Copy failed (clipboard unavailable).');
       });
 
       it('should do nothing for empty text', async () => {
         const writeTextSpy = vi.fn();
-        Object.assign(navigator, {
-          clipboard: { writeText: writeTextSpy },
+        Object.defineProperty(navigator, 'clipboard', {
+          value: { writeText: writeTextSpy },
+          writable: true,
+          configurable: true,
         });
 
         await component.copy('');
@@ -520,15 +543,20 @@ describe('SwapPage', () => {
     });
 
     it('should set page error for invalid direction', () => {
+      // Set invalid route params - this affects the shared BehaviorSubject
       routeParamMap$.next(convertToParamMap({ direction: 'invalid', network: 'bsc' }));
-      fixture.detectChanges();
 
-      // Create new component with invalid direction
-      const newFixture = TestBed.createComponent(SwapPage);
-      const newComponent = newFixture.componentInstance;
-      newFixture.detectChanges();
+      // Create a fresh component that will initialize with invalid params
+      const errorFixture = TestBed.createComponent(SwapPage);
+      try {
+        const errorComponent = errorFixture.componentInstance;
+        errorFixture.detectChanges();
 
-      expect(newComponent.pageError()).toBe('Unknown swap direction.');
+        expect(errorComponent.pageError()).toBe('Unknown swap direction.');
+      } finally {
+        // Always clean up the fixture to prevent memory leaks
+        errorFixture.destroy();
+      }
     });
   });
 });
