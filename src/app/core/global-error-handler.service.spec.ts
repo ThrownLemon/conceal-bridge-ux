@@ -284,7 +284,9 @@ describe('GlobalErrorHandler', () => {
 
       const error = service.currentError();
       expect(error).toBeTruthy();
-      expect(error?.id).toMatch(/^err_\d+_[a-z0-9]+$/);
+      expect(error?.id).toMatch(
+        /^err_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+      );
       expect(typeof error?.message).toBe('string');
       expect(error?.originalError).toBeTruthy();
       expect(error?.timestamp).toBeInstanceOf(Date);
