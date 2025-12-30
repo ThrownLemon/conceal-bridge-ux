@@ -1,9 +1,10 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideZard } from '@/shared/core/provider/providezard';
+import { GlobalErrorHandler } from './core/global-error-handler.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -11,5 +12,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideRouter(routes),
     provideZard(),
+    { provide: ErrorHandler, useExisting: GlobalErrorHandler },
   ],
 };
