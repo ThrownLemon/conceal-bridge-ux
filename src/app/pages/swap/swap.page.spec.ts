@@ -981,59 +981,41 @@ describe('SwapPage', () => {
       expect(apiMock.checkSwapState).toHaveBeenCalledWith('eth', 'wccx', 'test-payment-id');
     });
 
-    it('should complete swap when polling returns success', async () => {
+    it('should complete swap, update history, and transition to step 2 on successful poll', async () => {
       // Manually set up polling state
       component.step.set(1);
       component.paymentId.set('test-payment-id');
 
       // Mock successful swap state
-      apiMock.checkSwapState.mockReturnValue(
-        of({
-          result: true,
-          txdata: {
-            swaped: 100,
-            address: '0xrecipient',
-            swapHash: '0xswaphash',
-            depositHash: '0xdeposithash',
-          },
-        } as BridgeSwapStateResponse),
-      );
+      const swapResponse = {
+        result: true,
+        txdata: {
+          swaped: 100,
+          address: '0xrecipient',
+          swapHash: '0xswaphash',
+          depositHash: '0xdeposithash',
+        },
+      };
+      apiMock.checkSwapState.mockReturnValue(of(swapResponse as BridgeSwapStateResponse));
 
       component.startPolling('eth', 'wccx', 'test-payment-id');
 
       // Wait for immediate poll
       await vi.advanceTimersByTimeAsync(0);
 
+      // Verify state transition and status
       expect(component.step()).toBe(2);
-      expect(component.swapState()).toBeTruthy();
-      expect(component.swapState()?.result).toBe(true);
-    });
+      expect(component.swapState()).toEqual(swapResponse);
+      expect(component.statusMessage()).toBe('Payment received!');
 
-    it('should add transaction to history when swap completes', async () => {
-      component.step.set(1);
-      component.paymentId.set('test-payment-id');
-
-      apiMock.checkSwapState.mockReturnValue(
-        of({
-          result: true,
-          txdata: {
-            swaped: 100,
-            address: '0xrecipient',
-            swapHash: '0xswaphash',
-            depositHash: '0xdeposithash',
-          },
-        } as BridgeSwapStateResponse),
-      );
-
-      component.startPolling('eth', 'wccx', 'test-payment-id');
-      await vi.advanceTimersByTimeAsync(0);
-
+      // Verify history is updated
       expect(historyMock.addTransaction).toHaveBeenCalledWith(
         expect.objectContaining({
           id: 'test-payment-id',
           direction: 'ccx-to-evm',
           network: 'eth',
           status: 'completed',
+          amount: 100,
         }),
       );
     });
@@ -1140,12 +1122,16 @@ describe('SwapPage', () => {
 
   describe('Network Switching', () => {
     it('should reload config when network changes', () => {
-      expect(apiMock.getChainConfig).toHaveBeenCalledWith('bsc');
+      // Clear mock history to ensure we're only checking calls made within this test
+      apiMock.getChainConfig.mockClear();
 
+      // Change network and trigger effects
       routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'eth' }));
       fixture.detectChanges();
 
+      // Verify that the config was reloaded for the new network
       expect(apiMock.getChainConfig).toHaveBeenCalledWith('eth');
+      expect(apiMock.getChainConfig).toHaveBeenCalledTimes(1);
     });
 
     it('should reset state when network changes', () => {
@@ -1217,33 +1203,6 @@ describe('SwapPage', () => {
       await component.startCcxToEvm();
 
       expect(component.step()).toBe(1);
-    });
-
-    it('should transition from step 1 to step 2 when swap completes', async () => {
-      vi.useFakeTimers();
-
-      component.step.set(1);
-      component.paymentId.set('test-payment-id');
-
-      apiMock.checkSwapState.mockReturnValue(
-        of({
-          result: true,
-          txdata: {
-            swaped: 100,
-            address: '0xrecipient',
-            swapHash: '0xswaphash',
-            depositHash: '0xdeposithash',
-          },
-        } as BridgeSwapStateResponse),
-      );
-
-      component.startPolling('eth', 'wccx', 'test-payment-id');
-      await vi.advanceTimersByTimeAsync(0);
-
-      expect(component.step()).toBe(2);
-      expect(component.statusMessage()).toBe('Payment received!');
-
-      vi.useRealTimers();
     });
 
     it('should return to step 0 after reset from step 2', () => {
