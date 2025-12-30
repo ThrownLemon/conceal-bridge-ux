@@ -60,6 +60,7 @@ describe('TransactionHistoryComponent', () => {
   });
 
   afterEach(() => {
+    fixture.destroy();
     TestBed.resetTestingModule();
   });
 

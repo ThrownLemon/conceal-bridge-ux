@@ -4,17 +4,6 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { ZardSheetComponent, ZardSheetOptions } from './sheet.component';
 
-// Test host component for template portal tests (reserved for future use)
-// @Component({
-//   template: `<ng-template #testTemplate>Test Content</ng-template>`,
-//   standalone: true,
-// })
-// class TestHostComponent {
-//   @ViewChild('testTemplate', { static: true }) templateRef!: TemplateRef<unknown>;
-//   @ViewChild('testTemplate', { static: true, read: ViewContainerRef })
-//   viewContainerRef!: ViewContainerRef;
-// }
-
 describe('ZardSheetComponent', () => {
   let component: ZardSheetComponent<unknown, unknown>;
   let fixture: ComponentFixture<ZardSheetComponent<unknown, unknown>>;
@@ -35,6 +24,9 @@ describe('ZardSheetComponent', () => {
   }
 
   afterEach(() => {
+    if (fixture) {
+      fixture.destroy();
+    }
     TestBed.resetTestingModule();
   });
 

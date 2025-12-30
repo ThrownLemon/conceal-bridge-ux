@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { WalletButtonComponent } from './wallet-button.component';
@@ -14,15 +14,29 @@ describe('WalletButtonComponent', () => {
   let mockChainMetaService: Partial<EvmChainMetadataService>;
   let mockModalService: Partial<WalletModalService>;
 
+  // Writable signals for easier test manipulation
+  let isConnectedSignal: WritableSignal<boolean>;
+  let addressSignal: WritableSignal<`0x${string}` | null>;
+  let chainIdSignal: WritableSignal<number | null>;
+  let connectorSignal: WritableSignal<'metamask' | 'trust' | 'binance' | null>;
+  let shortAddressSignal: WritableSignal<string>;
+
   const mockAddress = '0x1234567890123456789012345678901234567890';
 
   beforeEach(() => {
+    // Initialize writable signals
+    isConnectedSignal = signal(false);
+    addressSignal = signal<`0x${string}` | null>(null);
+    chainIdSignal = signal<number | null>(null);
+    connectorSignal = signal<'metamask' | 'trust' | 'binance' | null>(null);
+    shortAddressSignal = signal('');
+
     mockWalletService = {
-      isConnected: signal(false),
-      address: signal<`0x${string}` | null>(null),
-      chainId: signal<number | null>(null),
-      connector: signal<'metamask' | 'trust' | 'binance' | null>(null),
-      shortAddress: signal(''),
+      isConnected: isConnectedSignal,
+      address: addressSignal,
+      chainId: chainIdSignal,
+      connector: connectorSignal,
+      shortAddress: shortAddressSignal,
       ensureChain: vi.fn().mockResolvedValue(undefined),
       disconnect: vi.fn().mockResolvedValue(undefined),
     };
@@ -51,6 +65,7 @@ describe('WalletButtonComponent', () => {
   });
 
   afterEach(() => {
+    fixture.destroy();
     TestBed.resetTestingModule();
   });
 
@@ -85,17 +100,11 @@ describe('WalletButtonComponent', () => {
 
   describe('connected state - header variant', () => {
     beforeEach(() => {
-      (mockWalletService.isConnected as ReturnType<typeof signal<boolean>>).set(true);
-      (mockWalletService.address as ReturnType<typeof signal<`0x${string}` | null>>).set(
-        mockAddress as `0x${string}`,
-      );
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
-      (mockWalletService.shortAddress as ReturnType<typeof signal<string>>).set('0x1234…7890');
-      (
-        mockWalletService.connector as ReturnType<
-          typeof signal<'metamask' | 'trust' | 'binance' | null>
-        >
-      ).set('metamask');
+      isConnectedSignal.set(true);
+      addressSignal.set(mockAddress as `0x${string}`);
+      chainIdSignal.set(1);
+      shortAddressSignal.set('0x1234…7890');
+      connectorSignal.set('metamask');
       fixture.detectChanges();
     });
 
@@ -322,23 +331,18 @@ describe('WalletButtonComponent', () => {
       expect(component.connectorLogo('binance')).toBe('images/wallets/binance.svg');
     });
 
-    it('should return walletconnect logo as fallback', () => {
-      // Test that the fallback returns walletconnect.svg
-      // The component internally handles unknown connectors
-      const result = component.connectorLogo('metamask');
-      expect(result).toBe('images/wallets/metamask.png');
+    it('should return walletconnect logo as fallback for unknown connectors', () => {
+      // Unknown connector types fall back to walletconnect.svg
+      const result = component.connectorLogo('unknown' as 'metamask');
+      expect(result).toBe('images/wallets/walletconnect.svg');
     });
   });
 
   describe('computed signals', () => {
     beforeEach(() => {
-      (mockWalletService.isConnected as ReturnType<typeof signal<boolean>>).set(true);
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
-      (
-        mockWalletService.connector as ReturnType<
-          typeof signal<'metamask' | 'trust' | 'binance' | null>
-        >
-      ).set('metamask');
+      isConnectedSignal.set(true);
+      chainIdSignal.set(1);
+      connectorSignal.set('metamask');
       fixture.detectChanges();
     });
 
@@ -348,17 +352,17 @@ describe('WalletButtonComponent', () => {
       });
 
       it('should return BSC logo for chainId 56', () => {
-        (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(56);
+        chainIdSignal.set(56);
         expect(component.connectedChainLogo()).toBe('images/branding/bsc.png');
       });
 
       it('should return Polygon logo for chainId 137', () => {
-        (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(137);
+        chainIdSignal.set(137);
         expect(component.connectedChainLogo()).toBe('images/branding/plg.png');
       });
 
       it('should return chain metadata logo for other chains', () => {
-        (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(42161);
+        chainIdSignal.set(42161);
         const logo = component.connectedChainLogo();
         // Falls back to chain metadata logo or null
         expect(logo).toBeDefined();
@@ -371,17 +375,17 @@ describe('WalletButtonComponent', () => {
       });
 
       it('should return BNB Smart Chain for chainId 56', () => {
-        (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(56);
+        chainIdSignal.set(56);
         expect(component.currentNetworkName()).toBe('BNB Smart Chain');
       });
 
       it('should return Polygon for chainId 137', () => {
-        (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(137);
+        chainIdSignal.set(137);
         expect(component.currentNetworkName()).toBe('Polygon');
       });
 
       it('should return chain metadata name for other chains', () => {
-        (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(42161);
+        chainIdSignal.set(42161);
         const name = component.currentNetworkName();
         expect(name).toBeDefined();
       });
@@ -393,11 +397,7 @@ describe('WalletButtonComponent', () => {
       });
 
       it('should return null when no connector', () => {
-        (
-          mockWalletService.connector as ReturnType<
-            typeof signal<'metamask' | 'trust' | 'binance' | null>
-          >
-        ).set(null);
+        connectorSignal.set(null);
         expect(component.currentWalletLogo()).toBeNull();
       });
     });

@@ -24,8 +24,6 @@ describe('ZardDarkMode', () => {
         }
       }) as MediaQueryList['addEventListener'],
       removeEventListener: vi.fn() as MediaQueryList['removeEventListener'],
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
       dispatchEvent: vi.fn(),
       onchange: null,
     };

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { HomePage } from './home.page';
@@ -14,15 +14,25 @@ describe('HomePage', () => {
   let mockWalletService: Partial<EvmWalletService>;
   let mockChainMetaService: Partial<EvmChainMetadataService>;
 
+  // Writable signals for easier test manipulation
+  let isConnectedSignal: WritableSignal<boolean>;
+  let isInstalledSignal: WritableSignal<boolean>;
+  let chainIdSignal: WritableSignal<number | null>;
+
   beforeEach(() => {
+    // Initialize writable signals
+    isConnectedSignal = signal(false);
+    isInstalledSignal = signal(true);
+    chainIdSignal = signal<number | null>(null);
+
     mockRouter = {
       navigate: vi.fn().mockResolvedValue(true),
     };
 
     mockWalletService = {
-      isConnected: signal(false),
-      isInstalled: signal(true),
-      chainId: signal<number | null>(null),
+      isConnected: isConnectedSignal,
+      isInstalled: isInstalledSignal,
+      chainId: chainIdSignal,
       hydrate: vi.fn().mockResolvedValue(undefined),
       ensureChain: vi.fn().mockResolvedValue(undefined),
     };
@@ -48,6 +58,7 @@ describe('HomePage', () => {
   });
 
   afterEach(() => {
+    fixture.destroy();
     TestBed.resetTestingModule();
   });
 
@@ -181,15 +192,17 @@ describe('HomePage', () => {
       expect(component.networkSwitchStatus()).toBe('From and To networks cannot be the same.');
     });
 
-    it('should auto-swap to network when setting from to match to with ccx', () => {
+    it('should show error and swap toNetwork when setting from to match to with ccx', () => {
       component.form.controls.fromNetwork.setValue('eth');
       component.form.controls.toNetwork.setValue('ccx');
 
       component.setFromNetwork('ccx');
 
-      // When from is set to match to, it shows error and swaps the TO network
-      // fromNetwork stays unchanged, toNetwork gets swapped to last EVM
+      // When from is set to match to (ccx), the equality check triggers
+      // and auto-corrects by swapping toNetwork to the last used EVM ('bsc' by default)
       expect(component.form.controls.fromNetwork.value).toBe('eth');
+      expect(component.form.controls.toNetwork.value).toBe('bsc');
+      expect(component.form.controls.direction.value).toBe('ccx-to-evm');
       expect(component.networkSwitchStatus()).toBe('From and To networks cannot be the same.');
     });
 
@@ -277,7 +290,7 @@ describe('HomePage', () => {
 
   describe('switchWalletToSelectedNetwork', () => {
     it('should show message when wallet not installed', async () => {
-      (mockWalletService.isInstalled as ReturnType<typeof signal<boolean>>).set(false);
+      isInstalledSignal.set(false);
 
       await component.switchWalletToSelectedNetwork();
 
@@ -286,7 +299,8 @@ describe('HomePage', () => {
 
     it('should show message when candidate is CCX', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
-      component.form.controls.toNetwork.setValue('ccx' as 'eth' | 'bsc' | 'plg');
+      // Manually set toNetwork to 'ccx' to test the edge case
+      component.form.controls.toNetwork.setValue('ccx');
 
       await component.switchWalletToSelectedNetwork();
 
@@ -296,7 +310,7 @@ describe('HomePage', () => {
     it('should show message when already on target chain', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
       component.form.controls.toNetwork.setValue('eth');
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
+      chainIdSignal.set(1);
 
       await component.switchWalletToSelectedNetwork();
 
@@ -306,7 +320,7 @@ describe('HomePage', () => {
     it('should switch chain successfully', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
       component.form.controls.toNetwork.setValue('bsc');
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
+      chainIdSignal.set(1);
 
       await component.switchWalletToSelectedNetwork();
 
@@ -317,7 +331,7 @@ describe('HomePage', () => {
     it('should handle user rejection (code 4001)', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
       component.form.controls.toNetwork.setValue('bsc');
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
+      chainIdSignal.set(1);
       const error = new Error('User rejected') as Error & { code: number };
       error.code = 4001;
       vi.mocked(mockWalletService.ensureChain!).mockRejectedValueOnce(error);
@@ -330,7 +344,7 @@ describe('HomePage', () => {
     it('should handle pending request (code -32002)', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
       component.form.controls.toNetwork.setValue('bsc');
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
+      chainIdSignal.set(1);
       const error = new Error('Pending') as Error & { code: number };
       error.code = -32002;
       vi.mocked(mockWalletService.ensureChain!).mockRejectedValueOnce(error);
@@ -345,7 +359,7 @@ describe('HomePage', () => {
     it('should handle generic errors', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
       component.form.controls.toNetwork.setValue('bsc');
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
+      chainIdSignal.set(1);
       vi.mocked(mockWalletService.ensureChain!).mockRejectedValueOnce(new Error('Unknown error'));
 
       await component.switchWalletToSelectedNetwork();
@@ -356,7 +370,7 @@ describe('HomePage', () => {
     it('should handle non-Error exceptions', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
       component.form.controls.toNetwork.setValue('bsc');
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
+      chainIdSignal.set(1);
       vi.mocked(mockWalletService.ensureChain!).mockRejectedValueOnce('string error');
 
       await component.switchWalletToSelectedNetwork();
@@ -367,7 +381,7 @@ describe('HomePage', () => {
     it('should set isSwitchingNetwork during operation', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
       component.form.controls.toNetwork.setValue('bsc');
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
+      chainIdSignal.set(1);
 
       let resolveEnsure: () => void;
       const ensurePromise = new Promise<void>((resolve) => {
@@ -388,7 +402,7 @@ describe('HomePage', () => {
 
   describe('go method', () => {
     beforeEach(() => {
-      (mockWalletService.isConnected as ReturnType<typeof signal<boolean>>).set(true);
+      isConnectedSignal.set(true);
     });
 
     it('should navigate to swap page with correct params', () => {
@@ -502,7 +516,7 @@ describe('HomePage', () => {
     });
 
     it('should show Continue button when connected', () => {
-      (mockWalletService.isConnected as ReturnType<typeof signal<boolean>>).set(true);
+      isConnectedSignal.set(true);
       fixture.detectChanges();
 
       const button = fixture.nativeElement.querySelector('button[type="submit"]');
