@@ -12,6 +12,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideRouter(routes),
     provideZard(),
-    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    { provide: ErrorHandler, useExisting: GlobalErrorHandler },
   ],
 };

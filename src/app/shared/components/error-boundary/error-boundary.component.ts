@@ -27,7 +27,7 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
   standalone: true,
   imports: [ZardAlertComponent, ZardButtonComponent, ZardIconComponent],
   template: `
-    @if (errorHandler.hasError()) {
+    @if (errorHandler.currentError(); as error) {
       <div
         class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
         role="alertdialog"
@@ -46,25 +46,21 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
               <h2 id="error-title" class="text-lg font-semibold text-foreground">
                 Something went wrong
               </h2>
-              @if (errorHandler.currentError(); as error) {
-                <p class="text-xs text-muted-foreground">Error ID: {{ error.id }}</p>
-              }
+              <p class="text-xs text-muted-foreground">Error ID: {{ error.id }}</p>
             </div>
           </div>
 
-          @if (errorHandler.currentError(); as error) {
-            <p id="error-description" class="mb-6 text-sm text-muted-foreground">
-              {{ error.message }}
-            </p>
+          <p id="error-description" class="mb-6 text-sm text-muted-foreground">
+            {{ error.message }}
+          </p>
 
-            @if (error.isChunkError) {
-              <z-alert
-                zType="default"
-                zTitle="Tip"
-                zDescription="The app may have been updated. Reloading usually fixes this."
-                class="mb-6"
-              />
-            }
+          @if (error.isChunkError) {
+            <z-alert
+              zType="default"
+              zTitle="Tip"
+              zDescription="The app may have been updated. Reloading usually fixes this."
+              class="mb-6"
+            />
           }
 
           <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
