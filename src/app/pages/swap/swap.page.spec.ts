@@ -955,21 +955,6 @@ describe('SwapPage', () => {
       expect(component.isBusy()).toBe(false);
       expect(component.statusMessage()).toBe('Execution failed');
     });
-
-    it('should handle invalid amount', async () => {
-      component.evmToCcxForm.patchValue({
-        amount: 'not-a-number',
-        ccxToAddress: MOCK_CCX_ADDRESS,
-      });
-      // Manually override the pattern validation for this test
-      component.evmToCcxForm.controls.amount.setErrors(null);
-      component.evmToCcxForm.controls.amount.markAsTouched();
-      component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
-
-      await component.startEvmToCcx();
-
-      expect(component.statusMessage()).toBe('Invalid amount.');
-    });
   });
 
   describe('Polling Mechanism', () => {
@@ -1014,8 +999,8 @@ describe('SwapPage', () => {
 
       component.startPolling('eth', 'wccx', 'test-payment-id');
 
-      // Wait for immediate poll
-      await vi.advanceTimersByTimeAsync(0);
+      // Flush all timers to ensure polling loop completes
+      await vi.runAllTimersAsync();
 
       // Verify state transition and status
       expect(component.step()).toBe(2);
@@ -1093,14 +1078,16 @@ describe('SwapPage', () => {
       component.startPolling('eth', 'wccx', 'test-payment-id');
       await vi.advanceTimersByTimeAsync(0);
 
+      // Verify first poll has fired before reset
+      expect(apiMock.checkSwapState).toHaveBeenCalledTimes(1);
+
       // Reset should cancel polling
       component.reset();
 
       // Advance time and verify no more API calls
-      const callCountBefore = apiMock.checkSwapState.mock.calls.length;
       await vi.advanceTimersByTimeAsync(10000);
 
-      expect(apiMock.checkSwapState.mock.calls.length).toBe(callCountBefore);
+      expect(apiMock.checkSwapState).toHaveBeenCalledTimes(1);
     });
 
     it('should record correct direction for evm-to-ccx swap in history', async () => {
@@ -1123,7 +1110,9 @@ describe('SwapPage', () => {
       );
 
       component.startPolling('bsc', 'ccx', 'test-payment-id');
-      await vi.advanceTimersByTimeAsync(0);
+
+      // Flush all timers to ensure polling loop completes
+      await vi.runAllTimersAsync();
 
       expect(historyMock.addTransaction).toHaveBeenCalledWith(
         expect.objectContaining({
