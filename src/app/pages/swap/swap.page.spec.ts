@@ -421,6 +421,7 @@ describe('SwapPage', () => {
       });
 
       afterEach(() => {
+        vi.clearAllTimers();
         vi.useRealTimers();
         // Restore original clipboard after each test
         Object.defineProperty(navigator, 'clipboard', {
@@ -965,6 +966,7 @@ describe('SwapPage', () => {
     });
 
     afterEach(() => {
+      vi.clearAllTimers();
       vi.useRealTimers();
     });
 
