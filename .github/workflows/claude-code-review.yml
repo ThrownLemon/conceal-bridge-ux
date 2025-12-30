@@ -76,9 +76,6 @@ jobs:
           # Enable progress tracking with visual indicators
           track_progress: true
 
-          # Include 'Fix this' links in review feedback
-          include_fix_links: true
-
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ steps.pr-number.outputs.pr_number }}

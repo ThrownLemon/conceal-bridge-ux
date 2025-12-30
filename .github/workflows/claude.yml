@@ -55,9 +55,6 @@ jobs:
           # Enable progress tracking
           track_progress: true
 
-          # Include fix links when reviewing code
-          include_fix_links: true
-
           # Allow Claude to interact with PRs, issues, and CI
           claude_args: |
             --allowedTools "Bash(gh issue:*),Bash(gh pr:*),Bash(gh api:*),Bash(gh search:*),Bash(gh run:*),mcp__github_inline_comment__create_inline_comment"
