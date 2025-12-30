@@ -873,5 +873,390 @@ describe('SwapPage', () => {
       expect(component.step()).toBe(1);
       expect(component.paymentId()).toBe('test-payment-id');
     });
+
+    it('should check token balance before transfer', async () => {
+      component.evmToCcxForm.patchValue({
+        amount: '100',
+        ccxToAddress:
+          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+      });
+      component.evmToCcxForm.controls.amount.markAsTouched();
+      component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
+      walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
+      walletMock.ensureChain.mockResolvedValue(undefined);
+
+      // Mock insufficient balance
+      walletMock.getClients.mockReturnValue({
+        publicClient: {
+          readContract: vi.fn(async () => 1000n), // Only 0.001 wCCX
+        },
+        walletClient: {
+          writeContract: vi.fn(async () => '0xabcdef' as `0x${string}`),
+        },
+      });
+
+      await component.startEvmToCcx();
+
+      expect(component.statusMessage()).toBe('Insufficient wCCX balance for this transfer.');
+    });
+
+    it('should handle swap execution failure', async () => {
+      component.evmToCcxForm.patchValue({
+        amount: '100',
+        ccxToAddress:
+          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+      });
+      component.evmToCcxForm.controls.amount.markAsTouched();
+      component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
+      walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
+      walletMock.ensureChain.mockResolvedValue(undefined);
+      walletMock.waitForReceipt.mockResolvedValue({ status: 'success' });
+
+      // Mock successful init but failed exec
+      apiMock.sendWccxToCcxInit.mockReturnValue(
+        of({ success: true, paymentId: 'test-payment-id' }),
+      );
+      apiMock.execWccxToCcxSwap.mockReturnValue(of({ success: false, error: 'Execution failed' }));
+
+      await component.startEvmToCcx();
+
+      expect(component.isBusy()).toBe(false);
+      expect(component.statusMessage()).toBe('Execution failed');
+    });
+
+    it('should handle invalid amount', async () => {
+      component.evmToCcxForm.patchValue({
+        amount: 'not-a-number',
+        ccxToAddress:
+          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+      });
+      // Manually override the pattern validation for this test
+      component.evmToCcxForm.controls.amount.setErrors(null);
+      component.evmToCcxForm.controls.amount.markAsTouched();
+      component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
+
+      await component.startEvmToCcx();
+
+      expect(component.statusMessage()).toBe('Invalid amount.');
+    });
+  });
+
+  describe('Polling Mechanism', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'eth' }));
+      fixture.detectChanges();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should start polling after successful swap initialization', async () => {
+      component.ccxToEvmForm.patchValue({
+        amount: '100',
+        ccxFromAddress:
+          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+      });
+      component.ccxToEvmForm.controls.amount.markAsTouched();
+      component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
+      component.ccxToEvmForm.controls.evmToAddress.markAsTouched();
+      walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
+      walletMock.ensureChain.mockResolvedValue(undefined);
+      apiMock.estimateGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
+      apiMock.getGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
+      walletMock.sendNativeTransaction.mockResolvedValue('0xabcd1234');
+      walletMock.waitForReceipt.mockResolvedValue({ status: 'success' });
+      apiMock.sendCcxToWccxInit.mockReturnValue(
+        of({ success: true, paymentId: 'test-payment-id' }),
+      );
+      apiMock.checkSwapState.mockReturnValue(of({ result: false }));
+
+      await component.startCcxToEvm();
+
+      // Wait for initial poll
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(apiMock.checkSwapState).toHaveBeenCalledWith('eth', 'wccx', 'test-payment-id');
+    });
+
+    it('should complete swap when polling returns success', async () => {
+      // Manually set up polling state
+      component.step.set(1);
+      component.paymentId.set('test-payment-id');
+
+      // Mock successful swap state
+      apiMock.checkSwapState.mockReturnValue(
+        of({
+          result: true,
+          txdata: {
+            swaped: 100,
+            address: '0xrecipient',
+            swapHash: '0xswaphash',
+            depositHash: '0xdeposithash',
+          },
+        } as BridgeSwapStateResponse),
+      );
+
+      component.startPolling('eth', 'wccx', 'test-payment-id');
+
+      // Wait for immediate poll
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(component.step()).toBe(2);
+      expect(component.swapState()).toBeTruthy();
+      expect(component.swapState()?.result).toBe(true);
+    });
+
+    it('should add transaction to history when swap completes', async () => {
+      component.step.set(1);
+      component.paymentId.set('test-payment-id');
+
+      apiMock.checkSwapState.mockReturnValue(
+        of({
+          result: true,
+          txdata: {
+            swaped: 100,
+            address: '0xrecipient',
+            swapHash: '0xswaphash',
+            depositHash: '0xdeposithash',
+          },
+        } as BridgeSwapStateResponse),
+      );
+
+      component.startPolling('eth', 'wccx', 'test-payment-id');
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(historyMock.addTransaction).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'test-payment-id',
+          direction: 'ccx-to-evm',
+          network: 'eth',
+          status: 'completed',
+        }),
+      );
+    });
+
+    it('should continue polling when swap is not complete', async () => {
+      component.step.set(1);
+      component.paymentId.set('test-payment-id');
+
+      // First poll returns incomplete
+      apiMock.checkSwapState.mockReturnValue(of({ result: false }));
+
+      component.startPolling('eth', 'wccx', 'test-payment-id');
+
+      // Initial poll
+      await vi.advanceTimersByTimeAsync(0);
+      expect(component.step()).toBe(1); // Still polling
+      expect(apiMock.checkSwapState).toHaveBeenCalledTimes(1);
+
+      // Wait for next poll interval (10 seconds)
+      await vi.advanceTimersByTimeAsync(10000);
+      expect(apiMock.checkSwapState).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle polling error with backoff', async () => {
+      component.step.set(1);
+      component.paymentId.set('test-payment-id');
+
+      // Mock error response
+      apiMock.checkSwapState.mockReturnValue(throwError(() => new Error('Network error')));
+
+      component.startPolling('eth', 'wccx', 'test-payment-id');
+
+      // Initial poll fails
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(component.pollingError()).toContain('Temporary connection issue');
+      expect(component.step()).toBe(1); // Still in polling state
+    });
+
+    it('should show exhaustion error after max retries', async () => {
+      component.step.set(1);
+      component.paymentId.set('test-payment-id');
+
+      apiMock.checkSwapState.mockReturnValue(throwError(() => new Error('Network error')));
+
+      component.startPolling('eth', 'wccx', 'test-payment-id');
+
+      // Run through all retries (5 retries with backoff)
+      // Initial attempt + 5 retries = 6 total attempts
+      for (let i = 0; i < 6; i++) {
+        await vi.advanceTimersByTimeAsync(30000); // Max delay is 30s
+      }
+
+      expect(component.pollingError()).toContain('Unable to check swap status');
+      expect(component.pollingError()).toContain('test-payment-id');
+    });
+
+    it('should cancel polling on reset', async () => {
+      component.step.set(1);
+      component.paymentId.set('test-payment-id');
+
+      apiMock.checkSwapState.mockReturnValue(of({ result: false }));
+
+      component.startPolling('eth', 'wccx', 'test-payment-id');
+      await vi.advanceTimersByTimeAsync(0);
+
+      // Reset should cancel polling
+      component.reset();
+
+      // Advance time and verify no more API calls
+      const callCountBefore = apiMock.checkSwapState.mock.calls.length;
+      await vi.advanceTimersByTimeAsync(10000);
+
+      expect(apiMock.checkSwapState.mock.calls.length).toBe(callCountBefore);
+    });
+
+    it('should record correct direction for evm-to-ccx swap in history', async () => {
+      routeParamMap$.next(convertToParamMap({ direction: 'evm-to-ccx', network: 'bsc' }));
+      fixture.detectChanges();
+
+      component.step.set(1);
+      component.paymentId.set('test-payment-id');
+
+      apiMock.checkSwapState.mockReturnValue(
+        of({
+          result: true,
+          txdata: {
+            swaped: 50,
+            address: 'ccxrecipient',
+            swapHash: '0xswaphash',
+            depositHash: '0xdeposithash',
+          },
+        } as BridgeSwapStateResponse),
+      );
+
+      component.startPolling('bsc', 'ccx', 'test-payment-id');
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(historyMock.addTransaction).toHaveBeenCalledWith(
+        expect.objectContaining({
+          direction: 'evm-to-ccx',
+          network: 'bsc',
+        }),
+      );
+    });
+  });
+
+  describe('Network Switching', () => {
+    it('should reload config when network changes', () => {
+      expect(apiMock.getChainConfig).toHaveBeenCalledWith('bsc');
+
+      routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'eth' }));
+      fixture.detectChanges();
+
+      expect(apiMock.getChainConfig).toHaveBeenCalledWith('eth');
+    });
+
+    it('should reset state when network changes', () => {
+      component.step.set(1);
+      component.paymentId.set('some-id');
+
+      routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'plg' }));
+      fixture.detectChanges();
+
+      expect(component.step()).toBe(0);
+      expect(component.paymentId()).toBe('');
+    });
+
+    it('should call ensureChain before transaction', async () => {
+      routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'eth' }));
+      fixture.detectChanges();
+
+      component.ccxToEvmForm.patchValue({
+        amount: '100',
+        ccxFromAddress:
+          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+      });
+      component.ccxToEvmForm.controls.amount.markAsTouched();
+      component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
+      component.ccxToEvmForm.controls.evmToAddress.markAsTouched();
+      walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
+      walletMock.ensureChain.mockResolvedValue(undefined);
+      apiMock.estimateGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
+      apiMock.getGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
+      walletMock.sendNativeTransaction.mockResolvedValue('0xabcd1234');
+      walletMock.waitForReceipt.mockResolvedValue({ status: 'success' });
+      apiMock.sendCcxToWccxInit.mockReturnValue(
+        of({ success: true, paymentId: 'test-payment-id' }),
+      );
+
+      await component.startCcxToEvm();
+
+      expect(walletMock.ensureChain).toHaveBeenCalled();
+    });
+  });
+
+  describe('Step Transitions', () => {
+    it('should transition from step 0 to step 1 after swap init', async () => {
+      routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'eth' }));
+      fixture.detectChanges();
+
+      expect(component.step()).toBe(0);
+
+      component.ccxToEvmForm.patchValue({
+        amount: '100',
+        ccxFromAddress:
+          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+      });
+      component.ccxToEvmForm.controls.amount.markAsTouched();
+      component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
+      component.ccxToEvmForm.controls.evmToAddress.markAsTouched();
+      walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
+      walletMock.ensureChain.mockResolvedValue(undefined);
+      apiMock.estimateGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
+      apiMock.getGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
+      walletMock.sendNativeTransaction.mockResolvedValue('0xabcd1234');
+      walletMock.waitForReceipt.mockResolvedValue({ status: 'success' });
+      apiMock.sendCcxToWccxInit.mockReturnValue(
+        of({ success: true, paymentId: 'test-payment-id' }),
+      );
+
+      await component.startCcxToEvm();
+
+      expect(component.step()).toBe(1);
+    });
+
+    it('should transition from step 1 to step 2 when swap completes', () => {
+      vi.useFakeTimers();
+
+      component.step.set(1);
+      component.paymentId.set('test-payment-id');
+
+      apiMock.checkSwapState.mockReturnValue(
+        of({
+          result: true,
+          txdata: {
+            swaped: 100,
+            address: '0xrecipient',
+            swapHash: '0xswaphash',
+            depositHash: '0xdeposithash',
+          },
+        } as BridgeSwapStateResponse),
+      );
+
+      component.startPolling('eth', 'wccx', 'test-payment-id');
+      vi.advanceTimersByTime(0);
+
+      expect(component.step()).toBe(2);
+      expect(component.statusMessage()).toBe('Payment received!');
+
+      vi.useRealTimers();
+    });
+
+    it('should return to step 0 after reset from step 2', () => {
+      component.step.set(2);
+      component.swapState.set({ result: true } as BridgeSwapStateResponse);
+
+      component.reset();
+
+      expect(component.step()).toBe(0);
+      expect(component.swapState()).toBeNull();
+    });
   });
 });
