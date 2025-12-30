@@ -80,6 +80,11 @@ describe('SwapPage', () => {
     },
   };
 
+  // Constants for commonly used mock addresses
+  const MOCK_CCX_ADDRESS =
+    'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij';
+  const MOCK_EVM_ADDRESS = '0x742d35cc6634c0532925a3b844bc9e7595f0beb1';
+
   beforeEach(async () => {
     routeParamMap$ = new BehaviorSubject(
       convertToParamMap({ direction: 'ccx-to-evm', network: 'bsc' }),
@@ -150,6 +155,28 @@ describe('SwapPage', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  /**
+   * Helper function to set up mocks for a successful ccx-to-evm swap initialization.
+   * This reduces duplication across multiple tests.
+   */
+  function setupSuccessfulCcxToEvmInit(): void {
+    component.ccxToEvmForm.patchValue({
+      amount: '100',
+      ccxFromAddress: MOCK_CCX_ADDRESS,
+      evmToAddress: MOCK_EVM_ADDRESS,
+    });
+    component.ccxToEvmForm.controls.amount.markAsTouched();
+    component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
+    component.ccxToEvmForm.controls.evmToAddress.markAsTouched();
+    walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
+    walletMock.ensureChain.mockResolvedValue(undefined);
+    apiMock.estimateGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
+    apiMock.getGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
+    walletMock.sendNativeTransaction.mockResolvedValue('0xabcd1234');
+    walletMock.waitForReceipt.mockResolvedValue({ status: 'success' });
+    apiMock.sendCcxToWccxInit.mockReturnValue(of({ success: true, paymentId: 'test-payment-id' }));
+  }
 
   describe('Component Initialization', () => {
     it('should create the component', () => {
@@ -588,9 +615,8 @@ describe('SwapPage', () => {
       component.config.set(null);
       component.ccxToEvmForm.patchValue({
         amount: '100',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+        ccxFromAddress: MOCK_CCX_ADDRESS,
+        evmToAddress: MOCK_EVM_ADDRESS,
       });
       component.ccxToEvmForm.controls.amount.markAsTouched();
       component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
@@ -604,9 +630,8 @@ describe('SwapPage', () => {
     it('should show error for amount below minimum', async () => {
       component.ccxToEvmForm.patchValue({
         amount: '0.5',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+        ccxFromAddress: MOCK_CCX_ADDRESS,
+        evmToAddress: MOCK_EVM_ADDRESS,
       });
       component.ccxToEvmForm.controls.amount.markAsTouched();
       component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
@@ -620,9 +645,8 @@ describe('SwapPage', () => {
     it('should show error for amount above maximum', async () => {
       component.ccxToEvmForm.patchValue({
         amount: '100000',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+        ccxFromAddress: MOCK_CCX_ADDRESS,
+        evmToAddress: MOCK_EVM_ADDRESS,
       });
       component.ccxToEvmForm.controls.amount.markAsTouched();
       component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
@@ -637,9 +661,8 @@ describe('SwapPage', () => {
       component.wccxSwapBalance.set(50);
       component.ccxToEvmForm.patchValue({
         amount: '100',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+        ccxFromAddress: MOCK_CCX_ADDRESS,
+        evmToAddress: MOCK_EVM_ADDRESS,
       });
       component.ccxToEvmForm.controls.amount.markAsTouched();
       component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
@@ -655,7 +678,7 @@ describe('SwapPage', () => {
       component.ccxToEvmForm.patchValue({
         amount: '100',
         ccxFromAddress: 'invalid',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+        evmToAddress: MOCK_EVM_ADDRESS,
       });
 
       await component.startCcxToEvm();
@@ -667,8 +690,7 @@ describe('SwapPage', () => {
       component.ccxToEvmForm.markAllAsTouched();
       component.ccxToEvmForm.patchValue({
         amount: '100',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxFromAddress: MOCK_CCX_ADDRESS,
         evmToAddress: 'invalid',
       });
 
@@ -680,9 +702,8 @@ describe('SwapPage', () => {
     it('should handle wallet connection failure', async () => {
       component.ccxToEvmForm.patchValue({
         amount: '100',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+        ccxFromAddress: MOCK_CCX_ADDRESS,
+        evmToAddress: MOCK_EVM_ADDRESS,
       });
       component.ccxToEvmForm.controls.amount.markAsTouched();
       component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
@@ -698,9 +719,8 @@ describe('SwapPage', () => {
     it('should handle gas estimation failure', async () => {
       component.ccxToEvmForm.patchValue({
         amount: '100',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+        ccxFromAddress: MOCK_CCX_ADDRESS,
+        evmToAddress: MOCK_EVM_ADDRESS,
       });
       component.ccxToEvmForm.controls.amount.markAsTouched();
       component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
@@ -718,9 +738,8 @@ describe('SwapPage', () => {
     it('should handle successful swap initialization', async () => {
       component.ccxToEvmForm.patchValue({
         amount: '100',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
+        ccxFromAddress: MOCK_CCX_ADDRESS,
+        evmToAddress: MOCK_EVM_ADDRESS,
         email: 'test@example.com',
       });
       component.ccxToEvmForm.controls.amount.markAsTouched();
@@ -772,8 +791,7 @@ describe('SwapPage', () => {
       component.config.set(null);
       component.evmToCcxForm.patchValue({
         amount: '100',
-        ccxToAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxToAddress: MOCK_CCX_ADDRESS,
       });
       component.evmToCcxForm.controls.amount.markAsTouched();
       component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
@@ -786,8 +804,7 @@ describe('SwapPage', () => {
     it('should show error for amount below minimum', async () => {
       component.evmToCcxForm.patchValue({
         amount: '0.5',
-        ccxToAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxToAddress: MOCK_CCX_ADDRESS,
       });
       component.evmToCcxForm.controls.amount.markAsTouched();
       component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
@@ -800,8 +817,7 @@ describe('SwapPage', () => {
     it('should show error for amount above maximum', async () => {
       component.evmToCcxForm.patchValue({
         amount: '100000',
-        ccxToAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxToAddress: MOCK_CCX_ADDRESS,
       });
       component.evmToCcxForm.controls.amount.markAsTouched();
       component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
@@ -815,8 +831,7 @@ describe('SwapPage', () => {
       component.ccxSwapBalance.set(50);
       component.evmToCcxForm.patchValue({
         amount: '100',
-        ccxToAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxToAddress: MOCK_CCX_ADDRESS,
       });
       component.evmToCcxForm.controls.amount.markAsTouched();
       component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
@@ -841,8 +856,7 @@ describe('SwapPage', () => {
     it('should handle wallet connection failure', async () => {
       component.evmToCcxForm.patchValue({
         amount: '100',
-        ccxToAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxToAddress: MOCK_CCX_ADDRESS,
       });
       component.evmToCcxForm.controls.amount.markAsTouched();
       component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
@@ -857,8 +871,7 @@ describe('SwapPage', () => {
     it('should handle successful swap initialization', async () => {
       component.evmToCcxForm.patchValue({
         amount: '100',
-        ccxToAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxToAddress: MOCK_CCX_ADDRESS,
       });
       component.evmToCcxForm.controls.amount.markAsTouched();
       component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
@@ -874,11 +887,31 @@ describe('SwapPage', () => {
       expect(component.paymentId()).toBe('test-payment-id');
     });
 
+    it('should handle swap initialization failure for evm-to-ccx', async () => {
+      component.evmToCcxForm.patchValue({
+        amount: '100',
+        ccxToAddress: MOCK_CCX_ADDRESS,
+      });
+      component.evmToCcxForm.controls.amount.markAsTouched();
+      component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
+      walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
+      walletMock.ensureChain.mockResolvedValue(undefined);
+
+      // Mock failed init
+      apiMock.sendWccxToCcxInit.mockReturnValue(
+        of({ success: false, error: 'EVM-to-CCX init failed' }),
+      );
+
+      await component.startEvmToCcx();
+
+      expect(component.isBusy()).toBe(false);
+      expect(component.statusMessage()).toBe('EVM-to-CCX init failed');
+    });
+
     it('should check token balance before transfer', async () => {
       component.evmToCcxForm.patchValue({
         amount: '100',
-        ccxToAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxToAddress: MOCK_CCX_ADDRESS,
       });
       component.evmToCcxForm.controls.amount.markAsTouched();
       component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
@@ -903,8 +936,7 @@ describe('SwapPage', () => {
     it('should handle swap execution failure', async () => {
       component.evmToCcxForm.patchValue({
         amount: '100',
-        ccxToAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxToAddress: MOCK_CCX_ADDRESS,
       });
       component.evmToCcxForm.controls.amount.markAsTouched();
       component.evmToCcxForm.controls.ccxToAddress.markAsTouched();
@@ -927,8 +959,7 @@ describe('SwapPage', () => {
     it('should handle invalid amount', async () => {
       component.evmToCcxForm.patchValue({
         amount: 'not-a-number',
-        ccxToAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
+        ccxToAddress: MOCK_CCX_ADDRESS,
       });
       // Manually override the pattern validation for this test
       component.evmToCcxForm.controls.amount.setErrors(null);
@@ -953,24 +984,7 @@ describe('SwapPage', () => {
     });
 
     it('should start polling after successful swap initialization', async () => {
-      component.ccxToEvmForm.patchValue({
-        amount: '100',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
-      });
-      component.ccxToEvmForm.controls.amount.markAsTouched();
-      component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
-      component.ccxToEvmForm.controls.evmToAddress.markAsTouched();
-      walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
-      walletMock.ensureChain.mockResolvedValue(undefined);
-      apiMock.estimateGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
-      apiMock.getGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
-      walletMock.sendNativeTransaction.mockResolvedValue('0xabcd1234');
-      walletMock.waitForReceipt.mockResolvedValue({ status: 'success' });
-      apiMock.sendCcxToWccxInit.mockReturnValue(
-        of({ success: true, paymentId: 'test-payment-id' }),
-      );
+      setupSuccessfulCcxToEvmInit();
       apiMock.checkSwapState.mockReturnValue(of({ result: false }));
 
       await component.startCcxToEvm();
@@ -1149,24 +1163,7 @@ describe('SwapPage', () => {
       routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'eth' }));
       fixture.detectChanges();
 
-      component.ccxToEvmForm.patchValue({
-        amount: '100',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
-      });
-      component.ccxToEvmForm.controls.amount.markAsTouched();
-      component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
-      component.ccxToEvmForm.controls.evmToAddress.markAsTouched();
-      walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
-      walletMock.ensureChain.mockResolvedValue(undefined);
-      apiMock.estimateGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
-      apiMock.getGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
-      walletMock.sendNativeTransaction.mockResolvedValue('0xabcd1234');
-      walletMock.waitForReceipt.mockResolvedValue({ status: 'success' });
-      apiMock.sendCcxToWccxInit.mockReturnValue(
-        of({ success: true, paymentId: 'test-payment-id' }),
-      );
+      setupSuccessfulCcxToEvmInit();
 
       await component.startCcxToEvm();
 
@@ -1181,24 +1178,7 @@ describe('SwapPage', () => {
 
       expect(component.step()).toBe(0);
 
-      component.ccxToEvmForm.patchValue({
-        amount: '100',
-        ccxFromAddress:
-          'ccx7Test12345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghij',
-        evmToAddress: '0x742d35cc6634c0532925a3b844bc9e7595f0beb1',
-      });
-      component.ccxToEvmForm.controls.amount.markAsTouched();
-      component.ccxToEvmForm.controls.ccxFromAddress.markAsTouched();
-      component.ccxToEvmForm.controls.evmToAddress.markAsTouched();
-      walletMock.connect.mockResolvedValue('0x1234567890123456789012345678901234567890');
-      walletMock.ensureChain.mockResolvedValue(undefined);
-      apiMock.estimateGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
-      apiMock.getGasPrice.mockReturnValue(of({ result: true, gas: 0.01 }));
-      walletMock.sendNativeTransaction.mockResolvedValue('0xabcd1234');
-      walletMock.waitForReceipt.mockResolvedValue({ status: 'success' });
-      apiMock.sendCcxToWccxInit.mockReturnValue(
-        of({ success: true, paymentId: 'test-payment-id' }),
-      );
+      setupSuccessfulCcxToEvmInit();
 
       await component.startCcxToEvm();
 
