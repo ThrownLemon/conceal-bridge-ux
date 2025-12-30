@@ -23,17 +23,20 @@ export interface CapturedError {
  * Global error handler that captures uncaught exceptions and provides
  * user-friendly error states for the application.
  *
- * This service extends Angular's ErrorHandler to:
+ * This service implements Angular's ErrorHandler interface to:
  * - Catch and normalize all uncaught exceptions
  * - Detect chunk loading errors (lazy load failures)
  * - Detect network-related errors
  * - Provide recovery options (reload, navigate home)
  * - Log errors appropriately for debugging
+ * - Rate-limit rapid error floods to prevent UI thrashing
  *
  * @example
  * ```typescript
- * // In app.config.ts
+ * // In app.config.ts, use useExisting to ensure the same singleton
+ * // instance is used for both injection and Angular's error handling:
  * providers: [
+ *   GlobalErrorHandler,
  *   { provide: ErrorHandler, useExisting: GlobalErrorHandler },
  * ]
  * ```
@@ -42,6 +45,12 @@ export interface CapturedError {
 export class GlobalErrorHandler implements ErrorHandler {
   readonly #zone = inject(NgZone);
   readonly #router = inject(Router);
+
+  /** Minimum milliseconds between displaying error UI to prevent flooding */
+  static readonly ERROR_THROTTLE_MS = 1000;
+
+  /** Timestamp of the last error that was displayed to the user */
+  #lastErrorTime = 0;
 
   /**
    * Signal indicating whether the application is in an error state.
@@ -61,23 +70,43 @@ export class GlobalErrorHandler implements ErrorHandler {
    * Handles an error caught by Angular's error handling mechanism.
    * This method is called automatically for uncaught exceptions.
    *
+   * Protected by try-catch to prevent infinite recursion if internal
+   * operations fail. Rate-limited to prevent UI thrashing from error floods.
+   *
    * @param error - The error that was thrown
    */
   handleError(error: unknown): void {
-    // Extract the actual error from wrapped errors
-    const unwrapped = this.#unwrapError(error);
+    try {
+      // Rate limit error display to prevent flooding
+      const now = Date.now();
+      if (now - this.#lastErrorTime < GlobalErrorHandler.ERROR_THROTTLE_MS) {
+        // Still log the error even if we don't display it
+        console.error('[GlobalErrorHandler] Error throttled:', error);
+        return;
+      }
+      this.#lastErrorTime = now;
 
-    // Create a captured error object
-    const captured = this.#createCapturedError(unwrapped);
+      // Extract the actual error from wrapped errors
+      const unwrapped = this.#unwrapError(error);
 
-    // Log the error for debugging
-    this.#logError(captured, unwrapped);
+      // Create a captured error object
+      const captured = this.#createCapturedError(unwrapped);
 
-    // Update the error state (run inside NgZone to trigger change detection)
-    this.#zone.run(() => {
-      this.#hasError.set(true);
-      this.#currentError.set(captured);
-    });
+      // Log the error for debugging
+      this.#logError(captured, unwrapped);
+
+      // Update the error state (run inside NgZone to trigger change detection)
+      this.#zone.run(() => {
+        this.#hasError.set(true);
+        this.#currentError.set(captured);
+      });
+    } catch (internalError) {
+      // Last-resort fallback: log to console without triggering handleError again
+      console.error('[GlobalErrorHandler] Failed to handle error:', {
+        originalError: error,
+        internalError,
+      });
+    }
   }
 
   /**
@@ -100,11 +129,16 @@ export class GlobalErrorHandler implements ErrorHandler {
   /**
    * Navigates to the home page and clears the error state.
    * Provides a way to recover from errors on specific pages.
+   * Falls back to a hard redirect if router navigation fails.
    */
   goHome(): void {
     this.clearError();
     this.#zone.run(() => {
-      void this.#router.navigate(['/']);
+      this.#router.navigate(['/']).catch(() => {
+        // Router navigation failed (guard blocked, router in bad state, etc.)
+        // Fall back to a hard redirect which will reload the app
+        window.location.href = '/';
+      });
     });
   }
 

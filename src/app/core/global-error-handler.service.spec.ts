@@ -34,12 +34,17 @@ describe('GlobalErrorHandler', () => {
       expect(service.currentError()?.message).toContain('unexpected error');
     });
 
-    it('should generate unique error IDs', () => {
+    it('should generate unique error IDs', async () => {
       const error1 = new Error('Error 1');
       const error2 = new Error('Error 2');
 
       service.handleError(error1);
       const id1 = service.currentError()?.id;
+
+      // Wait for throttle period to pass so second error is not throttled
+      await new Promise((resolve) =>
+        setTimeout(resolve, GlobalErrorHandler.ERROR_THROTTLE_MS + 10),
+      );
 
       service.clearError();
       service.handleError(error2);
@@ -100,6 +105,50 @@ describe('GlobalErrorHandler', () => {
       service.handleError(error);
 
       expect(service.currentError()?.isNetworkError).toBe(true);
+    });
+
+    it('should detect TimeoutError by name', () => {
+      const error = new Error('Failed');
+      error.name = 'TimeoutError';
+
+      service.handleError(error);
+
+      expect(service.currentError()?.isNetworkError).toBe(true);
+    });
+
+    it('should detect fetch errors from message', () => {
+      const error = new Error('Failed to fetch');
+
+      service.handleError(error);
+
+      expect(service.currentError()?.isNetworkError).toBe(true);
+    });
+
+    it('should detect offline errors from message', () => {
+      const error = new Error('The browser is offline');
+
+      service.handleError(error);
+
+      expect(service.currentError()?.isNetworkError).toBe(true);
+    });
+
+    it('should detect chunkloaderror from message pattern', () => {
+      const error = new Error('chunkloaderror: failed to load chunk');
+
+      service.handleError(error);
+
+      expect(service.currentError()?.isChunkError).toBe(true);
+    });
+
+    it('should prioritize chunk errors over network errors', () => {
+      // Error that matches both chunk and network patterns
+      const error = new Error('Failed to fetch dynamically imported module');
+
+      service.handleError(error);
+
+      // Chunk error should take precedence in messaging
+      expect(service.currentError()?.isChunkError).toBe(true);
+      expect(service.currentError()?.message).toContain('load part of the application');
     });
 
     it('should handle ErrorEvent wrapper', () => {
@@ -201,6 +250,32 @@ describe('GlobalErrorHandler', () => {
 
       navigateSpy.mockRestore();
     });
+
+    it('should fallback to window.location when navigation fails', async () => {
+      const navigateSpy = vi.spyOn(router, 'navigate').mockRejectedValue(new Error('Nav failed'));
+      // Mock window.location.href
+      const originalHref = window.location.href;
+      const hrefSpy = vi.fn();
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, href: originalHref },
+        writable: true,
+      });
+      Object.defineProperty(window.location, 'href', {
+        set: hrefSpy,
+        get: () => originalHref,
+      });
+
+      service.handleError(new Error('Test'));
+      service.goHome();
+
+      // Wait for the promise rejection to be caught
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      expect(navigateSpy).toHaveBeenCalledWith(['/']);
+      expect(hrefSpy).toHaveBeenCalledWith('/');
+
+      navigateSpy.mockRestore();
+    });
   });
 
   describe('captured error structure', () => {
@@ -215,6 +290,65 @@ describe('GlobalErrorHandler', () => {
       expect(error?.timestamp).toBeInstanceOf(Date);
       expect(typeof error?.isChunkError).toBe('boolean');
       expect(typeof error?.isNetworkError).toBe('boolean');
+    });
+  });
+
+  describe('rate limiting', () => {
+    it('should throttle rapid successive errors', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      try {
+        // First error should be captured
+        service.handleError(new Error('Error 1'));
+        const firstId = service.currentError()?.id;
+        expect(service.hasError()).toBe(true);
+
+        // Immediate second error should be throttled
+        service.handleError(new Error('Error 2'));
+        expect(service.currentError()?.id).toBe(firstId);
+
+        // Should have logged the throttled error
+        expect(consoleSpy).toHaveBeenCalledWith(
+          '[GlobalErrorHandler] Error throttled:',
+          expect.any(Error),
+        );
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    });
+
+    it('should allow errors after throttle period', async () => {
+      // First error
+      service.handleError(new Error('Error 1'));
+      const firstId = service.currentError()?.id;
+
+      // Wait for throttle period to pass
+      await new Promise((resolve) =>
+        setTimeout(resolve, GlobalErrorHandler.ERROR_THROTTLE_MS + 10),
+      );
+
+      // Clear and handle new error
+      service.clearError();
+      service.handleError(new Error('Error 2'));
+      const secondId = service.currentError()?.id;
+
+      expect(firstId).not.toBe(secondId);
+    });
+  });
+
+  describe('error handling resilience', () => {
+    it('should handle edge case error objects without throwing', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      try {
+        // Various edge cases that shouldn't crash handleError
+        expect(() => service.handleError(undefined)).not.toThrow();
+        expect(() => service.handleError(null)).not.toThrow();
+        expect(() => service.handleError(0)).not.toThrow();
+        expect(() => service.handleError('')).not.toThrow();
+        expect(() => service.handleError({})).not.toThrow();
+        expect(() => service.handleError(Symbol('test'))).not.toThrow();
+      } finally {
+        consoleSpy.mockRestore();
+      }
     });
   });
 });

@@ -89,17 +89,24 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorBoundaryComponent {
+  /** Access to the global error handler for state and actions */
   protected readonly errorHandler = inject(GlobalErrorHandler);
 
   /** Reference to the error dialog element for focus management */
   private readonly errorDialog = viewChild<ElementRef<HTMLDivElement>>('errorDialog');
 
   constructor() {
-    // Focus the dialog when an error appears for screen reader accessibility
+    // Focus the dialog when an error appears for screen reader accessibility.
+    // This effect runs whenever errorDialog() signal changes (element appears/disappears).
     effect(() => {
       const dialogRef = this.errorDialog();
       if (dialogRef) {
-        dialogRef.nativeElement.focus();
+        try {
+          dialogRef.nativeElement.focus();
+        } catch {
+          // Focus call can fail if element is not focusable or DOM is in bad state.
+          // Silently ignore since accessibility focus is best-effort.
+        }
       }
     });
   }
