@@ -147,13 +147,11 @@ describe('ErrorBoundaryComponent', () => {
     });
 
     it('should focus the dialog when error appears', async () => {
-      // The effect should have focused the dialog
-      const dialog = fixture.nativeElement.querySelector('[role="alertdialog"]');
-      await new Promise((resolve) => setTimeout(resolve, 10));
-      fixture.detectChanges();
+      // Wait for effect to run and complete focus operation
+      await fixture.whenStable();
 
-      // Check that dialog can receive focus
-      expect(dialog.getAttribute('tabindex')).toBe('-1');
+      const dialog = fixture.nativeElement.querySelector('[role="alertdialog"]');
+      expect(document.activeElement).toBe(dialog);
     });
   });
 });
