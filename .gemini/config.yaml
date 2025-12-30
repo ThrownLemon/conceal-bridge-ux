@@ -1,0 +1,38 @@
+# Gemini Code Assist Configuration
+# Docs: https://developers.google.com/gemini-code-assist/docs/customize-gemini-behavior-github
+
+# Disable fun features (poems in summaries, etc.)
+have_fun: false
+
+# Files to ignore during code review
+ignore_patterns:
+  - '**/*.lock'
+  - '**/package-lock.json'
+  - '**/dist/**'
+  - '**/node_modules/**'
+  - '**/*.min.js'
+  - '**/*.min.css'
+  - '**/coverage/**'
+  - '**/.angular/**'
+
+# Code review settings
+code_review:
+  # Only show medium severity and above (skip low/nitpick comments)
+  comment_severity_threshold: MEDIUM
+
+  # Limit review comments to avoid noise (set to -1 for unlimited)
+  max_review_comments: 10
+
+  # Pull request opened event settings
+  pull_request_opened:
+    # Disable the verbose PR summary comment
+    summary: false
+
+    # Keep code review enabled
+    code_review: true
+
+    # Disable the help message with usage instructions
+    help: false
+
+    # Skip draft PRs (review only when ready)
+    include_drafts: false
