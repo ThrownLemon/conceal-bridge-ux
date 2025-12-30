@@ -50,7 +50,7 @@ export class BridgeApiService {
 
   /**
    * Constructs the full API URL for a given network and path.
-   * @param network - The target EVM network ('eth', 'bsc', 'polygon').
+   * @param network - The target EVM network ('eth', 'bsc', 'plg').
    * @param path - The API endpoint path.
    * @returns The complete URL string.
    */
@@ -66,7 +66,7 @@ export class BridgeApiService {
    * Returns cached data if available; otherwise fetches from the API.
    * Configuration includes contract addresses, token decimals, and network details.
    *
-   * @param network - The target EVM network ('eth', 'bsc', 'polygon').
+   * @param network - The target EVM network ('eth', 'bsc', 'plg').
    * @returns Observable emitting the chain configuration.
    *
    * @example
@@ -97,7 +97,7 @@ export class BridgeApiService {
   /**
    * Estimates the gas price for a CCX → wCCX swap.
    *
-   * @param network - The target EVM network.
+   * @param network - The target EVM network ('eth', 'bsc', 'plg').
    * @param amount - The swap amount in CCX atomic units.
    * @returns Observable emitting the gas estimation result.
    *
@@ -119,7 +119,7 @@ export class BridgeApiService {
   /**
    * Gets the current gas price for the specified network.
    *
-   * @param network - The target EVM network.
+   * @param network - The target EVM network ('eth', 'bsc', 'plg').
    * @returns Observable emitting the current gas price.
    *
    * @example
@@ -140,7 +140,7 @@ export class BridgeApiService {
    *
    * This represents the maximum amount that can be swapped from wCCX to CCX.
    *
-   * @param network - The target EVM network.
+   * @param network - The target EVM network ('eth', 'bsc', 'plg').
    * @returns Observable emitting the CCX balance response.
    *
    * @example
@@ -159,12 +159,12 @@ export class BridgeApiService {
    *
    * This represents the maximum amount that can be swapped from CCX to wCCX.
    *
-   * @param network - The target EVM network.
+   * @param network - The target EVM network ('eth', 'bsc', 'plg').
    * @returns Observable emitting the wCCX balance response.
    *
    * @example
    * ```typescript
-   * bridge.getWccxSwapBalance('polygon').subscribe(response => {
+   * bridge.getWccxSwapBalance('plg').subscribe(response => {
    *   console.log('Available wCCX:', response.balance);
    * });
    * ```
@@ -179,7 +179,7 @@ export class BridgeApiService {
    * After calling this, the user should send CCX to the provided payment address,
    * then poll checkSwapState() until the swap is complete.
    *
-   * @param network - The target EVM network where wCCX will be minted.
+   * @param network - The target EVM network where wCCX will be minted ('eth', 'bsc', 'plg').
    * @param body - The swap initialization parameters.
    * @param body.email - Optional email for notifications.
    * @param body.amount - The amount of CCX to swap (in atomic units).
@@ -224,7 +224,7 @@ export class BridgeApiService {
    * Called after the user has sent wCCX to the bridge contract.
    * The backend will verify the transaction and prepare the CCX payout.
    *
-   * @param network - The EVM network where wCCX was burned.
+   * @param network - The EVM network where wCCX was burned ('eth', 'bsc', 'plg').
    * @param body - The swap initialization parameters.
    * @param body.fromAddress - The EVM address that sent wCCX.
    * @param body.toAddress - The CCX wallet address to receive funds.
@@ -268,7 +268,7 @@ export class BridgeApiService {
    * Called to trigger the actual CCX payout after the wCCX transfer
    * has been verified by the backend.
    *
-   * @param network - The EVM network of the original wCCX transfer.
+   * @param network - The EVM network of the original wCCX transfer ('eth', 'bsc', 'plg').
    * @param body - The execution parameters.
    * @param body.paymentId - The payment ID from sendWccxToCcxInit().
    * @param body.email - Optional email for notifications.
@@ -297,7 +297,7 @@ export class BridgeApiService {
    * Poll this method to track swap progress until completion.
    * The response includes status, confirmations, and transaction details.
    *
-   * @param network - The EVM network of the swap.
+   * @param network - The EVM network of the swap ('eth', 'bsc', 'plg').
    * @param direction - The swap direction: 'wccx' for CCX→wCCX, 'ccx' for wCCX→CCX.
    * @param paymentId - The payment ID from the swap initialization.
    * @returns Observable emitting the current swap state.

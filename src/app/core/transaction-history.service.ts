@@ -18,7 +18,7 @@ const STORAGE_KEY = 'conceal_bridge_tx_history';
  * // Add a new transaction
  * history.addTransaction({
  *   paymentId: 'abc123',
- *   direction: 'ccx-to-wccx',
+ *   direction: 'ccx-to-evm',
  *   amount: 1000,
  *   status: 'pending',
  *   timestamp: Date.now()
@@ -107,7 +107,7 @@ export class TransactionHistoryService {
    * ```typescript
    * history.addTransaction({
    *   paymentId: 'abc123',
-   *   direction: 'ccx-to-wccx',
+   *   direction: 'ccx-to-evm',
    *   amount: 1000000,
    *   status: 'completed',
    *   timestamp: Date.now(),
