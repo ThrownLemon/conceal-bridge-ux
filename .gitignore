@@ -71,5 +71,4 @@ playwright-report/
 
 .mcp.json
 
-.gemini/
 gha-creds-*.json
