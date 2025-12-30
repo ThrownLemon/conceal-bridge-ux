@@ -1081,11 +1081,8 @@ describe('SwapPage', () => {
 
       component.startPolling('eth', 'wccx', 'test-payment-id');
 
-      // Run through all retries (5 retries with backoff)
-      // Initial attempt + 5 retries = 6 total attempts
-      for (let i = 0; i < 6; i++) {
-        await vi.advanceTimersByTimeAsync(30000); // Max delay is 30s
-      }
+      // Run through all retries until exhaustion
+      await vi.runAllTimersAsync();
 
       expect(component.pollingError()).toContain('Unable to check swap status');
       expect(component.pollingError()).toContain('test-payment-id');
@@ -1222,7 +1219,7 @@ describe('SwapPage', () => {
       expect(component.step()).toBe(1);
     });
 
-    it('should transition from step 1 to step 2 when swap completes', () => {
+    it('should transition from step 1 to step 2 when swap completes', async () => {
       vi.useFakeTimers();
 
       component.step.set(1);
@@ -1241,7 +1238,7 @@ describe('SwapPage', () => {
       );
 
       component.startPolling('eth', 'wccx', 'test-payment-id');
-      vi.advanceTimersByTime(0);
+      await vi.advanceTimersByTimeAsync(0);
 
       expect(component.step()).toBe(2);
       expect(component.statusMessage()).toBe('Payment received!');
