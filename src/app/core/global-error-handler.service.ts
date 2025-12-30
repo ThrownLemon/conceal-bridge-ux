@@ -260,6 +260,6 @@ export class GlobalErrorHandler implements ErrorHandler {
    * @returns A unique error ID
    */
   #generateErrorId(): string {
-    return `err_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    return `err_${crypto.randomUUID()}`;
   }
 }
