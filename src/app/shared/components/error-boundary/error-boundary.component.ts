@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  effect,
+  inject,
+  viewChild,
+} from '@angular/core';
 
 import { GlobalErrorHandler } from '@/core/global-error-handler.service';
 import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
@@ -29,6 +36,8 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
   template: `
     @if (errorHandler.currentError(); as error) {
       <div
+        #errorDialog
+        tabindex="-1"
         class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
         role="alertdialog"
         aria-modal="true"
@@ -81,4 +90,17 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 })
 export class ErrorBoundaryComponent {
   protected readonly errorHandler = inject(GlobalErrorHandler);
+
+  /** Reference to the error dialog element for focus management */
+  private readonly errorDialog = viewChild<ElementRef<HTMLDivElement>>('errorDialog');
+
+  constructor() {
+    // Focus the dialog when an error appears for screen reader accessibility
+    effect(() => {
+      const dialogRef = this.errorDialog();
+      if (dialogRef) {
+        dialogRef.nativeElement.focus();
+      }
+    });
+  }
 }

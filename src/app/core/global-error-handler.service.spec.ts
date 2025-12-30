@@ -146,18 +146,20 @@ describe('GlobalErrorHandler', () => {
 
     it('should log error to console', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-      const error = new Error('Test error');
+      try {
+        const error = new Error('Test error');
 
-      service.handleError(error);
+        service.handleError(error);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '[GlobalErrorHandler] Uncaught error:',
-        expect.objectContaining({
-          message: expect.any(String),
-        }),
-      );
-
-      consoleSpy.mockRestore();
+        expect(consoleSpy).toHaveBeenCalledWith(
+          '[GlobalErrorHandler] Uncaught error:',
+          expect.objectContaining({
+            message: expect.any(String),
+          }),
+        );
+      } finally {
+        consoleSpy.mockRestore();
+      }
     });
   });
 

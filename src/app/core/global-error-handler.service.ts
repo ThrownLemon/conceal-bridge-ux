@@ -34,7 +34,7 @@ export interface CapturedError {
  * ```typescript
  * // In app.config.ts
  * providers: [
- *   { provide: ErrorHandler, useClass: GlobalErrorHandler },
+ *   { provide: ErrorHandler, useExisting: GlobalErrorHandler },
  * ]
  * ```
  */
