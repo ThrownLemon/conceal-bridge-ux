@@ -24,7 +24,7 @@ import type {
  *
  * // Get chain configuration
  * bridge.getChainConfig('bsc').subscribe(config => {
- *   console.log('wCCX contract:', config.wrappedCcxContract);
+ *   console.log('wCCX contract:', config.wccx.contractAddress);
  * });
  *
  * // Initiate a CCX → wCCX swap
@@ -72,8 +72,8 @@ export class BridgeApiService {
    * @example
    * ```typescript
    * bridge.getChainConfig('bsc').subscribe(config => {
-   *   console.log('Contract:', config.wrappedCcxContract);
-   *   console.log('Decimals:', config.units);
+   *   console.log('Contract:', config.wccx.contractAddress);
+   *   console.log('Decimals:', config.wccx.units);
    * });
    * ```
    */
@@ -186,7 +186,7 @@ export class BridgeApiService {
    * @param body.toAddress - The EVM address to receive wCCX.
    * @param body.fromAddress - The CCX wallet address sending funds.
    * @param body.txfeehash - The transaction hash of the gas fee payment.
-   * @returns Observable emitting the swap initialization response with paymentId.
+   * @returns Observable emitting the swap response. On success, contains `paymentId`; on failure, contains `error`.
    *
    * @example
    * ```typescript
@@ -196,8 +196,9 @@ export class BridgeApiService {
    *   fromAddress: 'ccxAddress...',
    *   txfeehash: '0x123...'
    * }).subscribe(response => {
-   *   console.log('Payment ID:', response.paymentId);
-   *   console.log('Send CCX to:', response.paymentAddress);
+   *   if (response.success) {
+   *     console.log('Payment ID:', response.paymentId);
+   *   }
    * });
    * ```
    */
@@ -231,7 +232,7 @@ export class BridgeApiService {
    * @param body.txHash - The transaction hash of the wCCX transfer.
    * @param body.amount - The amount of wCCX swapped (in atomic units).
    * @param body.email - Optional email for notifications.
-   * @returns Observable emitting the swap initialization response with paymentId.
+   * @returns Observable emitting the swap response. On success, contains `paymentId`; on failure, contains `error`.
    *
    * @example
    * ```typescript
@@ -295,22 +296,23 @@ export class BridgeApiService {
    * Checks the current state of a swap transaction.
    *
    * Poll this method to track swap progress until completion.
-   * The response includes status, confirmations, and transaction details.
+   * The response includes `result` (boolean) and optional `txdata` with transaction details.
    *
    * @param network - The EVM network of the swap ('eth', 'bsc', 'plg').
-   * @param direction - The swap direction: 'wccx' for CCX→wCCX, 'ccx' for wCCX→CCX.
+   * @param direction - The swap direction: 'wccx' when output is wCCX (CCX→wCCX), 'ccx' when output is CCX (wCCX→CCX).
    * @param paymentId - The payment ID from the swap initialization.
-   * @returns Observable emitting the current swap state.
+   * @returns Observable emitting the current swap state with `result` and optional `txdata`.
    *
    * @example
    * ```typescript
    * // Poll every 10 seconds until complete
    * interval(10000).pipe(
    *   switchMap(() => bridge.checkSwapState('bsc', 'wccx', paymentId)),
-   *   takeWhile(state => state.status !== 'completed', true)
+   *   takeWhile(state => !state.result || !state.txdata, true)
    * ).subscribe(state => {
-   *   console.log('Status:', state.status);
-   *   console.log('Confirmations:', state.confirmations);
+   *   if (state.txdata) {
+   *     console.log('Swap complete:', state.txdata.swapHash);
+   *   }
    * });
    * ```
    */
