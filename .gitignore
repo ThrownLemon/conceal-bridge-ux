@@ -70,3 +70,6 @@ playwright-report/
 .claude-flow/metrics/system-metrics.json
 
 .mcp.json
+
+.gemini/
+gha-creds-*.json
