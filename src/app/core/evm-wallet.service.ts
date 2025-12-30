@@ -23,6 +23,12 @@ interface Eip1193Provider {
   connect?: () => Promise<void> | void;
 }
 
+/**
+ * Supported wallet connector identifiers.
+ * - 'metamask': MetaMask browser extension
+ * - 'trust': Trust Wallet browser extension
+ * - 'binance': Binance Wallet browser extension
+ */
 export type WalletConnectorId = 'metamask' | 'trust' | 'binance';
 
 type ProviderWithFlags = Eip1193Provider & {
@@ -33,30 +39,83 @@ type ProviderWithFlags = Eip1193Provider & {
   isBinanceChain?: boolean;
 };
 
+/**
+ * Service for managing EVM wallet connections and blockchain interactions.
+ *
+ * Provides wallet connection management, chain switching, transaction sending,
+ * and state hydration for EVM-compatible wallets (MetaMask, Trust, Binance).
+ *
+ * @example
+ * ```typescript
+ * const wallet = inject(EvmWalletService);
+ *
+ * // Connect with specific wallet
+ * await wallet.connectWith('metamask');
+ *
+ * // Check connection status
+ * if (wallet.isConnected()) {
+ *   console.log('Connected address:', wallet.address());
+ * }
+ *
+ * // Switch to a specific chain before transaction
+ * await wallet.ensureChain(bsc);
+ * ```
+ */
 @Injectable({ providedIn: 'root' })
 export class EvmWalletService {
   readonly #destroyRef = inject(DestroyRef);
 
+  /** LocalStorage key used to persist the user's explicit disconnect action. */
   static readonly DISCONNECTED_STORAGE_KEY = 'conceal_bridge_wallet_disconnected';
 
   readonly #address = signal<Address | null>(null);
+  /**
+   * The currently connected wallet address.
+   * @returns The connected EVM address or null if not connected.
+   */
   readonly address = this.#address.asReadonly();
 
   readonly #chainId = signal<number | null>(null);
+  /**
+   * The current chain ID the wallet is connected to.
+   * @returns The chain ID number or null if not connected/unknown.
+   */
   readonly chainId = this.#chainId.asReadonly();
 
   readonly #disconnectedByUser = signal(false);
+  /**
+   * Indicates whether the user explicitly disconnected their wallet.
+   * Used to prevent auto-reconnection on page reload.
+   * @returns True if user clicked disconnect, false otherwise.
+   */
   readonly disconnectedByUser = this.#disconnectedByUser.asReadonly();
 
   readonly #connector = signal<WalletConnectorId | null>(null);
+  /**
+   * The currently active wallet connector type.
+   * @returns The connector ID ('metamask', 'trust', 'binance') or null if not connected.
+   */
   readonly connector = this.#connector.asReadonly();
 
   readonly #provider = signal<Eip1193Provider | null>(null);
+  /**
+   * The underlying EIP-1193 provider instance.
+   * @returns The provider object or null if not available.
+   */
   readonly provider = this.#provider.asReadonly();
 
+  /**
+   * Whether an injected EVM provider (window.ethereum) is available.
+   * @returns True if window.ethereum exists, typically indicating MetaMask/Trust extension.
+   */
   readonly hasInjectedProvider = computed(
     () => typeof window !== 'undefined' && !!(window as unknown as { ethereum?: unknown }).ethereum,
   );
+
+  /**
+   * Whether the Binance Wallet provider (window.BinanceChain) is available.
+   * @returns True if Binance Wallet extension is installed.
+   */
   readonly hasBinanceProvider = computed(
     () =>
       typeof window !== 'undefined' &&
@@ -64,18 +123,41 @@ export class EvmWalletService {
   );
 
   /**
-   * Legacy name used across the app: indicates an injected EVM provider is present.
-   * (MetaMask / Trust / Binance Wallet browser extension typically expose this.)
+   * Legacy alias for hasInjectedProvider.
+   * Indicates an injected EVM provider is present (MetaMask/Trust/Binance extension).
+   * @returns True if any injected provider is detected.
    */
   readonly isInstalled = computed(() => this.hasInjectedProvider());
+
+  /**
+   * Whether a wallet is currently connected.
+   * @returns True if an address is set, false otherwise.
+   */
   readonly isConnected = computed(() => !!this.address());
 
+  /**
+   * A truncated version of the connected address for display purposes.
+   * @returns Formatted address like "0x1234...5678" or empty string if not connected.
+   */
   readonly shortAddress = computed(() => {
     const addr = this.address();
     if (!addr) return '';
     return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
   });
 
+  /**
+   * Checks if a specific wallet connector is available in the browser.
+   *
+   * @param connector - The wallet connector type to check ('metamask', 'trust', 'binance').
+   * @returns True if the specified wallet extension is detected.
+   *
+   * @example
+   * ```typescript
+   * if (walletService.isConnectorAvailable('metamask')) {
+   *   await walletService.connectWith('metamask');
+   * }
+   * ```
+   */
   isConnectorAvailable(connector: WalletConnectorId): boolean {
     if (connector === 'binance') return this.hasBinanceProvider();
 
@@ -110,8 +192,18 @@ export class EvmWalletService {
   }
 
   /**
-   * Hydrate wallet state without triggering any wallet permission prompts.
-   * Uses `getAddresses` (eth_accounts) + `getChainId` (eth_chainId).
+   * Hydrates wallet state from the browser without triggering permission prompts.
+   *
+   * Uses eth_accounts and eth_chainId to restore connection state on page load.
+   * Respects the user's disconnect preference stored in localStorage.
+   *
+   * @returns Promise that resolves when hydration is complete.
+   *
+   * @example
+   * ```typescript
+   * // Called automatically in constructor, but can be called manually
+   * await walletService.hydrate();
+   * ```
    */
   async hydrate(): Promise<void> {
     const provider = this.#provider() ?? this.#injectedProvider();
@@ -136,6 +228,25 @@ export class EvmWalletService {
     }
   }
 
+  /**
+   * Connects to the default injected EVM wallet.
+   *
+   * Prompts the user to approve connection if not already authorized.
+   * Clears any previous disconnect flag.
+   *
+   * @returns Promise resolving to the connected wallet address.
+   * @throws Error if no injected wallet is detected or no account is returned.
+   *
+   * @example
+   * ```typescript
+   * try {
+   *   const address = await walletService.connect();
+   *   console.log('Connected:', address);
+   * } catch (error) {
+   *   console.error('Connection failed:', error.message);
+   * }
+   * ```
+   */
   async connect(): Promise<Address> {
     this.#setDisconnectedFlag(false);
     // Backwards compatible default: best-effort injected provider.
@@ -154,6 +265,24 @@ export class EvmWalletService {
     return account;
   }
 
+  /**
+   * Connects to a specific wallet provider by connector type.
+   *
+   * Prompts the user to approve connection if not already authorized.
+   * Use isConnectorAvailable() first to check if the wallet is installed.
+   *
+   * @param connector - The wallet connector type ('metamask', 'trust', 'binance').
+   * @returns Promise resolving to the connected wallet address.
+   * @throws Error if the specified wallet is not detected or no account is returned.
+   *
+   * @example
+   * ```typescript
+   * if (walletService.isConnectorAvailable('metamask')) {
+   *   const address = await walletService.connectWith('metamask');
+   *   console.log('Connected via MetaMask:', address);
+   * }
+   * ```
+   */
   async connectWith(connector: WalletConnectorId): Promise<Address> {
     this.#setDisconnectedFlag(false);
     const provider = await this.#resolveProvider(connector);
@@ -172,6 +301,21 @@ export class EvmWalletService {
     return account;
   }
 
+  /**
+   * Disconnects the currently connected wallet.
+   *
+   * Attempts to use ERC-7846 disconnect if supported by the wallet,
+   * then falls back to provider.disconnect(). Persists the disconnect
+   * state to localStorage to prevent auto-reconnection on page reload.
+   *
+   * @returns Promise that resolves when disconnection is complete.
+   *
+   * @example
+   * ```typescript
+   * await walletService.disconnect();
+   * console.log('Wallet disconnected');
+   * ```
+   */
   async disconnect(): Promise<void> {
     const provider = this.#provider();
     try {
@@ -205,6 +349,24 @@ export class EvmWalletService {
     */
   }
 
+  /**
+   * Ensures the wallet is connected to the specified chain.
+   *
+   * Attempts to switch to the chain, and if the chain is not known to the wallet
+   * (error code 4902), adds it first then switches.
+   *
+   * @param chain - The Viem chain object to switch to (e.g., mainnet, bsc, polygon).
+   * @returns Promise that resolves when chain switch is complete.
+   * @throws Error if no wallet provider is available or chain switch fails.
+   *
+   * @example
+   * ```typescript
+   * import { bsc } from 'viem/chains';
+   *
+   * await walletService.ensureChain(bsc);
+   * // Wallet is now on BSC, ready for transactions
+   * ```
+   */
   async ensureChain(chain: Chain): Promise<void> {
     const provider = this.#provider() ?? this.#injectedProvider();
     if (!provider) throw new Error('No EVM wallet provider available.');
@@ -224,6 +386,28 @@ export class EvmWalletService {
     }
   }
 
+  /**
+   * Prompts the wallet to track/watch an ERC-20 token.
+   *
+   * Adds the token to the user's wallet UI for easy balance viewing.
+   *
+   * @param params - Token parameters.
+   * @param params.address - The token contract address.
+   * @param params.symbol - The token symbol (e.g., 'wCCX').
+   * @param params.decimals - The token decimals (e.g., 6).
+   * @param params.image - Optional URL to the token icon.
+   * @returns Promise resolving to true if the token was added successfully.
+   * @throws Error if no wallet provider is available.
+   *
+   * @example
+   * ```typescript
+   * await walletService.watchErc20Asset({
+   *   address: '0x...',
+   *   symbol: 'wCCX',
+   *   decimals: 6,
+   * });
+   * ```
+   */
   async watchErc20Asset(params: {
     address: Address;
     symbol: string;
@@ -239,6 +423,27 @@ export class EvmWalletService {
     });
   }
 
+  /**
+   * Creates Viem wallet and public clients for blockchain interactions.
+   *
+   * @param chain - The Viem chain object to create clients for.
+   * @param provider - Optional EIP-1193 provider. Defaults to the current provider.
+   * @returns Object containing walletClient and publicClient.
+   * @throws Error if no provider is available.
+   *
+   * @example
+   * ```typescript
+   * import { bsc } from 'viem/chains';
+   *
+   * const { walletClient, publicClient } = walletService.getClients(bsc);
+   *
+   * // Use publicClient for read operations
+   * const balance = await publicClient.getBalance({ address });
+   *
+   * // Use walletClient for write operations
+   * const hash = await walletClient.sendTransaction({ ... });
+   * ```
+   */
   getClients(chain: Chain, provider?: Eip1193Provider) {
     const p = provider ?? this.#provider() ?? this.#injectedProvider();
     if (!p) throw new Error('No EVM wallet provider available.');
@@ -250,6 +455,33 @@ export class EvmWalletService {
     return { walletClient, publicClient };
   }
 
+  /**
+   * Sends a native token transaction (ETH, BNB, MATIC).
+   *
+   * Connects the wallet if not already connected. Does NOT automatically
+   * switch chains - use ensureChain() first.
+   *
+   * @param params - Transaction parameters.
+   * @param params.chain - The chain to send the transaction on.
+   * @param params.to - The recipient address.
+   * @param params.value - The amount to send in wei (as BigInt).
+   * @param params.data - Optional hex-encoded calldata.
+   * @returns Promise resolving to the transaction hash.
+   * @throws Error if no wallet provider is available.
+   *
+   * @example
+   * ```typescript
+   * import { bsc } from 'viem/chains';
+   * import { parseEther } from 'viem';
+   *
+   * await walletService.ensureChain(bsc);
+   * const hash = await walletService.sendNativeTransaction({
+   *   chain: bsc,
+   *   to: '0x...',
+   *   value: parseEther('0.1'),
+   * });
+   * ```
+   */
   async sendNativeTransaction(params: {
     chain: Chain;
     to: Address;
@@ -270,6 +502,26 @@ export class EvmWalletService {
     });
   }
 
+  /**
+   * Waits for a transaction to be confirmed on-chain.
+   *
+   * @param params - Wait parameters.
+   * @param params.chain - The chain the transaction was sent on.
+   * @param params.hash - The transaction hash to wait for.
+   * @param params.confirmations - Number of block confirmations required.
+   * @returns Promise resolving to the transaction receipt.
+   * @throws Error if no wallet provider is available or transaction fails.
+   *
+   * @example
+   * ```typescript
+   * const receipt = await walletService.waitForReceipt({
+   *   chain: bsc,
+   *   hash: '0x...',
+   *   confirmations: 3,
+   * });
+   * console.log('Transaction confirmed:', receipt.status);
+   * ```
+   */
   async waitForReceipt(params: { chain: Chain; hash: Hash; confirmations: number }) {
     const provider = this.#provider() ?? this.#injectedProvider();
     if (!provider) throw new Error('No EVM wallet provider available.');
@@ -280,6 +532,20 @@ export class EvmWalletService {
     });
   }
 
+  /**
+   * Refreshes the current chain ID from the wallet provider.
+   *
+   * Updates the chainId signal with the current network. Called automatically
+   * after connect, ensureChain, and hydrate operations.
+   *
+   * @returns Promise that resolves when chain ID is updated.
+   *
+   * @example
+   * ```typescript
+   * await walletService.refreshChainId();
+   * console.log('Current chain:', walletService.chainId());
+   * ```
+   */
   async refreshChainId(): Promise<void> {
     try {
       const provider = this.#provider() ?? this.#injectedProvider();
