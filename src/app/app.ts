@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ErrorBoundaryComponent } from '@/shared/components/error-boundary/error-boundary.component';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
 import { TransactionHistoryService } from './core/transaction-history.service';
@@ -15,6 +16,7 @@ import { WalletModalComponent } from './shared/wallet/wallet-modal.component';
   imports: [
     RouterLink,
     RouterOutlet,
+    ErrorBoundaryComponent,
     WalletButtonComponent,
     TransactionHistoryComponent,
     WalletModalComponent,

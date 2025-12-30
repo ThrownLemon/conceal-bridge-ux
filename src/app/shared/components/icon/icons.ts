@@ -66,6 +66,7 @@ import {
   Plus,
   Popcorn,
   Puzzle,
+  RefreshCw,
   Save,
   Search,
   Settings,
@@ -194,6 +195,7 @@ export const ZARD_ICONS = {
   'user-plus': UserPlus,
   'credit-card': CreditCard,
   activity: Activity,
+  'refresh-cw': RefreshCw,
 } as const satisfies Record<string, LucideIconData>;
 
 export declare type ZardIcon = keyof typeof ZARD_ICONS | LucideIconData;
