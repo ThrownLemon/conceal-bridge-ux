@@ -14,6 +14,7 @@ import {
   catchError,
   distinctUntilChanged,
   filter,
+  from,
   map,
   of,
   skip,
@@ -797,6 +798,33 @@ export class SwapPage {
       filter(isEvmNetworkKey),
       takeUntilDestroyed(this.#destroyRef),
     );
+
+    // Ensure wallet network matches route network.
+    // When navigating to a specific network route (e.g., from home page),
+    // automatically switch the wallet to that network.
+    network$
+      .pipe(
+        switchMap((network) => {
+          const targetChain = EVM_NETWORKS[network].chain;
+          const currentChainId = this.wallet.chainId();
+
+          // If wallet is already on the correct network, do nothing
+          if (currentChainId === targetChain.id) {
+            return of(null);
+          }
+
+          // Switch wallet to match route network
+          return from(this.wallet.ensureChain(targetChain)).pipe(
+            catchError((e: unknown) => {
+              // User cancelled or error - that's ok, they can manually switch
+              console.warn('[SwapPage] Failed to switch wallet network:', e);
+              return of(null);
+            }),
+          );
+        }),
+        takeUntilDestroyed(this.#destroyRef),
+      )
+      .subscribe();
 
     // When wallet network changes, navigate to the new network's route.
     // This will trigger a route change, which will then reload the config/balances.

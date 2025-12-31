@@ -190,7 +190,7 @@ export class HomePage {
   readonly form = this.#fb.group({
     direction: this.#fb.control<SwapDirection>('ccx-to-evm'),
     fromNetwork: this.#fb.control<NetworkKey>('ccx'),
-    toNetwork: this.#fb.control<NetworkKey>('bsc'),
+    toNetwork: this.#fb.control<NetworkKey>('eth'),
   });
 
   readonly direction = toSignal(

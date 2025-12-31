@@ -4,6 +4,7 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
 import { ZardDividerComponent } from '@/shared/components/divider/divider.component';
 import { ZardAvatarComponent } from '@/shared/components/avatar/avatar.component';
+import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
 import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
@@ -15,7 +16,13 @@ type Variant = 'header' | 'primary';
 @Component({
   selector: 'app-wallet-button',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ZardButtonComponent, ZardDropdownImports, ZardDividerComponent, ZardAvatarComponent],
+  imports: [
+    ZardButtonComponent,
+    ZardDropdownImports,
+    ZardDividerComponent,
+    ZardAvatarComponent,
+    ZardIconComponent,
+  ],
   template: `
     @if (!wallet.isConnected()) {
       <button
@@ -53,9 +60,12 @@ type Variant = 'header' | 'primary';
                 (click)="switchNetwork(opt.key)"
                 [disabled]="isSwitchingNetwork()"
               >
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 w-full">
                   <z-avatar class="h-5 w-5" [zSrc]="opt.logo" [zAlt]="opt.label + ' logo'" />
-                  <span>{{ opt.label }}</span>
+                  <span class="flex-1">{{ opt.label }}</span>
+                  @if (isCurrentNetwork(opt.chain.id)) {
+                    <z-icon zType="check" class="h-4 w-4 text-primary" />
+                  }
                 </div>
               </z-dropdown-menu-item>
             }
@@ -180,6 +190,10 @@ export class WalletButtonComponent {
       chain: EVM_NETWORKS.plg.chain,
     },
   ]);
+
+  isCurrentNetwork(chainId: number): boolean {
+    return this.wallet.chainId() === chainId;
+  }
 
   open(): void {
     this.#modalService.open();

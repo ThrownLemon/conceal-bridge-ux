@@ -70,7 +70,7 @@ describe('HomePage', () => {
     it('should have default form values', () => {
       expect(component.form.controls.direction.value).toBe('ccx-to-evm');
       expect(component.form.controls.fromNetwork.value).toBe('ccx');
-      expect(component.form.controls.toNetwork.value).toBe('bsc');
+      expect(component.form.controls.toNetwork.value).toBe('eth');
     });
 
     it('should have networks array from EVM_NETWORKS', () => {
@@ -177,9 +177,9 @@ describe('HomePage', () => {
     });
 
     it('should set from network to EVM and to network to CCX', () => {
-      component.setFromNetwork('eth');
+      component.setFromNetwork('bsc');
 
-      expect(component.form.controls.fromNetwork.value).toBe('eth');
+      expect(component.form.controls.fromNetwork.value).toBe('bsc');
       expect(component.form.controls.toNetwork.value).toBe('ccx');
       expect(component.form.controls.direction.value).toBe('evm-to-ccx');
     });
@@ -209,7 +209,7 @@ describe('HomePage', () => {
     it('should clear status on successful change', () => {
       component.networkSwitchStatus.set('Old status');
 
-      component.setFromNetwork('eth');
+      component.setFromNetwork('bsc');
 
       expect(component.networkSwitchStatus()).toBeNull();
     });
@@ -495,7 +495,7 @@ describe('HomePage', () => {
     });
 
     it('should have toKey signal', () => {
-      expect(component.toKey()).toBe('bsc');
+      expect(component.toKey()).toBe('eth');
     });
   });
 
