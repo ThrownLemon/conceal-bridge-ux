@@ -9,12 +9,13 @@ import {
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   catchError,
   distinctUntilChanged,
   filter,
   map,
+  merge,
   of,
   Subject,
   switchMap,
@@ -691,7 +692,6 @@ export class SwapPage {
   readonly #destroyRef = inject(DestroyRef);
   readonly #injector = inject(Injector);
   readonly #route = inject(ActivatedRoute);
-  readonly #router = inject(Router);
   readonly #fb = inject(NonNullableFormBuilder);
 
   readonly api = inject(BridgeApiService);
@@ -790,31 +790,26 @@ export class SwapPage {
     // Best-practice: hydrate wallet state without prompting.
     void this.wallet.hydrate();
 
-    // Emit network when route param changes.
-    const network$ = this.#route.paramMap.pipe(
+    // Base observable: emit network when route param changes.
+    const routeNetwork$ = this.#route.paramMap.pipe(
       map((pm) => pm.get('network')),
       filter(isEvmNetworkKey),
-      takeUntilDestroyed(this.#destroyRef),
     );
 
-    // When wallet network changes, navigate to the new network's route.
-    // This will trigger a route change, which will then reload the config/balances.
-    toObservable(this.wallet.chainId, { injector: this.#injector })
-      .pipe(
-        map((chainId) => chainIdToNetworkKey(chainId)),
-        filter((key): key is EvmNetworkKey => key !== null),
-        distinctUntilChanged(),
-        takeUntilDestroyed(this.#destroyRef),
-      )
-      .subscribe((newNetwork) => {
-        const currentDirection =
-          (this.#route.snapshot.paramMap.get('direction') as SwapDirection) ?? 'ccx-to-evm';
-        const currentNetwork = this.#route.snapshot.paramMap.get('network');
+    // Convert wallet chainId signal to observable and map to network key.
+    // When wallet network changes, re-emit the current route network to trigger reload.
+    const walletNetwork$ = toObservable(this.wallet.chainId, { injector: this.#injector }).pipe(
+      map((chainId) => chainIdToNetworkKey(chainId)),
+      filter((key): key is EvmNetworkKey => key !== null),
+      switchMap(() => routeNetwork$.pipe(take(1))),
+    );
 
-        if (newNetwork !== currentNetwork) {
-          void this.#router.navigate(['/swap', currentDirection, newNetwork]);
-        }
-      });
+    // Merge both streams: route changes and wallet network changes both trigger emissions.
+    // The route network is always the source of truth for which network to load.
+    const network$ = merge(routeNetwork$, walletNetwork$).pipe(
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.#destroyRef),
+    );
 
     network$
       .pipe(
