@@ -149,18 +149,28 @@ export class WalletButtonComponent {
 
   readonly connectedChainLogo = computed(() => {
     const chainId = this.wallet.chainId();
+    const meta = this.#chains.get(chainId);
+
+    // Prefer API logo, fallback to hardcoded logos
+    if (meta?.logoUri) return meta.logoUri;
+
     if (chainId === 1) return 'images/branding/eth.png';
     if (chainId === 56) return 'images/branding/bsc.png';
     if (chainId === 137) return 'images/branding/plg.png';
-    return this.connectedChain()?.logoUri ?? null;
+    return null;
   });
 
   readonly currentNetworkName = computed(() => {
     const chainId = this.wallet.chainId();
+    const meta = this.#chains.get(chainId);
+
+    // Prefer API name, fallback to hardcoded names
+    if (meta?.name) return meta.name;
+
     if (chainId === 1) return 'Ethereum';
     if (chainId === 56) return 'BNB Smart Chain';
     if (chainId === 137) return 'Polygon';
-    return this.connectedChain()?.name ?? 'Network';
+    return 'Network';
   });
 
   readonly currentNetworkLogo = computed(() => this.connectedChainLogo());
@@ -170,26 +180,31 @@ export class WalletButtonComponent {
     return c ? this.connectorLogo(c) : null;
   });
 
-  readonly evmNetworkOptions = computed(() => [
-    {
-      key: 'eth' as const,
-      label: 'Ethereum',
-      logo: 'images/branding/eth.png',
-      chain: EVM_NETWORKS.eth.chain,
-    },
-    {
-      key: 'bsc' as const,
-      label: 'BNB Smart Chain',
-      logo: 'images/branding/bsc.png',
-      chain: EVM_NETWORKS.bsc.chain,
-    },
-    {
-      key: 'plg' as const,
-      label: 'Polygon',
-      logo: 'images/branding/plg.png',
-      chain: EVM_NETWORKS.plg.chain,
-    },
-  ]);
+  readonly evmNetworkOptions = computed(() => {
+    // Touch chain metadata signal so labels/logos refresh when remote metadata loads
+    this.#chains.byId();
+
+    return [
+      {
+        key: 'eth' as const,
+        label: this.#chains.get(1)?.name ?? 'Ethereum',
+        logo: this.#chains.get(1)?.logoUri ?? 'images/branding/eth.png',
+        chain: EVM_NETWORKS.eth.chain,
+      },
+      {
+        key: 'bsc' as const,
+        label: this.#chains.get(56)?.name ?? 'BNB Smart Chain',
+        logo: this.#chains.get(56)?.logoUri ?? 'images/branding/bsc.png',
+        chain: EVM_NETWORKS.bsc.chain,
+      },
+      {
+        key: 'plg' as const,
+        label: this.#chains.get(137)?.name ?? 'Polygon',
+        logo: this.#chains.get(137)?.logoUri ?? 'images/branding/plg.png',
+        chain: EVM_NETWORKS.plg.chain,
+      },
+    ];
+  });
 
   isCurrentNetwork(chainId: number): boolean {
     return this.wallet.chainId() === chainId;

@@ -7,7 +7,7 @@ import { ActivatedRoute, convertToParamMap, type ParamMap } from '@angular/route
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { provideRouter } from '@angular/router';
 import type { BridgeChainConfig, BridgeSwapStateResponse } from '../../core/bridge-types';
-import { bsc } from 'viem/chains';
+import { bscTestnet } from 'viem/chains';
 import { signal, type WritableSignal } from '@angular/core';
 import type { Mock } from 'vitest';
 
@@ -491,7 +491,7 @@ describe('SwapPage', () => {
 
         await component.addTokenToWallet();
 
-        expect(walletMock.ensureChain).toHaveBeenCalledWith(bsc);
+        expect(walletMock.ensureChain).toHaveBeenCalledWith(bscTestnet);
         expect(walletMock.watchErc20Asset).toHaveBeenCalledWith({
           address: mockConfig.wccx.contractAddress,
           symbol: 'wCCX',

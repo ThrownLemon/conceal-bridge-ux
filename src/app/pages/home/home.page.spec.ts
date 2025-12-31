@@ -132,7 +132,7 @@ describe('HomePage', () => {
     it('should return default label when no metadata', () => {
       vi.mocked(mockChainMetaService.get!).mockReturnValue(null);
       const label = component.networkLabel('eth');
-      expect(label).toBe('Ethereum Mainnet');
+      expect(label).toBe('Sepolia Testnet'); // Development mode uses testnets
     });
   });
 
@@ -184,26 +184,28 @@ describe('HomePage', () => {
       expect(component.form.controls.direction.value).toBe('evm-to-ccx');
     });
 
-    it('should show error when from equals to', () => {
+    it('should swap networks when from equals to', () => {
+      component.form.controls.fromNetwork.setValue('ccx');
       component.form.controls.toNetwork.setValue('eth');
 
-      component.setFromNetwork('eth');
+      component.setFromNetwork('eth'); // Setting from to match to should swap them
 
-      expect(component.networkSwitchStatus()).toBe('From and To networks cannot be the same.');
+      expect(component.form.controls.fromNetwork.value).toBe('eth');
+      expect(component.form.controls.toNetwork.value).toBe('ccx');
+      expect(component.networkSwitchStatus()).toBeNull(); // No error
     });
 
-    it('should show error and swap toNetwork when setting from to match to with ccx', () => {
+    it('should swap from and to when setting from to match to with ccx', () => {
       component.form.controls.fromNetwork.setValue('eth');
       component.form.controls.toNetwork.setValue('ccx');
 
-      component.setFromNetwork('ccx');
+      component.setFromNetwork('ccx'); // Setting from to match to should swap them
 
-      // When from is set to match to (ccx), the equality check triggers
-      // and auto-corrects by swapping toNetwork to the last used EVM ('bsc' by default)
-      expect(component.form.controls.fromNetwork.value).toBe('eth');
-      expect(component.form.controls.toNetwork.value).toBe('bsc');
+      // When from is set to match to (ccx), the values swap
+      expect(component.form.controls.fromNetwork.value).toBe('ccx');
+      expect(component.form.controls.toNetwork.value).toBe('eth');
       expect(component.form.controls.direction.value).toBe('ccx-to-evm');
-      expect(component.networkSwitchStatus()).toBe('From and To networks cannot be the same.');
+      expect(component.networkSwitchStatus()).toBeNull(); // No error
     });
 
     it('should clear status on successful change', () => {
@@ -233,12 +235,15 @@ describe('HomePage', () => {
       expect(component.form.controls.direction.value).toBe('ccx-to-evm');
     });
 
-    it('should show error when to equals from', () => {
+    it('should swap networks when to equals from', () => {
       component.form.controls.fromNetwork.setValue('eth');
+      component.form.controls.toNetwork.setValue('ccx');
 
-      component.setToNetwork('eth');
+      component.setToNetwork('eth'); // Setting to to match from should swap them
 
-      expect(component.networkSwitchStatus()).toBe('From and To networks cannot be the same.');
+      expect(component.form.controls.fromNetwork.value).toBe('ccx');
+      expect(component.form.controls.toNetwork.value).toBe('eth');
+      expect(component.networkSwitchStatus()).toBeNull(); // No error
     });
 
     it('should clear status on successful change', () => {
@@ -310,22 +315,22 @@ describe('HomePage', () => {
     it('should show message when already on target chain', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
       component.form.controls.toNetwork.setValue('eth');
-      chainIdSignal.set(1);
+      chainIdSignal.set(11155111); // Sepolia testnet in development mode
 
       await component.switchWalletToSelectedNetwork();
 
-      expect(component.networkSwitchStatus()).toBe('Wallet already on Ethereum Mainnet.');
+      expect(component.networkSwitchStatus()).toBe('Wallet already on Sepolia Testnet.');
     });
 
     it('should switch chain successfully', async () => {
       component.form.controls.direction.setValue('ccx-to-evm');
       component.form.controls.toNetwork.setValue('bsc');
-      chainIdSignal.set(1);
+      chainIdSignal.set(11155111); // Sepolia testnet (current chain in dev mode)
 
       await component.switchWalletToSelectedNetwork();
 
       expect(mockWalletService.ensureChain).toHaveBeenCalled();
-      expect(component.networkSwitchStatus()).toBe('Switched wallet to BNB Smart Chain Mainnet.');
+      expect(component.networkSwitchStatus()).toBe('Switched wallet to BNB Smart Chain Testnet.');
     });
 
     it('should handle user rejection (code 4001)', async () => {

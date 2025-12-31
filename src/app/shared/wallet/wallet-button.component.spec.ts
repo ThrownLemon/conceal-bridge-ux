@@ -42,7 +42,13 @@ describe('WalletButtonComponent', () => {
     };
 
     mockChainMetaService = {
-      get: vi.fn().mockReturnValue({ name: 'Ethereum', logoUri: 'eth.png' }),
+      get: vi.fn().mockImplementation((chainId: number) => {
+        // Return null for these chain IDs to test hardcoded fallbacks
+        if (chainId === 1 || chainId === 56 || chainId === 137) return null;
+        // For other chain IDs, return mock data
+        return { name: 'Test Chain', logoUri: 'test.png' };
+      }),
+      byId: signal(new Map()),
     };
 
     mockModalService = {
