@@ -16,6 +16,7 @@ import {
   filter,
   map,
   of,
+  skip,
   Subject,
   switchMap,
   take,
@@ -799,8 +800,10 @@ export class SwapPage {
 
     // When wallet network changes, navigate to the new network's route.
     // This will trigger a route change, which will then reload the config/balances.
+    // Skip(1) ensures we only react to actual changes, not the initial wallet state.
     toObservable(this.wallet.chainId, { injector: this.#injector })
       .pipe(
+        skip(1),
         map((chainId) => chainIdToNetworkKey(chainId)),
         filter((key): key is EvmNetworkKey => key !== null),
         distinctUntilChanged(),
