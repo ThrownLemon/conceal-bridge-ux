@@ -197,6 +197,7 @@ When establishing context for a new task, prioritize reading:
 | ---------------------- | ------------------------------------------------------------------ |
 | Build & Architecture   | [docs/build_guide.md](./docs/build_guide.md)                       |
 | Backend API Contract   | [docs/backend_api.md](./docs/backend_api.md)                       |
+| LI.FI Chain Data API   | [docs/lifi_api.md](./docs/lifi_api.md)                             |
 | Wallet Integration     | [docs/wallets.md](./docs/wallets.md)                               |
 | Web3 Patterns          | [docs/web3_integrations.md](./docs/web3_integrations.md)           |
 | Style Guide            | [docs/style_guide.md](./docs/style_guide.md)                       |
