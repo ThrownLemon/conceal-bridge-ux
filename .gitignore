@@ -72,3 +72,6 @@ playwright-report/
 .mcp.json
 
 gha-creds-*.json
+
+# Auto Claude data directory
+.auto-claude/

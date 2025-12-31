@@ -151,12 +151,17 @@ export class WalletButtonComponent {
     const chainId = this.wallet.chainId();
     const meta = this.#chains.get(chainId);
 
-    // Prefer API logo, fallback to hardcoded logos
+    // Prefer API logo, fallback to hardcoded logos based on network key
     if (meta?.logoUri) return meta.logoUri;
 
-    if (chainId === 1) return 'images/branding/eth.png';
-    if (chainId === 56) return 'images/branding/bsc.png';
-    if (chainId === 137) return 'images/branding/plg.png';
+    // Map chain ID to network key for fallback
+    const ethChainId = EVM_NETWORKS.eth.chain.id;
+    const bscChainId = EVM_NETWORKS.bsc.chain.id;
+    const plgChainId = EVM_NETWORKS.plg.chain.id;
+
+    if (chainId === ethChainId) return 'images/branding/eth.png';
+    if (chainId === bscChainId) return 'images/branding/bsc.png';
+    if (chainId === plgChainId) return 'images/branding/plg.png';
     return null;
   });
 
@@ -164,12 +169,17 @@ export class WalletButtonComponent {
     const chainId = this.wallet.chainId();
     const meta = this.#chains.get(chainId);
 
-    // Prefer API name, fallback to hardcoded names
+    // Prefer API name, fallback to configured network labels
     if (meta?.name) return meta.name;
 
-    if (chainId === 1) return 'Ethereum';
-    if (chainId === 56) return 'BNB Smart Chain';
-    if (chainId === 137) return 'Polygon';
+    // Map chain ID to network key for fallback
+    const ethChainId = EVM_NETWORKS.eth.chain.id;
+    const bscChainId = EVM_NETWORKS.bsc.chain.id;
+    const plgChainId = EVM_NETWORKS.plg.chain.id;
+
+    if (chainId === ethChainId) return EVM_NETWORKS.eth.label;
+    if (chainId === bscChainId) return EVM_NETWORKS.bsc.label;
+    if (chainId === plgChainId) return EVM_NETWORKS.plg.label;
     return 'Network';
   });
 
@@ -184,23 +194,28 @@ export class WalletButtonComponent {
     // Touch chain metadata signal so labels/logos refresh when remote metadata loads
     this.#chains.byId();
 
+    // Get actual chain IDs from configured networks
+    const ethChainId = EVM_NETWORKS.eth.chain.id;
+    const bscChainId = EVM_NETWORKS.bsc.chain.id;
+    const plgChainId = EVM_NETWORKS.plg.chain.id;
+
     return [
       {
         key: 'eth' as const,
-        label: this.#chains.get(1)?.name ?? 'Ethereum',
-        logo: this.#chains.get(1)?.logoUri ?? 'images/branding/eth.png',
+        label: this.#chains.get(ethChainId)?.name ?? EVM_NETWORKS.eth.label,
+        logo: this.#chains.get(ethChainId)?.logoUri ?? 'images/branding/eth.png',
         chain: EVM_NETWORKS.eth.chain,
       },
       {
         key: 'bsc' as const,
-        label: this.#chains.get(56)?.name ?? 'BNB Smart Chain',
-        logo: this.#chains.get(56)?.logoUri ?? 'images/branding/bsc.png',
+        label: this.#chains.get(bscChainId)?.name ?? EVM_NETWORKS.bsc.label,
+        logo: this.#chains.get(bscChainId)?.logoUri ?? 'images/branding/bsc.png',
         chain: EVM_NETWORKS.bsc.chain,
       },
       {
         key: 'plg' as const,
-        label: this.#chains.get(137)?.name ?? 'Polygon',
-        logo: this.#chains.get(137)?.logoUri ?? 'images/branding/plg.png',
+        label: this.#chains.get(plgChainId)?.name ?? EVM_NETWORKS.plg.label,
+        logo: this.#chains.get(plgChainId)?.logoUri ?? 'images/branding/plg.png',
         chain: EVM_NETWORKS.plg.chain,
       },
     ];
