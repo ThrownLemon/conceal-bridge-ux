@@ -5,14 +5,13 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { HomePage } from './home.page';
 import { EvmWalletService } from '../../core/evm-wallet.service';
-import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
+import { EVM_NETWORKS } from '../../core/evm-networks';
 
 describe('HomePage', () => {
   let component: HomePage;
   let fixture: ComponentFixture<HomePage>;
   let mockRouter: Partial<Router>;
   let mockWalletService: Partial<EvmWalletService>;
-  let mockChainMetaService: Partial<EvmChainMetadataService>;
 
   // Writable signals for easier test manipulation
   let isConnectedSignal: WritableSignal<boolean>;
@@ -37,18 +36,12 @@ describe('HomePage', () => {
       ensureChain: vi.fn().mockResolvedValue(undefined),
     };
 
-    mockChainMetaService = {
-      get: vi.fn().mockReturnValue({ chainId: 1, name: 'Ethereum', logoUri: 'eth.png' }),
-      byId: signal(new Map()),
-    };
-
     TestBed.configureTestingModule({
       imports: [HomePage],
       providers: [
         provideNoopAnimations(),
         { provide: Router, useValue: mockRouter },
         { provide: EvmWalletService, useValue: mockWalletService },
-        { provide: EvmChainMetadataService, useValue: mockChainMetaService },
       ],
     });
 
@@ -119,20 +112,19 @@ describe('HomePage', () => {
   });
 
   describe('networkLabel method', () => {
-    it('should return label from chain metadata when available', () => {
-      vi.mocked(mockChainMetaService.get!).mockReturnValue({
-        chainId: 1,
-        name: 'Custom Name',
-        logoUri: null,
-      });
+    it('should return static label for eth', () => {
       const label = component.networkLabel('eth');
-      expect(label).toBe('Custom Name');
+      expect(label).toBe(EVM_NETWORKS.eth.label);
     });
 
-    it('should return default label when no metadata', () => {
-      vi.mocked(mockChainMetaService.get!).mockReturnValue(null);
-      const label = component.networkLabel('eth');
-      expect(label).toBe('Sepolia Testnet'); // Development mode uses testnets
+    it('should return static label for bsc', () => {
+      const label = component.networkLabel('bsc');
+      expect(label).toBe(EVM_NETWORKS.bsc.label);
+    });
+
+    it('should return static label for plg', () => {
+      const label = component.networkLabel('plg');
+      expect(label).toBe(EVM_NETWORKS.plg.label);
     });
   });
 

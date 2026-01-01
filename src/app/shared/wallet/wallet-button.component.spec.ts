@@ -4,7 +4,6 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { WalletButtonComponent } from './wallet-button.component';
 import { EvmWalletService } from '../../core/evm-wallet.service';
-import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { WalletModalService } from '../../core/wallet-modal.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 
@@ -17,7 +16,6 @@ describe('WalletButtonComponent', () => {
   let component: WalletButtonComponent;
   let fixture: ComponentFixture<WalletButtonComponent>;
   let mockWalletService: Partial<EvmWalletService>;
-  let mockChainMetaService: Partial<EvmChainMetadataService>;
   let mockModalService: Partial<WalletModalService>;
 
   // Writable signals for easier test manipulation
@@ -47,17 +45,6 @@ describe('WalletButtonComponent', () => {
       disconnect: vi.fn().mockResolvedValue(undefined),
     };
 
-    mockChainMetaService = {
-      get: vi.fn().mockImplementation((chainId: number) => {
-        // Return null for configured chain IDs to test hardcoded fallbacks
-        if (chainId === ETH_CHAIN_ID || chainId === BSC_CHAIN_ID || chainId === PLG_CHAIN_ID)
-          return null;
-        // For other chain IDs, return mock data
-        return { name: 'Test Chain', logoUri: 'test.png' };
-      }),
-      byId: signal(new Map()),
-    };
-
     mockModalService = {
       open: vi.fn(),
     };
@@ -67,7 +54,6 @@ describe('WalletButtonComponent', () => {
       providers: [
         provideNoopAnimations(),
         { provide: EvmWalletService, useValue: mockWalletService },
-        { provide: EvmChainMetadataService, useValue: mockChainMetaService },
         { provide: WalletModalService, useValue: mockModalService },
       ],
     });
@@ -374,11 +360,10 @@ describe('WalletButtonComponent', () => {
         expect(component.connectedChainLogo()).toBe('images/branding/plg.png');
       });
 
-      it('should return chain metadata logo for other chains', () => {
+      it('should return null for unknown chains', () => {
         chainIdSignal.set(42161);
         const logo = component.connectedChainLogo();
-        // Falls back to chain metadata logo or null
-        expect(logo).toBeDefined();
+        expect(logo).toBeNull();
       });
     });
 
@@ -397,10 +382,10 @@ describe('WalletButtonComponent', () => {
         expect(component.currentNetworkName()).toBe(EVM_NETWORKS.plg.label);
       });
 
-      it('should return chain metadata name for other chains', () => {
+      it('should return "Network" for unknown chains', () => {
         chainIdSignal.set(42161);
         const name = component.currentNetworkName();
-        expect(name).toBeDefined();
+        expect(name).toBe('Network');
       });
     });
 

@@ -10,7 +10,6 @@ import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
-import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 import type { EvmNetworkKey, SwapDirection } from '../../core/bridge-types';
 import { EvmWalletService } from '../../core/evm-wallet.service';
@@ -20,9 +19,9 @@ type NetworkKey = 'ccx' | EvmNetworkKey;
 
 const NETWORK_LOGOS: Record<NetworkKey, string> = {
   ccx: 'images/branding/ccx.png',
-  eth: 'images/branding/eth.png',
-  bsc: 'images/branding/bsc.png',
-  plg: 'images/branding/plg.png',
+  eth: EVM_NETWORKS.eth.logoUri,
+  bsc: EVM_NETWORKS.bsc.logoUri,
+  plg: EVM_NETWORKS.plg.logoUri,
 };
 
 @Component({
@@ -212,7 +211,6 @@ export class HomePage {
   readonly #router = inject(Router);
   readonly #fb = inject(NonNullableFormBuilder);
   readonly #wallet = inject(EvmWalletService);
-  readonly #chainMeta = inject(EvmChainMetadataService);
 
   readonly wallet = this.#wallet;
 
@@ -247,8 +245,6 @@ export class HomePage {
   readonly #lastEvm = signal<EvmNetworkKey>('bsc');
 
   readonly networkOptions = computed(() => {
-    // Touch chain metadata signal so labels refresh when remote metadata loads.
-    this.#chainMeta.byId();
     return [
       {
         key: 'ccx' as const,
@@ -256,16 +252,12 @@ export class HomePage {
         subtitle: 'Native chain',
         logoUri: NETWORK_LOGOS.ccx,
       },
-      ...this.networks.map((n) => {
-        const meta = this.#chainMeta.get(n.chain.id);
-        return {
-          key: n.key,
-          label: this.networkLabel(n.key),
-          subtitle: 'EVM network',
-          // Prefer colored logo from chain metadata API, fallback to local logo
-          logoUri: meta?.logoUri ?? NETWORK_LOGOS[n.key],
-        };
-      }),
+      ...this.networks.map((n) => ({
+        key: n.key,
+        label: n.label,
+        subtitle: 'EVM network',
+        logoUri: n.logoUri,
+      })),
     ];
   });
 
@@ -283,9 +275,7 @@ export class HomePage {
   }
 
   networkLabel(key: EvmNetworkKey): string {
-    const info = EVM_NETWORKS[key];
-    const meta = this.#chainMeta.get(info.chain.id);
-    return meta?.name ?? info.label;
+    return EVM_NETWORKS[key].label;
   }
 
   displayFor(key: NetworkKey) {
@@ -293,12 +283,10 @@ export class HomePage {
       return { label: 'Conceal', subtitle: 'Native chain', logoUri: NETWORK_LOGOS.ccx };
     }
     const info = EVM_NETWORKS[key];
-    const meta = this.#chainMeta.get(info.chain.id);
     return {
-      label: this.networkLabel(key),
+      label: info.label,
       subtitle: 'EVM network',
-      // Prefer colored logo from chain metadata API, fallback to local logo
-      logoUri: meta?.logoUri ?? NETWORK_LOGOS[key],
+      logoUri: info.logoUri,
     };
   }
 

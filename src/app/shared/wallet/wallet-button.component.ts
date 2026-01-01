@@ -6,7 +6,6 @@ import { ZardDividerComponent } from '@/shared/components/divider/divider.compon
 import { ZardAvatarComponent } from '@/shared/components/avatar/avatar.component';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
-import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
 import { WalletModalService } from '../../core/wallet-modal.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
@@ -138,48 +137,42 @@ export class WalletButtonComponent {
   readonly variant = input<Variant>('header');
 
   readonly wallet = inject(EvmWalletService);
-  readonly #chains = inject(EvmChainMetadataService);
   readonly #modalService = inject(WalletModalService);
 
   readonly isSwitchingNetwork = signal(false);
   readonly networkStatus = signal<string | null>(null);
   readonly copyStatus = signal<string | null>(null);
 
-  readonly connectedChain = computed(() => this.#chains.get(this.wallet.chainId()));
+  readonly connectedChain = computed(() => {
+    const chainId = this.wallet.chainId();
+    // Find the network info by chain ID
+    for (const info of Object.values(EVM_NETWORKS)) {
+      if (info.chain.id === chainId) {
+        return { name: info.label, id: chainId };
+      }
+    }
+    return null;
+  });
 
   readonly connectedChainLogo = computed(() => {
     const chainId = this.wallet.chainId();
-    const meta = this.#chains.get(chainId);
-
-    // Prefer API logo, fallback to hardcoded logos based on network key
-    if (meta?.logoUri) return meta.logoUri;
-
-    // Map chain ID to network key for fallback
-    const ethChainId = EVM_NETWORKS.eth.chain.id;
-    const bscChainId = EVM_NETWORKS.bsc.chain.id;
-    const plgChainId = EVM_NETWORKS.plg.chain.id;
-
-    if (chainId === ethChainId) return 'images/branding/eth.png';
-    if (chainId === bscChainId) return 'images/branding/bsc.png';
-    if (chainId === plgChainId) return 'images/branding/plg.png';
+    // Find the network info by chain ID
+    for (const info of Object.values(EVM_NETWORKS)) {
+      if (info.chain.id === chainId) {
+        return info.logoUri;
+      }
+    }
     return null;
   });
 
   readonly currentNetworkName = computed(() => {
     const chainId = this.wallet.chainId();
-    const meta = this.#chains.get(chainId);
-
-    // Prefer API name, fallback to configured network labels
-    if (meta?.name) return meta.name;
-
-    // Map chain ID to network key for fallback
-    const ethChainId = EVM_NETWORKS.eth.chain.id;
-    const bscChainId = EVM_NETWORKS.bsc.chain.id;
-    const plgChainId = EVM_NETWORKS.plg.chain.id;
-
-    if (chainId === ethChainId) return EVM_NETWORKS.eth.label;
-    if (chainId === bscChainId) return EVM_NETWORKS.bsc.label;
-    if (chainId === plgChainId) return EVM_NETWORKS.plg.label;
+    // Find the network info by chain ID
+    for (const info of Object.values(EVM_NETWORKS)) {
+      if (info.chain.id === chainId) {
+        return info.label;
+      }
+    }
     return 'Network';
   });
 
@@ -191,31 +184,23 @@ export class WalletButtonComponent {
   });
 
   readonly evmNetworkOptions = computed(() => {
-    // Touch chain metadata signal so labels/logos refresh when remote metadata loads
-    this.#chains.byId();
-
-    // Get actual chain IDs from configured networks
-    const ethChainId = EVM_NETWORKS.eth.chain.id;
-    const bscChainId = EVM_NETWORKS.bsc.chain.id;
-    const plgChainId = EVM_NETWORKS.plg.chain.id;
-
     return [
       {
         key: 'eth' as const,
-        label: this.#chains.get(ethChainId)?.name ?? EVM_NETWORKS.eth.label,
-        logo: this.#chains.get(ethChainId)?.logoUri ?? 'images/branding/eth.png',
+        label: EVM_NETWORKS.eth.label,
+        logo: EVM_NETWORKS.eth.logoUri,
         chain: EVM_NETWORKS.eth.chain,
       },
       {
         key: 'bsc' as const,
-        label: this.#chains.get(bscChainId)?.name ?? EVM_NETWORKS.bsc.label,
-        logo: this.#chains.get(bscChainId)?.logoUri ?? 'images/branding/bsc.png',
+        label: EVM_NETWORKS.bsc.label,
+        logo: EVM_NETWORKS.bsc.logoUri,
         chain: EVM_NETWORKS.bsc.chain,
       },
       {
         key: 'plg' as const,
-        label: this.#chains.get(plgChainId)?.name ?? EVM_NETWORKS.plg.label,
-        logo: this.#chains.get(plgChainId)?.logoUri ?? 'images/branding/plg.png',
+        label: EVM_NETWORKS.plg.label,
+        logo: EVM_NETWORKS.plg.logoUri,
         chain: EVM_NETWORKS.plg.chain,
       },
     ];
