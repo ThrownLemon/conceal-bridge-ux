@@ -11,6 +11,7 @@ describe('ZardDarkMode', () => {
   let mockMediaMatcher: Partial<MediaMatcher>;
   let mockMediaQueryList: Partial<MediaQueryList>;
   let changeHandler: ((event: MediaQueryListEvent) => void) | null = null;
+  let originalLocalStorage: typeof globalThis.localStorage;
 
   function createService(options: { isBrowser?: boolean; prefersDark?: boolean } = {}) {
     const { isBrowser = true, prefersDark = false } = options;
@@ -68,9 +69,18 @@ describe('ZardDarkMode', () => {
     service = TestBed.inject(ZardDarkMode);
   }
 
+  beforeEach(() => {
+    originalLocalStorage = globalThis.localStorage;
+  });
+
   afterEach(() => {
     TestBed.resetTestingModule();
     changeHandler = null;
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: originalLocalStorage,
+      writable: true,
+      configurable: true,
+    });
   });
 
   describe('initialization', () => {
