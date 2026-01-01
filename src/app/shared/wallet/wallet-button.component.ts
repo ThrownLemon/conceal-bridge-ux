@@ -143,38 +143,21 @@ export class WalletButtonComponent {
   readonly networkStatus = signal<string | null>(null);
   readonly copyStatus = signal<string | null>(null);
 
+  /** Finds the network info for the currently connected chain ID. */
+  readonly #connectedNetworkInfo = computed(() => {
+    const chainId = this.wallet.chainId();
+    if (!chainId) return null;
+    return Object.values(EVM_NETWORKS).find((info) => info.chain.id === chainId) ?? null;
+  });
+
   readonly connectedChain = computed(() => {
-    const chainId = this.wallet.chainId();
-    // Find the network info by chain ID
-    for (const info of Object.values(EVM_NETWORKS)) {
-      if (info.chain.id === chainId) {
-        return { name: info.label, id: chainId };
-      }
-    }
-    return null;
+    const info = this.#connectedNetworkInfo();
+    return info ? { name: info.label, id: info.chain.id } : null;
   });
 
-  readonly connectedChainLogo = computed(() => {
-    const chainId = this.wallet.chainId();
-    // Find the network info by chain ID
-    for (const info of Object.values(EVM_NETWORKS)) {
-      if (info.chain.id === chainId) {
-        return info.logoUri;
-      }
-    }
-    return null;
-  });
+  readonly connectedChainLogo = computed(() => this.#connectedNetworkInfo()?.logoUri ?? null);
 
-  readonly currentNetworkName = computed(() => {
-    const chainId = this.wallet.chainId();
-    // Find the network info by chain ID
-    for (const info of Object.values(EVM_NETWORKS)) {
-      if (info.chain.id === chainId) {
-        return info.label;
-      }
-    }
-    return 'Network';
-  });
+  readonly currentNetworkName = computed(() => this.#connectedNetworkInfo()?.label ?? 'Network');
 
   readonly currentNetworkLogo = computed(() => this.connectedChainLogo());
 

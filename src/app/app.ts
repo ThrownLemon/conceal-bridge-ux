@@ -39,7 +39,11 @@ export class App {
   protected readonly testnetBannerDismissed = signal(this.#loadBannerDismissed());
 
   protected dismissTestnetBanner(): void {
-    sessionStorage.setItem(TESTNET_BANNER_DISMISSED_KEY, 'true');
+    try {
+      sessionStorage.setItem(TESTNET_BANNER_DISMISSED_KEY, 'true');
+    } catch {
+      // sessionStorage may be unavailable (e.g., private browsing, quota exceeded)
+    }
     this.testnetBannerDismissed.set(true);
   }
 

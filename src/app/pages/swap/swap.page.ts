@@ -78,11 +78,17 @@ function isSwapDirection(value: string | null): value is SwapDirection {
 /**
  * Maps a chain ID to the corresponding network key.
  * Returns null if the chain ID is not supported.
+ * Derives mapping from EVM_NETWORKS to work with both mainnet and testnet configurations.
  */
 function chainIdToNetworkKey(chainId: number | null): EvmNetworkKey | null {
-  if (chainId === 1) return 'eth';
-  if (chainId === 56) return 'bsc';
-  if (chainId === 137) return 'plg';
+  if (chainId === null) return null;
+
+  for (const key in EVM_NETWORKS) {
+    const networkKey = key as EvmNetworkKey;
+    if (EVM_NETWORKS[networkKey].chain.id === chainId) {
+      return networkKey;
+    }
+  }
   return null;
 }
 
