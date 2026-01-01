@@ -678,8 +678,9 @@ export class EvmWalletService {
     if (typeof window === 'undefined') return null;
     try {
       const stored = window.localStorage.getItem(EvmWalletService.CONNECTOR_STORAGE_KEY);
-      if (stored === 'metamask' || stored === 'trust' || stored === 'binance') {
-        return stored;
+      const validConnectors: readonly WalletConnectorId[] = ['metamask', 'trust', 'binance'];
+      if (stored && validConnectors.includes(stored as WalletConnectorId)) {
+        return stored as WalletConnectorId;
       }
       return null;
     } catch {
