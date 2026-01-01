@@ -347,17 +347,17 @@ describe('WalletButtonComponent', () => {
 
     describe('connectedChainLogo', () => {
       it('should return Ethereum logo for configured ETH chain', () => {
-        expect(component.connectedChainLogo()).toBe('images/branding/eth.png');
+        expect(component.connectedChainLogo()).toBe('images/networks/ethereum.svg');
       });
 
       it('should return BSC logo for configured BSC chain', () => {
         chainIdSignal.set(BSC_CHAIN_ID);
-        expect(component.connectedChainLogo()).toBe('images/branding/bsc.png');
+        expect(component.connectedChainLogo()).toBe('images/networks/bsc.svg');
       });
 
       it('should return Polygon logo for configured PLG chain', () => {
         chainIdSignal.set(PLG_CHAIN_ID);
-        expect(component.connectedChainLogo()).toBe('images/branding/plg.png');
+        expect(component.connectedChainLogo()).toBe('images/networks/polygon.svg');
       });
 
       it('should return null for unknown chains', () => {

@@ -290,6 +290,35 @@ describe('EvmWalletService', () => {
 
       await expect(service.hydrate()).resolves.not.toThrow();
     });
+
+    it('should restore connector type from localStorage on hydrate', async () => {
+      asMock(window.localStorage.getItem).mockImplementation((key: string) => {
+        if (key === EvmWalletService.CONNECTOR_STORAGE_KEY) return 'metamask';
+        return null;
+      });
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [EvmWalletService] });
+      service = TestBed.inject(EvmWalletService);
+
+      await vi.waitFor(() => {
+        expect(service.connector()).toBe('metamask');
+      });
+    });
+
+    it('should not restore connector when disconnectedByUser is true', async () => {
+      asMock(window.localStorage.getItem).mockImplementation((key: string) => {
+        if (key === EvmWalletService.DISCONNECTED_STORAGE_KEY) return '1';
+        if (key === EvmWalletService.CONNECTOR_STORAGE_KEY) return 'metamask';
+        return null;
+      });
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [EvmWalletService] });
+      service = TestBed.inject(EvmWalletService);
+
+      await vi.waitFor(() => {
+        expect(service.connector()).toBeNull();
+      });
+    });
   });
 
   describe('connect', () => {
@@ -381,6 +410,14 @@ describe('EvmWalletService', () => {
       expect(service.connector()).toBe('metamask');
     });
 
+    it('should save connector to localStorage when connecting', async () => {
+      await service.connectWith('metamask');
+      expect(window.localStorage.setItem).toHaveBeenCalledWith(
+        EvmWalletService.CONNECTOR_STORAGE_KEY,
+        'metamask',
+      );
+    });
+
     it('should connect with binance provider', async () => {
       const result = await service.connectWith('binance');
       expect(result).toBe(mockAddress);
@@ -461,6 +498,15 @@ describe('EvmWalletService', () => {
       expect(window.localStorage.setItem).toHaveBeenCalledWith(
         EvmWalletService.DISCONNECTED_STORAGE_KEY,
         '1',
+      );
+    });
+
+    it('should remove connector from localStorage on disconnect', async () => {
+      await service.connectWith('metamask');
+      await service.disconnect();
+
+      expect(window.localStorage.removeItem).toHaveBeenCalledWith(
+        EvmWalletService.CONNECTOR_STORAGE_KEY,
       );
     });
 

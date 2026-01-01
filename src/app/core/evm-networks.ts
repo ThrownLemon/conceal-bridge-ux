@@ -10,6 +10,10 @@ export interface EvmNetworkInfo {
   chain: Chain;
 }
 
+// Override Polygon Amoy name to match ethereum-lists/chains canonical name
+// This prevents MetaMask warnings when adding the network
+const amoy: Chain = { ...polygonAmoy, name: 'Amoy' };
+
 // Use testnets in development, mainnets in production
 const chains = environment.production
   ? {
@@ -20,26 +24,26 @@ const chains = environment.production
   : {
       eth: sepolia,
       bsc: bscTestnet,
-      plg: polygonAmoy,
+      plg: amoy,
     };
 
 export const EVM_NETWORKS: Record<EvmNetworkKey, EvmNetworkInfo> = {
   eth: {
     key: 'eth',
     label: environment.production ? 'Ethereum Mainnet' : 'Sepolia Testnet',
-    logoUri: 'images/branding/eth.png',
+    logoUri: 'images/networks/ethereum.svg',
     chain: chains.eth,
   },
   bsc: {
     key: 'bsc',
     label: environment.production ? 'BNB Smart Chain Mainnet' : 'BNB Smart Chain Testnet',
-    logoUri: 'images/branding/bsc.png',
+    logoUri: 'images/networks/bsc.svg',
     chain: chains.bsc,
   },
   plg: {
     key: 'plg',
     label: environment.production ? 'Polygon Mainnet' : 'Polygon Amoy Testnet',
-    logoUri: 'images/branding/plg.png',
+    logoUri: 'images/networks/polygon.svg',
     chain: chains.plg,
   },
 };
