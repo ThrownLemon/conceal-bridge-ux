@@ -15,15 +15,29 @@ export interface EvmNetworkInfo {
 // See: https://github.com/ethereum-lists/chains
 const amoy: Chain = { ...polygonAmoy, name: 'Amoy' };
 
-const bscMainnet: Chain = {
+// Exported for testing - ensures our overrides match ethereum-lists/chains
+export const bscMainnet: Chain = {
   ...bsc,
   name: 'BNB Smart Chain Mainnet',
   rpcUrls: {
-    default: { http: ['https://bsc-dataseed1.bnbchain.org'] },
+    default: {
+      http: [
+        'https://bsc-dataseed1.bnbchain.org',
+        'https://bsc-dataseed2.bnbchain.org',
+        'https://bsc-dataseed3.bnbchain.org',
+      ],
+    },
+    public: {
+      http: [
+        'https://bsc-dataseed1.bnbchain.org',
+        'https://bsc-dataseed2.bnbchain.org',
+        'https://bsc-dataseed3.bnbchain.org',
+      ],
+    },
   },
 };
 
-const polygonMainnet: Chain = {
+export const polygonMainnet: Chain = {
   ...polygon,
   name: 'Polygon Mainnet',
 };
