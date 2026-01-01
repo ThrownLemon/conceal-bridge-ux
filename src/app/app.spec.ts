@@ -11,8 +11,12 @@ describe('App', () => {
     removeItem: ReturnType<typeof vi.fn>;
     clear: ReturnType<typeof vi.fn>;
   };
+  let originalSessionStorage: Storage;
 
   beforeEach(async () => {
+    // Save original sessionStorage before mocking
+    originalSessionStorage = window.sessionStorage;
+
     // Create sessionStorage mock
     sessionStorageMock = {
       getItem: vi.fn().mockReturnValue(null),
@@ -36,6 +40,12 @@ describe('App', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    // Restore original sessionStorage
+    Object.defineProperty(window, 'sessionStorage', {
+      value: originalSessionStorage,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('should create the app', () => {
