@@ -10,16 +10,44 @@ export interface EvmNetworkInfo {
   chain: Chain;
 }
 
-// Override Polygon Amoy name to match ethereum-lists/chains canonical name
-// This prevents MetaMask warnings when adding the network
+// Override chain names and RPC URLs to match ethereum-lists/chains canonical values.
+// This prevents MetaMask warnings when adding the network.
+// See: https://github.com/ethereum-lists/chains
 const amoy: Chain = { ...polygonAmoy, name: 'Amoy' };
+
+// Exported for testing - ensures our overrides match ethereum-lists/chains
+export const bscMainnet: Chain = {
+  ...bsc,
+  name: 'BNB Smart Chain Mainnet',
+  rpcUrls: {
+    default: {
+      http: [
+        'https://bsc-dataseed1.bnbchain.org',
+        'https://bsc-dataseed2.bnbchain.org',
+        'https://bsc-dataseed3.bnbchain.org',
+      ],
+    },
+    public: {
+      http: [
+        'https://bsc-dataseed1.bnbchain.org',
+        'https://bsc-dataseed2.bnbchain.org',
+        'https://bsc-dataseed3.bnbchain.org',
+      ],
+    },
+  },
+};
+
+export const polygonMainnet: Chain = {
+  ...polygon,
+  name: 'Polygon Mainnet',
+};
 
 // Use testnets in development, mainnets in production
 const chains = environment.production
   ? {
       eth: mainnet,
-      bsc: bsc,
-      plg: polygon,
+      bsc: bscMainnet,
+      plg: polygonMainnet,
     }
   : {
       eth: sepolia,
