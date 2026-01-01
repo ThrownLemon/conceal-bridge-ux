@@ -301,6 +301,13 @@ export class HomePage {
     window.open('https://metamask.io/download.html', '_blank');
   }
 
+  openTerms(): void {
+    window.open(
+      'https://concealnetwork.medium.com/conceal-bridge-user-guide-2ad03eee4963',
+      '_blank',
+    );
+  }
+
   setFromNetwork(next: NetworkKey): void {
     const currentFrom = this.form.controls.fromNetwork.value;
     const currentTo = this.form.controls.toNetwork.value;
