@@ -319,6 +319,7 @@ export class HomePage {
         this.#lastEvm.set(next);
       }
       this.networkSwitchStatus.set(null);
+      this.normalizeNetworks();
       return;
     }
 
@@ -356,6 +357,7 @@ export class HomePage {
         this.#lastEvm.set(next);
       }
       this.networkSwitchStatus.set(null);
+      this.normalizeNetworks();
       return;
     }
 
