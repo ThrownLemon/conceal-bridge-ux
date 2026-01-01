@@ -75,3 +75,4 @@ gha-creds-*.json
 
 # Auto Claude data directory
 .auto-claude/
+.claude_settings.json
