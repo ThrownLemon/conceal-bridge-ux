@@ -68,6 +68,9 @@ export class EvmWalletService {
   /** LocalStorage key used to persist the user's explicit disconnect action. */
   static readonly DISCONNECTED_STORAGE_KEY = 'conceal_bridge_wallet_disconnected';
 
+  /** LocalStorage key used to persist the connected wallet connector type. */
+  static readonly CONNECTOR_STORAGE_KEY = 'conceal_bridge_wallet_connector';
+
   readonly #address = signal<Address | null>(null);
   /**
    * The currently connected wallet address.
@@ -179,8 +182,9 @@ export class EvmWalletService {
     this.#disconnectedByUser.set(this.#readDisconnectedFlag());
 
     // Default to injected provider if present; no prompts should happen here.
+    // Use skipPersist=true to avoid clearing stored connector before hydrate() reads it.
     const injected = this.#injectedProvider();
-    if (injected) this.#setProvider(injected, null);
+    if (injected) this.#setProvider(injected, null, true);
 
     // Best-practice: hydrate state without prompting.
     void this.hydrate();
@@ -218,6 +222,14 @@ export class EvmWalletService {
       if (!this.#disconnectedByUser()) {
         const accounts = await walletClient.getAddresses();
         this.#address.set(accounts[0] ?? null);
+
+        // Restore the connector type from localStorage if we have an active connection
+        if (accounts[0]) {
+          const storedConnector = this.#readConnector();
+          if (storedConnector) {
+            this.#connector.set(storedConnector);
+          }
+        }
       } else {
         this.#address.set(null);
       }
@@ -338,7 +350,7 @@ export class EvmWalletService {
     this.#setDisconnectedFlag(true);
     this.#address.set(null);
     this.#chainId.set(null);
-    this.#connector.set(null);
+    this.#setConnector(null);
     /*
     // For WalletConnect, fully clear provider/session (real disconnect).
     if (connector === 'walletconnect') {
@@ -602,12 +614,21 @@ export class EvmWalletService {
     return injected;
   }
 
-  #setProvider(provider: Eip1193Provider, connector: WalletConnectorId | null): void {
+  #setProvider(
+    provider: Eip1193Provider,
+    connector: WalletConnectorId | null,
+    skipPersist = false,
+  ): void {
     this.#detachListeners?.();
     this.#detachListeners = null;
 
     this.#provider.set(provider);
-    this.#connector.set(connector);
+    if (skipPersist) {
+      // Only update signal, don't touch localStorage (used during initial setup)
+      this.#connector.set(connector);
+    } else {
+      this.#setConnector(connector);
+    }
 
     const onAccountsChanged = (args: unknown) => {
       const accounts = args as string[];
@@ -648,6 +669,34 @@ export class EvmWalletService {
     try {
       if (value) window.localStorage.setItem(EvmWalletService.DISCONNECTED_STORAGE_KEY, '1');
       else window.localStorage.removeItem(EvmWalletService.DISCONNECTED_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+  }
+
+  #readConnector(): WalletConnectorId | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      const stored = window.localStorage.getItem(EvmWalletService.CONNECTOR_STORAGE_KEY);
+      const validConnectors: readonly WalletConnectorId[] = ['metamask', 'trust', 'binance'];
+      if (stored && validConnectors.includes(stored as WalletConnectorId)) {
+        return stored as WalletConnectorId;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  #setConnector(connector: WalletConnectorId | null): void {
+    this.#connector.set(connector);
+    if (typeof window === 'undefined') return;
+    try {
+      if (connector) {
+        window.localStorage.setItem(EvmWalletService.CONNECTOR_STORAGE_KEY, connector);
+      } else {
+        window.localStorage.removeItem(EvmWalletService.CONNECTOR_STORAGE_KEY);
+      }
     } catch {
       // ignore
     }

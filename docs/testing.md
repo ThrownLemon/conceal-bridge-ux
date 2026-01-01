@@ -43,7 +43,6 @@ Use for:
 Use for:
 
 - [`BridgeApiService`](conceal-bridge-ux/src/app/core/bridge-api.service.ts:13) URL building and request shapes
-- [`EvmChainMetadataService`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:23) behavior when remote metadata fails (it already swallows failures via [`catchError()`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:45))
 - [`EvmWalletService`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:34) behavior around provider selection and error handling
 
 **Rule:** do not hit real networks; use Angular HTTP testing utilities for HttpClient-based services and provider fakes for wallet integration.

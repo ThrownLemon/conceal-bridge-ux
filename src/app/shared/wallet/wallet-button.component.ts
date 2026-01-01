@@ -4,8 +4,8 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
 import { ZardDividerComponent } from '@/shared/components/divider/divider.component';
 import { ZardAvatarComponent } from '@/shared/components/avatar/avatar.component';
+import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
-import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
 import { WalletModalService } from '../../core/wallet-modal.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
@@ -15,7 +15,13 @@ type Variant = 'header' | 'primary';
 @Component({
   selector: 'app-wallet-button',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ZardButtonComponent, ZardDropdownImports, ZardDividerComponent, ZardAvatarComponent],
+  imports: [
+    ZardButtonComponent,
+    ZardDropdownImports,
+    ZardDividerComponent,
+    ZardAvatarComponent,
+    ZardIconComponent,
+  ],
   template: `
     @if (!wallet.isConnected()) {
       <button
@@ -53,9 +59,12 @@ type Variant = 'header' | 'primary';
                 (click)="switchNetwork(opt.key)"
                 [disabled]="isSwitchingNetwork()"
               >
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 w-full">
                   <z-avatar class="h-5 w-5" [zSrc]="opt.logo" [zAlt]="opt.label + ' logo'" />
-                  <span>{{ opt.label }}</span>
+                  <span class="flex-1">{{ opt.label }}</span>
+                  @if (isCurrentNetwork(opt.chain.id)) {
+                    <z-icon zType="check" class="h-4 w-4 text-primary" />
+                  }
                 </div>
               </z-dropdown-menu-item>
             }
@@ -128,30 +137,27 @@ export class WalletButtonComponent {
   readonly variant = input<Variant>('header');
 
   readonly wallet = inject(EvmWalletService);
-  readonly #chains = inject(EvmChainMetadataService);
   readonly #modalService = inject(WalletModalService);
 
   readonly isSwitchingNetwork = signal(false);
   readonly networkStatus = signal<string | null>(null);
   readonly copyStatus = signal<string | null>(null);
 
-  readonly connectedChain = computed(() => this.#chains.get(this.wallet.chainId()));
-
-  readonly connectedChainLogo = computed(() => {
+  /** Finds the network info for the currently connected chain ID. */
+  readonly #connectedNetworkInfo = computed(() => {
     const chainId = this.wallet.chainId();
-    if (chainId === 1) return 'images/branding/eth.png';
-    if (chainId === 56) return 'images/branding/bsc.png';
-    if (chainId === 137) return 'images/branding/plg.png';
-    return this.connectedChain()?.logoUri ?? null;
+    if (!chainId) return null;
+    return Object.values(EVM_NETWORKS).find((info) => info.chain.id === chainId) ?? null;
   });
 
-  readonly currentNetworkName = computed(() => {
-    const chainId = this.wallet.chainId();
-    if (chainId === 1) return 'Ethereum';
-    if (chainId === 56) return 'BNB Smart Chain';
-    if (chainId === 137) return 'Polygon';
-    return this.connectedChain()?.name ?? 'Network';
+  readonly connectedChain = computed(() => {
+    const info = this.#connectedNetworkInfo();
+    return info ? { name: info.label, id: info.chain.id } : null;
   });
+
+  readonly connectedChainLogo = computed(() => this.#connectedNetworkInfo()?.logoUri ?? null);
+
+  readonly currentNetworkName = computed(() => this.#connectedNetworkInfo()?.label ?? 'Network');
 
   readonly currentNetworkLogo = computed(() => this.connectedChainLogo());
 
@@ -160,26 +166,32 @@ export class WalletButtonComponent {
     return c ? this.connectorLogo(c) : null;
   });
 
-  readonly evmNetworkOptions = computed(() => [
-    {
-      key: 'eth' as const,
-      label: 'Ethereum',
-      logo: 'images/branding/eth.png',
-      chain: EVM_NETWORKS.eth.chain,
-    },
-    {
-      key: 'bsc' as const,
-      label: 'BNB Smart Chain',
-      logo: 'images/branding/bsc.png',
-      chain: EVM_NETWORKS.bsc.chain,
-    },
-    {
-      key: 'plg' as const,
-      label: 'Polygon',
-      logo: 'images/branding/plg.png',
-      chain: EVM_NETWORKS.plg.chain,
-    },
-  ]);
+  readonly evmNetworkOptions = computed(() => {
+    return [
+      {
+        key: 'eth' as const,
+        label: EVM_NETWORKS.eth.label,
+        logo: EVM_NETWORKS.eth.logoUri,
+        chain: EVM_NETWORKS.eth.chain,
+      },
+      {
+        key: 'bsc' as const,
+        label: EVM_NETWORKS.bsc.label,
+        logo: EVM_NETWORKS.bsc.logoUri,
+        chain: EVM_NETWORKS.bsc.chain,
+      },
+      {
+        key: 'plg' as const,
+        label: EVM_NETWORKS.plg.label,
+        logo: EVM_NETWORKS.plg.logoUri,
+        chain: EVM_NETWORKS.plg.chain,
+      },
+    ];
+  });
+
+  isCurrentNetwork(chainId: number): boolean {
+    return this.wallet.chainId() === chainId;
+  }
 
   open(): void {
     this.#modalService.open();

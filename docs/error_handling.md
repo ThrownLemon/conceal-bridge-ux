@@ -259,14 +259,12 @@ Common scenarios and recommended responses:
 
 ---
 
-## 10) Background/non-critical failures (don’t hard-fail the app)
+## 10) Background/non-critical failures (don't hard-fail the app)
 
-Two examples already in the codebase:
+Example in the codebase:
 
 - Wallet hydration:
   - [`EvmWalletService.hydrate()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:114) catches and ignores errors so app startup never hard-fails.
-- Chain metadata:
-  - [`EvmChainMetadataService`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:23) treats metadata as optional and returns an empty list on errors via [`rxjs.catchError()`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:44).
 
 **Rule:** continue this approach for optional UI sugar; reserve `pageError` for critical path failures.
 

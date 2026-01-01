@@ -278,7 +278,6 @@ Rules:
   - prefer local assets in [`conceal-bridge-ux/public/`](conceal-bridge-ux/public:1)
   - be deliberate about `connect-src` allowlists for:
     - backend base URL from [`AppConfig.apiBaseUrl`](conceal-bridge-ux/src/app/core/app-config.ts:8)
-    - chain metadata API host used by [`EvmChainMetadataService`](conceal-bridge-ux/src/app/core/evm-chain-metadata.service.ts:43)
 
 ---
 

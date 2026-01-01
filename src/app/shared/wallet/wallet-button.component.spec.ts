@@ -4,14 +4,18 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { WalletButtonComponent } from './wallet-button.component';
 import { EvmWalletService } from '../../core/evm-wallet.service';
-import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { WalletModalService } from '../../core/wallet-modal.service';
+import { EVM_NETWORKS } from '../../core/evm-networks';
+
+// Get actual chain IDs from configured networks (testnets in dev, mainnets in prod)
+const ETH_CHAIN_ID = EVM_NETWORKS.eth.chain.id;
+const BSC_CHAIN_ID = EVM_NETWORKS.bsc.chain.id;
+const PLG_CHAIN_ID = EVM_NETWORKS.plg.chain.id;
 
 describe('WalletButtonComponent', () => {
   let component: WalletButtonComponent;
   let fixture: ComponentFixture<WalletButtonComponent>;
   let mockWalletService: Partial<EvmWalletService>;
-  let mockChainMetaService: Partial<EvmChainMetadataService>;
   let mockModalService: Partial<WalletModalService>;
 
   // Writable signals for easier test manipulation
@@ -41,10 +45,6 @@ describe('WalletButtonComponent', () => {
       disconnect: vi.fn().mockResolvedValue(undefined),
     };
 
-    mockChainMetaService = {
-      get: vi.fn().mockReturnValue({ name: 'Ethereum', logoUri: 'eth.png' }),
-    };
-
     mockModalService = {
       open: vi.fn(),
     };
@@ -54,7 +54,6 @@ describe('WalletButtonComponent', () => {
       providers: [
         provideNoopAnimations(),
         { provide: EvmWalletService, useValue: mockWalletService },
-        { provide: EvmChainMetadataService, useValue: mockChainMetaService },
         { provide: WalletModalService, useValue: mockModalService },
       ],
     });
@@ -102,7 +101,7 @@ describe('WalletButtonComponent', () => {
     beforeEach(() => {
       isConnectedSignal.set(true);
       addressSignal.set(mockAddress as `0x${string}`);
-      chainIdSignal.set(1);
+      chainIdSignal.set(ETH_CHAIN_ID);
       shortAddressSignal.set('0x1234…7890');
       connectorSignal.set('metamask');
       fixture.detectChanges();
@@ -115,7 +114,7 @@ describe('WalletButtonComponent', () => {
 
     it('should display current network name', () => {
       const networkName = component.currentNetworkName();
-      expect(networkName).toBe('Ethereum');
+      expect(networkName).toBe(EVM_NETWORKS.eth.label);
     });
 
     it('should display short address', () => {
@@ -131,7 +130,7 @@ describe('WalletButtonComponent', () => {
       (mockWalletService.address as ReturnType<typeof signal<`0x${string}` | null>>).set(
         mockAddress as `0x${string}`,
       );
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
+      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(ETH_CHAIN_ID);
       (mockWalletService.shortAddress as ReturnType<typeof signal<string>>).set('0x1234…7890');
       fixture.detectChanges();
     });
@@ -151,7 +150,7 @@ describe('WalletButtonComponent', () => {
   describe('network switching', () => {
     beforeEach(() => {
       (mockWalletService.isConnected as ReturnType<typeof signal<boolean>>).set(true);
-      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(1);
+      (mockWalletService.chainId as ReturnType<typeof signal<number | null>>).set(ETH_CHAIN_ID);
       fixture.detectChanges();
     });
 
@@ -159,7 +158,7 @@ describe('WalletButtonComponent', () => {
       await component.switchNetwork('bsc');
 
       expect(mockWalletService.ensureChain).toHaveBeenCalled();
-      expect(component.networkStatus()).toBe('Switched to BNB Smart Chain.');
+      expect(component.networkStatus()).toBe(`Switched to ${EVM_NETWORKS.bsc.label}.`);
       expect(component.isSwitchingNetwork()).toBe(false);
     });
 
@@ -341,53 +340,52 @@ describe('WalletButtonComponent', () => {
   describe('computed signals', () => {
     beforeEach(() => {
       isConnectedSignal.set(true);
-      chainIdSignal.set(1);
+      chainIdSignal.set(ETH_CHAIN_ID);
       connectorSignal.set('metamask');
       fixture.detectChanges();
     });
 
     describe('connectedChainLogo', () => {
-      it('should return Ethereum logo for chainId 1', () => {
-        expect(component.connectedChainLogo()).toBe('images/branding/eth.png');
+      it('should return Ethereum logo for configured ETH chain', () => {
+        expect(component.connectedChainLogo()).toBe('images/networks/ethereum.svg');
       });
 
-      it('should return BSC logo for chainId 56', () => {
-        chainIdSignal.set(56);
-        expect(component.connectedChainLogo()).toBe('images/branding/bsc.png');
+      it('should return BSC logo for configured BSC chain', () => {
+        chainIdSignal.set(BSC_CHAIN_ID);
+        expect(component.connectedChainLogo()).toBe('images/networks/bsc.svg');
       });
 
-      it('should return Polygon logo for chainId 137', () => {
-        chainIdSignal.set(137);
-        expect(component.connectedChainLogo()).toBe('images/branding/plg.png');
+      it('should return Polygon logo for configured PLG chain', () => {
+        chainIdSignal.set(PLG_CHAIN_ID);
+        expect(component.connectedChainLogo()).toBe('images/networks/polygon.svg');
       });
 
-      it('should return chain metadata logo for other chains', () => {
+      it('should return null for unknown chains', () => {
         chainIdSignal.set(42161);
         const logo = component.connectedChainLogo();
-        // Falls back to chain metadata logo or null
-        expect(logo).toBeDefined();
+        expect(logo).toBeNull();
       });
     });
 
     describe('currentNetworkName', () => {
-      it('should return Ethereum for chainId 1', () => {
-        expect(component.currentNetworkName()).toBe('Ethereum');
+      it('should return configured ETH label for ETH chain', () => {
+        expect(component.currentNetworkName()).toBe(EVM_NETWORKS.eth.label);
       });
 
-      it('should return BNB Smart Chain for chainId 56', () => {
-        chainIdSignal.set(56);
-        expect(component.currentNetworkName()).toBe('BNB Smart Chain');
+      it('should return configured BSC label for BSC chain', () => {
+        chainIdSignal.set(BSC_CHAIN_ID);
+        expect(component.currentNetworkName()).toBe(EVM_NETWORKS.bsc.label);
       });
 
-      it('should return Polygon for chainId 137', () => {
-        chainIdSignal.set(137);
-        expect(component.currentNetworkName()).toBe('Polygon');
+      it('should return configured PLG label for PLG chain', () => {
+        chainIdSignal.set(PLG_CHAIN_ID);
+        expect(component.currentNetworkName()).toBe(EVM_NETWORKS.plg.label);
       });
 
-      it('should return chain metadata name for other chains', () => {
+      it('should return "Network" for unknown chains', () => {
         chainIdSignal.set(42161);
         const name = component.currentNetworkName();
-        expect(name).toBeDefined();
+        expect(name).toBe('Network');
       });
     });
 

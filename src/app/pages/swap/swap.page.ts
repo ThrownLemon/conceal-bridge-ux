@@ -2,14 +2,28 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  Injector,
   computed,
   inject,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, filter, map, of, Subject, switchMap, take, takeUntil, timer } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+  catchError,
+  distinctUntilChanged,
+  filter,
+  from,
+  map,
+  of,
+  skip,
+  Subject,
+  switchMap,
+  take,
+  takeUntil,
+  timer,
+} from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { firstValueFrom } from 'rxjs';
@@ -59,6 +73,23 @@ function isEvmNetworkKey(value: string | null): value is EvmNetworkKey {
 
 function isSwapDirection(value: string | null): value is SwapDirection {
   return value === 'ccx-to-evm' || value === 'evm-to-ccx';
+}
+
+/**
+ * Maps a chain ID to the corresponding network key.
+ * Returns null if the chain ID is not supported.
+ * Derives mapping from EVM_NETWORKS to work with both mainnet and testnet configurations.
+ */
+function chainIdToNetworkKey(chainId: number | null): EvmNetworkKey | null {
+  if (chainId === null) return null;
+
+  for (const key in EVM_NETWORKS) {
+    const networkKey = key as EvmNetworkKey;
+    if (EVM_NETWORKS[networkKey].chain.id === chainId) {
+      return networkKey;
+    }
+  }
+  return null;
 }
 
 function inferDecimalsFromUnits(units: number): number | null {
@@ -666,7 +697,9 @@ const erc20Abi = [
 })
 export class SwapPage {
   readonly #destroyRef = inject(DestroyRef);
+  readonly #injector = inject(Injector);
   readonly #route = inject(ActivatedRoute);
+  readonly #router = inject(Router);
   readonly #fb = inject(NonNullableFormBuilder);
 
   readonly api = inject(BridgeApiService);
@@ -765,11 +798,60 @@ export class SwapPage {
     // Best-practice: hydrate wallet state without prompting.
     void this.wallet.hydrate();
 
-    // Load config + balances when network changes.
+    // Emit network when route param changes.
     const network$ = this.#route.paramMap.pipe(
       map((pm) => pm.get('network')),
       filter(isEvmNetworkKey),
+      takeUntilDestroyed(this.#destroyRef),
     );
+
+    // Ensure wallet network matches route network.
+    // When navigating to a specific network route (e.g., from home page),
+    // automatically switch the wallet to that network.
+    network$
+      .pipe(
+        switchMap((network) => {
+          const targetChain = EVM_NETWORKS[network].chain;
+          const currentChainId = this.wallet.chainId();
+
+          // If wallet is already on the correct network, do nothing
+          if (currentChainId === targetChain.id) {
+            return of(null);
+          }
+
+          // Switch wallet to match route network
+          return from(this.wallet.ensureChain(targetChain)).pipe(
+            catchError((e: unknown) => {
+              // User cancelled or error - that's ok, they can manually switch
+              console.warn('[SwapPage] Failed to switch wallet network:', e);
+              return of(null);
+            }),
+          );
+        }),
+        takeUntilDestroyed(this.#destroyRef),
+      )
+      .subscribe();
+
+    // When wallet network changes, navigate to the new network's route.
+    // This will trigger a route change, which will then reload the config/balances.
+    // Skip(1) ensures we only react to actual changes, not the initial wallet state.
+    toObservable(this.wallet.chainId, { injector: this.#injector })
+      .pipe(
+        skip(1),
+        map((chainId) => chainIdToNetworkKey(chainId)),
+        filter((key): key is EvmNetworkKey => key !== null),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.#destroyRef),
+      )
+      .subscribe((newNetwork) => {
+        const currentDirection =
+          (this.#route.snapshot.paramMap.get('direction') as SwapDirection) ?? 'ccx-to-evm';
+        const currentNetwork = this.#route.snapshot.paramMap.get('network');
+
+        if (newNetwork !== currentNetwork) {
+          void this.#router.navigate(['/swap', currentDirection, newNetwork]);
+        }
+      });
 
     network$
       .pipe(

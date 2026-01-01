@@ -70,9 +70,9 @@ describe('TransactionHistoryService', () => {
         createMockTransaction({ id: 'tx-1' }),
         createMockTransaction({ id: 'tx-2' }),
       ];
-      setupLocalStorage({ [STORAGE_KEY]: JSON.stringify(storedTxs) });
 
       TestBed.resetTestingModule();
+      setupLocalStorage({ [STORAGE_KEY]: JSON.stringify(storedTxs) });
       TestBed.configureTestingModule({ providers: [TransactionHistoryService] });
       service = TestBed.inject(TransactionHistoryService);
 
@@ -84,11 +84,10 @@ describe('TransactionHistoryService', () => {
 
   describe('localStorage error handling', () => {
     it('should handle malformed JSON in localStorage gracefully', () => {
-      setupLocalStorage({ [STORAGE_KEY]: 'not valid json{' });
-
       const warnSpy = vi.spyOn(console, 'warn').mockReturnValue(undefined);
 
       TestBed.resetTestingModule();
+      setupLocalStorage({ [STORAGE_KEY]: 'not valid json{' });
       TestBed.configureTestingModule({ providers: [TransactionHistoryService] });
       service = TestBed.inject(TransactionHistoryService);
 
@@ -97,9 +96,8 @@ describe('TransactionHistoryService', () => {
     });
 
     it('should handle non-array data in localStorage gracefully', () => {
-      setupLocalStorage({ [STORAGE_KEY]: JSON.stringify({ notAnArray: true }) });
-
       TestBed.resetTestingModule();
+      setupLocalStorage({ [STORAGE_KEY]: JSON.stringify({ notAnArray: true }) });
       TestBed.configureTestingModule({ providers: [TransactionHistoryService] });
       service = TestBed.inject(TransactionHistoryService);
 
@@ -107,9 +105,8 @@ describe('TransactionHistoryService', () => {
     });
 
     it('should handle null stored value', () => {
-      setupLocalStorage({ [STORAGE_KEY]: 'null' });
-
       TestBed.resetTestingModule();
+      setupLocalStorage({ [STORAGE_KEY]: 'null' });
       TestBed.configureTestingModule({ providers: [TransactionHistoryService] });
       service = TestBed.inject(TransactionHistoryService);
 
@@ -131,13 +128,12 @@ describe('TransactionHistoryService', () => {
     });
 
     it('should handle localStorage.getItem throwing', () => {
-      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-        throw new Error('SecurityError: localStorage is not available');
-      });
-
       const warnSpy = vi.spyOn(console, 'warn').mockReturnValue(undefined);
 
       TestBed.resetTestingModule();
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('SecurityError: localStorage is not available');
+      });
       TestBed.configureTestingModule({ providers: [TransactionHistoryService] });
       service = TestBed.inject(TransactionHistoryService);
 
@@ -336,7 +332,10 @@ describe('TransactionHistoryService', () => {
       service.addTransaction(createMockTransaction({ id: 'persisted-tx' }));
 
       // Create new instance (simulating app reload)
+      // Keep the same mockLocalStorage data but reset TestBed
+      const savedData = { ...mockLocalStorage };
       TestBed.resetTestingModule();
+      setupLocalStorage(savedData);
       TestBed.configureTestingModule({ providers: [TransactionHistoryService] });
       const newService = TestBed.inject(TransactionHistoryService);
 
@@ -349,9 +348,9 @@ describe('TransactionHistoryService', () => {
       const storedTxs: StoredTransaction[] = Array.from({ length: 5 }, (_, i) =>
         createMockTransaction({ id: `stored-${i}` }),
       );
-      setupLocalStorage({ [STORAGE_KEY]: JSON.stringify(storedTxs) });
 
       TestBed.resetTestingModule();
+      setupLocalStorage({ [STORAGE_KEY]: JSON.stringify(storedTxs) });
       TestBed.configureTestingModule({ providers: [TransactionHistoryService] });
       service = TestBed.inject(TransactionHistoryService);
 

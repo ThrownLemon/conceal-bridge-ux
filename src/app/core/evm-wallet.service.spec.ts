@@ -290,6 +290,35 @@ describe('EvmWalletService', () => {
 
       await expect(service.hydrate()).resolves.not.toThrow();
     });
+
+    it('should restore connector type from localStorage on hydrate', async () => {
+      asMock(window.localStorage.getItem).mockImplementation((key: string) => {
+        if (key === EvmWalletService.CONNECTOR_STORAGE_KEY) return 'metamask';
+        return null;
+      });
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [EvmWalletService] });
+      service = TestBed.inject(EvmWalletService);
+
+      await vi.waitFor(() => {
+        expect(service.connector()).toBe('metamask');
+      });
+    });
+
+    it('should not restore connector when disconnectedByUser is true', async () => {
+      asMock(window.localStorage.getItem).mockImplementation((key: string) => {
+        if (key === EvmWalletService.DISCONNECTED_STORAGE_KEY) return '1';
+        if (key === EvmWalletService.CONNECTOR_STORAGE_KEY) return 'metamask';
+        return null;
+      });
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [EvmWalletService] });
+      service = TestBed.inject(EvmWalletService);
+
+      await vi.waitFor(() => {
+        expect(service.connector()).toBeNull();
+      });
+    });
   });
 
   describe('connect', () => {
@@ -381,6 +410,14 @@ describe('EvmWalletService', () => {
       expect(service.connector()).toBe('metamask');
     });
 
+    it('should save connector to localStorage when connecting', async () => {
+      await service.connectWith('metamask');
+      expect(window.localStorage.setItem).toHaveBeenCalledWith(
+        EvmWalletService.CONNECTOR_STORAGE_KEY,
+        'metamask',
+      );
+    });
+
     it('should connect with binance provider', async () => {
       const result = await service.connectWith('binance');
       expect(result).toBe(mockAddress);
@@ -461,6 +498,15 @@ describe('EvmWalletService', () => {
       expect(window.localStorage.setItem).toHaveBeenCalledWith(
         EvmWalletService.DISCONNECTED_STORAGE_KEY,
         '1',
+      );
+    });
+
+    it('should remove connector from localStorage on disconnect', async () => {
+      await service.connectWith('metamask');
+      await service.disconnect();
+
+      expect(window.localStorage.removeItem).toHaveBeenCalledWith(
+        EvmWalletService.CONNECTOR_STORAGE_KEY,
       );
     });
 
@@ -770,6 +816,86 @@ describe('EvmWalletService', () => {
   describe('DISCONNECTED_STORAGE_KEY', () => {
     it('should have correct storage key value', () => {
       expect(EvmWalletService.DISCONNECTED_STORAGE_KEY).toBe('conceal_bridge_wallet_disconnected');
+    });
+  });
+
+  describe('connector persistence edge cases', () => {
+    beforeEach(() => {
+      setupWindow(mockProvider);
+      asMock(mockProvider.request).mockImplementation(async (args: { method: string }) => {
+        if (args.method === 'eth_chainId') return '0x1';
+        if (args.method === 'eth_accounts') return [mockAddress];
+        return null;
+      });
+    });
+
+    it('should return null when localStorage has invalid connector value', async () => {
+      asMock(window.localStorage.getItem).mockImplementation((key: string) => {
+        if (key === EvmWalletService.CONNECTOR_STORAGE_KEY) return 'invalid-wallet';
+        return null;
+      });
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [EvmWalletService] });
+      service = TestBed.inject(EvmWalletService);
+
+      await vi.waitFor(() => {
+        // Invalid connector values should be ignored, resulting in null
+        expect(service.connector()).toBeNull();
+      });
+    });
+
+    it('should return null when localStorage has empty string connector value', async () => {
+      asMock(window.localStorage.getItem).mockImplementation((key: string) => {
+        if (key === EvmWalletService.CONNECTOR_STORAGE_KEY) return '';
+        return null;
+      });
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [EvmWalletService] });
+      service = TestBed.inject(EvmWalletService);
+
+      await vi.waitFor(() => {
+        expect(service.connector()).toBeNull();
+      });
+    });
+
+    it('should handle localStorage.getItem throwing when reading connector', async () => {
+      asMock(window.localStorage.getItem).mockImplementation((key: string) => {
+        if (key === EvmWalletService.CONNECTOR_STORAGE_KEY) {
+          throw new Error('localStorage unavailable');
+        }
+        return null;
+      });
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [EvmWalletService] });
+
+      // Should not throw and should default to null
+      service = TestBed.inject(EvmWalletService);
+
+      await vi.waitFor(() => {
+        expect(service.connector()).toBeNull();
+      });
+    });
+
+    it('should accept valid connector values from localStorage', async () => {
+      const validConnectors = ['metamask', 'trust', 'binance'] as const;
+
+      for (const validConnector of validConnectors) {
+        asMock(window.localStorage.getItem).mockImplementation((key: string) => {
+          if (key === EvmWalletService.CONNECTOR_STORAGE_KEY) return validConnector;
+          return null;
+        });
+
+        TestBed.resetTestingModule();
+        TestBed.configureTestingModule({ providers: [EvmWalletService] });
+        service = TestBed.inject(EvmWalletService);
+
+        await vi.waitFor(() => {
+          expect(service.connector()).toBe(validConnector);
+        });
+      }
     });
   });
 });

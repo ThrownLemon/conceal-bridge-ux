@@ -10,7 +10,6 @@ import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
-import { EvmChainMetadataService } from '../../core/evm-chain-metadata.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 import type { EvmNetworkKey, SwapDirection } from '../../core/bridge-types';
 import { EvmWalletService } from '../../core/evm-wallet.service';
@@ -20,9 +19,9 @@ type NetworkKey = 'ccx' | EvmNetworkKey;
 
 const NETWORK_LOGOS: Record<NetworkKey, string> = {
   ccx: 'images/branding/ccx.png',
-  eth: 'images/branding/eth.png',
-  bsc: 'images/branding/bsc.png',
-  plg: 'images/branding/plg.png',
+  eth: EVM_NETWORKS.eth.logoUri,
+  bsc: EVM_NETWORKS.bsc.logoUri,
+  plg: EVM_NETWORKS.plg.logoUri,
 };
 
 @Component({
@@ -131,10 +130,44 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
               </div>
             </div>
 
-            <p class="text-xs text-muted-foreground">
-              One side must be Conceal (CCX). Logos/names are loaded from a public chain metadata
-              API.
-            </p>
+            @if (direction(); as dir) {
+              <p class="text-sm text-foreground flex items-center gap-1.5 flex-wrap">
+                <span>You are swapping</span>
+                @if (dir === 'ccx-to-evm') {
+                  @if (fromDisplay(); as from) {
+                    <span class="inline-flex items-center gap-1">
+                      <z-avatar class="h-4 w-4" [zSrc]="from.logoUri" [zAlt]="from.label" />
+                      <span class="font-semibold">{{ from.label }} (CCX)</span>
+                    </span>
+                  }
+                  <span>to</span>
+                  @if (toDisplay(); as to) {
+                    <span class="inline-flex items-center gap-1">
+                      <span class="font-semibold">Wrapped CCX (wCCX)</span>
+                      <span>on</span>
+                      <z-avatar class="h-4 w-4" [zSrc]="to.logoUri" [zAlt]="to.label" />
+                      <span class="font-semibold">{{ to.label }}</span>
+                    </span>
+                  }
+                } @else {
+                  @if (fromDisplay(); as from) {
+                    <span class="inline-flex items-center gap-1">
+                      <span class="font-semibold">Wrapped CCX (wCCX)</span>
+                      <span>on</span>
+                      <z-avatar class="h-4 w-4" [zSrc]="from.logoUri" [zAlt]="from.label" />
+                      <span class="font-semibold">{{ from.label }}</span>
+                    </span>
+                  }
+                  <span>to</span>
+                  @if (toDisplay(); as to) {
+                    <span class="inline-flex items-center gap-1">
+                      <z-avatar class="h-4 w-4" [zSrc]="to.logoUri" [zAlt]="to.label" />
+                      <span class="font-semibold">{{ to.label }} (CCX)</span>
+                    </span>
+                  }
+                }
+              </p>
+            }
             @if (networkSwitchStatus(); as status) {
               <p class="text-xs text-amber-400" aria-live="polite">{{ status }}</p>
             }
@@ -178,7 +211,6 @@ export class HomePage {
   readonly #router = inject(Router);
   readonly #fb = inject(NonNullableFormBuilder);
   readonly #wallet = inject(EvmWalletService);
-  readonly #chainMeta = inject(EvmChainMetadataService);
 
   readonly wallet = this.#wallet;
 
@@ -190,7 +222,7 @@ export class HomePage {
   readonly form = this.#fb.group({
     direction: this.#fb.control<SwapDirection>('ccx-to-evm'),
     fromNetwork: this.#fb.control<NetworkKey>('ccx'),
-    toNetwork: this.#fb.control<NetworkKey>('bsc'),
+    toNetwork: this.#fb.control<NetworkKey>('eth'),
   });
 
   readonly direction = toSignal(
@@ -213,8 +245,6 @@ export class HomePage {
   readonly #lastEvm = signal<EvmNetworkKey>('bsc');
 
   readonly networkOptions = computed(() => {
-    // Touch chain metadata signal so labels refresh when remote metadata loads.
-    this.#chainMeta.byId();
     return [
       {
         key: 'ccx' as const,
@@ -224,9 +254,9 @@ export class HomePage {
       },
       ...this.networks.map((n) => ({
         key: n.key,
-        label: this.networkLabel(n.key),
+        label: n.label,
         subtitle: 'EVM network',
-        logoUri: NETWORK_LOGOS[n.key],
+        logoUri: n.logoUri,
       })),
     ];
   });
@@ -245,16 +275,19 @@ export class HomePage {
   }
 
   networkLabel(key: EvmNetworkKey): string {
-    const info = EVM_NETWORKS[key];
-    const meta = this.#chainMeta.get(info.chain.id);
-    return meta?.name ?? info.label;
+    return EVM_NETWORKS[key].label;
   }
 
   displayFor(key: NetworkKey) {
     if (key === 'ccx') {
       return { label: 'Conceal', subtitle: 'Native chain', logoUri: NETWORK_LOGOS.ccx };
     }
-    return { label: this.networkLabel(key), subtitle: 'EVM network', logoUri: NETWORK_LOGOS[key] };
+    const info = EVM_NETWORKS[key];
+    return {
+      label: info.label,
+      subtitle: 'EVM network',
+      logoUri: info.logoUri,
+    };
   }
 
   openUserGuide(): void {
@@ -269,16 +302,24 @@ export class HomePage {
   }
 
   setFromNetwork(next: NetworkKey): void {
-    const otherBefore = this.form.controls.toNetwork.value;
-    if (next === otherBefore) {
-      this.networkSwitchStatus.set('From and To networks cannot be the same.');
+    const currentFrom = this.form.controls.fromNetwork.value;
+    const currentTo = this.form.controls.toNetwork.value;
+
+    // If user selects the same network that's in TO, swap them
+    if (next === currentTo) {
+      // Swap: TO gets old FROM value, FROM gets the selected value
+      this.form.controls.toNetwork.setValue(currentFrom);
+      this.form.controls.fromNetwork.setValue(next);
+      // Update direction based on where CCX ended up
       if (next === 'ccx') {
-        this.form.controls.toNetwork.setValue(this.#lastEvm());
         this.form.controls.direction.setValue('ccx-to-evm');
-        return;
+        if (currentFrom !== 'ccx') this.#lastEvm.set(currentFrom);
+      } else {
+        this.form.controls.direction.setValue('evm-to-ccx');
+        this.#lastEvm.set(next);
       }
-      this.form.controls.toNetwork.setValue('ccx');
-      this.form.controls.direction.setValue('evm-to-ccx');
+      this.networkSwitchStatus.set(null);
+      this.normalizeNetworks();
       return;
     }
 
@@ -299,16 +340,24 @@ export class HomePage {
   }
 
   setToNetwork(next: NetworkKey): void {
-    const otherBefore = this.form.controls.fromNetwork.value;
-    if (next === otherBefore) {
-      this.networkSwitchStatus.set('From and To networks cannot be the same.');
+    const currentFrom = this.form.controls.fromNetwork.value;
+    const currentTo = this.form.controls.toNetwork.value;
+
+    // If user selects the same network that's in FROM, swap them
+    if (next === currentFrom) {
+      // Swap: FROM gets old TO value, TO gets the selected value
+      this.form.controls.fromNetwork.setValue(currentTo);
+      this.form.controls.toNetwork.setValue(next);
+      // Update direction based on where CCX ended up
       if (next === 'ccx') {
-        this.form.controls.fromNetwork.setValue(this.#lastEvm());
         this.form.controls.direction.setValue('evm-to-ccx');
-        return;
+        if (currentTo !== 'ccx') this.#lastEvm.set(currentTo);
+      } else {
+        this.form.controls.direction.setValue('ccx-to-evm');
+        this.#lastEvm.set(next);
       }
-      this.form.controls.fromNetwork.setValue('ccx');
-      this.form.controls.direction.setValue('ccx-to-evm');
+      this.networkSwitchStatus.set(null);
+      this.normalizeNetworks();
       return;
     }
 

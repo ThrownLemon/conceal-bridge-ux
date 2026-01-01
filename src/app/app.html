@@ -8,6 +8,28 @@
     Skip to main content
   </a>
 
+  <!-- Testnet Warning Banner -->
+  @if (isTestnet && !testnetBannerDismissed()) {
+    <div
+      class="flex items-center justify-center gap-2 bg-amber-500 px-4 py-2 text-sm font-medium text-amber-950"
+      role="alert"
+    >
+      <z-icon zType="triangle-alert" class="size-4 shrink-0" />
+      <span>Testnet Mode — Using test networks. Tokens have no real value.</span>
+      <button
+        z-button
+        zType="ghost"
+        zSize="sm"
+        type="button"
+        class="-my-1 ml-2 size-6 shrink-0 !p-0 text-amber-950 hover:bg-amber-600/20 hover:text-amber-950"
+        (click)="dismissTestnetBanner()"
+        aria-label="Dismiss testnet warning"
+      >
+        <z-icon zType="x" class="size-3.5" />
+      </button>
+    </div>
+  }
+
   <header
     class="sticky top-0 z-10 border-b border-border/50 bg-background/80 backdrop-blur"
     aria-label="Site header"
