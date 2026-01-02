@@ -539,5 +539,13 @@ describe('HomePage', () => {
       const content = fixture.nativeElement.textContent;
       expect(content).toContain('Get MetaMask');
     });
+
+    it('should display clickable Terms & Conditions link', () => {
+      const link = fixture.nativeElement.querySelector('a[aria-label="Open Terms and Conditions in new tab"]');
+      expect(link).toBeTruthy();
+      expect(link.textContent).toContain('Terms & Conditions');
+      expect(link.getAttribute('role')).toBe('button');
+      expect(link.getAttribute('tabindex')).toBe('0');
+    });
   });
 });
