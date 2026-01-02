@@ -115,7 +115,10 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
                 <div class="flex justify-between">
                   <span>Status</span>
                   <z-badge [zType]="tx.status">
-                    {{ tx.status === 'pending' ? 'Pending' : 'Completed' }}
+                    @switch (tx.status) {
+                      @case ('pending') { Pending }
+                      @case ('completed') { Completed }
+                    }
                   </z-badge>
                 </div>
 
