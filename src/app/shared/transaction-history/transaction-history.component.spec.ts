@@ -37,6 +37,15 @@ describe('TransactionHistoryComponent', () => {
     network: 'eth',
   };
 
+  const mockPendingTransaction: StoredTransaction = {
+    id: 'tx-789',
+    direction: 'ccx-to-evm',
+    amount: 750,
+    status: 'pending',
+    timestamp: Date.now() - 30000, // 30 seconds ago
+    network: 'eth',
+  };
+
   beforeEach(() => {
     mockService = {
       isOpen: signal(false),
@@ -398,6 +407,50 @@ describe('TransactionHistoryComponent', () => {
 
       const content = fixture.nativeElement.textContent;
       expect(content).toContain('Completed');
+    });
+
+    it('should show Pending badge for pending transactions', () => {
+      mockService.transactions.set([mockPendingTransaction]);
+      fixture.detectChanges();
+
+      const content = fixture.nativeElement.textContent;
+      expect(content).toContain('Pending');
+    });
+
+    it('should apply completed variant styles to badge for completed transactions', () => {
+      mockService.transactions.set([mockTransaction]);
+      fixture.detectChanges();
+
+      const badge = fixture.nativeElement.querySelector('z-badge');
+      expect(badge).toBeTruthy();
+      // Check for green color classes specific to completed variant
+      expect(badge.className).toContain('text-green-600');
+    });
+
+    it('should apply pending variant styles to badge for pending transactions', () => {
+      mockService.transactions.set([mockPendingTransaction]);
+      fixture.detectChanges();
+
+      const badge = fixture.nativeElement.querySelector('z-badge');
+      expect(badge).toBeTruthy();
+      // Check for amber color classes specific to pending variant
+      expect(badge.className).toContain('text-amber-600');
+    });
+
+    it('should display both pending and completed badges correctly when mixed', () => {
+      mockService.transactions.set([mockTransaction, mockPendingTransaction]);
+      fixture.detectChanges();
+
+      const badges = fixture.nativeElement.querySelectorAll('z-badge');
+      expect(badges.length).toBe(2);
+
+      // First transaction (completed) - should have green styling
+      expect(badges[0].className).toContain('text-green-600');
+      expect(badges[0].textContent.trim()).toContain('Completed');
+
+      // Second transaction (pending) - should have amber styling
+      expect(badges[1].className).toContain('text-amber-600');
+      expect(badges[1].textContent.trim()).toContain('Pending');
     });
   });
 
