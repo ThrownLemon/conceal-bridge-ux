@@ -175,7 +175,16 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
 
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div class="text-xs text-muted-foreground">
-              By continuing, you agree to the bridge Terms &amp; Conditions.
+              By continuing, you agree to the bridge
+              <a
+                (click)="openTerms()"
+                class="cursor-pointer underline decoration-dotted hover:text-foreground focus:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
+                role="button"
+                tabindex="0"
+                aria-label="Open Terms and Conditions in new tab"
+              >
+                Terms &amp; Conditions
+              </a>.
             </div>
 
             @if (!wallet.isConnected()) {
