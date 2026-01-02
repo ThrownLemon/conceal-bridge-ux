@@ -7,6 +7,7 @@ export const alertVariants = cva(
       zType: {
         default: 'bg-card text-card-foreground',
         destructive: 'text-destructive bg-card',
+        warning: 'text-warning bg-card',
       },
     },
     defaultVariants: {
