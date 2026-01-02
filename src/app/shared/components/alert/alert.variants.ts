@@ -26,6 +26,7 @@ export const alertDescriptionVariants = cva('text-sm leading-relaxed mt-1', {
     zType: {
       default: 'text-muted-foreground',
       destructive: 'text-destructive/90',
+      warning: 'text-warning/90',
     },
   },
   defaultVariants: {
