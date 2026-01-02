@@ -85,6 +85,7 @@ export class ZardAlertComponent {
 
     if (this.zType() === 'destructive') return 'circle-alert';
     if (this.zType() === 'warning') return 'triangle-alert';
+    if (this.zType() === 'info') return 'info';
 
     return null;
   });
