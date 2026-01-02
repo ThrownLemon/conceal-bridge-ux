@@ -480,6 +480,15 @@ describe('HomePage', () => {
 
       expect(windowOpenSpy).toHaveBeenCalledWith('https://metamask.io/download.html', '_blank');
     });
+
+    it('should open terms and conditions in new tab', () => {
+      component.openTerms();
+
+      expect(windowOpenSpy).toHaveBeenCalledWith(
+        'https://concealnetwork.medium.com/conceal-bridge-user-guide-2ad03eee4963',
+        '_blank',
+      );
+    });
   });
 
   describe('form controls', () => {
@@ -529,6 +538,14 @@ describe('HomePage', () => {
     it('should display MetaMask card', () => {
       const content = fixture.nativeElement.textContent;
       expect(content).toContain('Get MetaMask');
+    });
+
+    it('should display clickable Terms & Conditions link', () => {
+      const link = fixture.nativeElement.querySelector('a[aria-label="Open Terms and Conditions in new tab"]');
+      expect(link).toBeTruthy();
+      expect(link.textContent).toContain('Terms & Conditions');
+      expect(link.getAttribute('role')).toBe('button');
+      expect(link.getAttribute('tabindex')).toBe('0');
     });
   });
 });
