@@ -480,6 +480,15 @@ describe('HomePage', () => {
 
       expect(windowOpenSpy).toHaveBeenCalledWith('https://metamask.io/download.html', '_blank');
     });
+
+    it('should open terms and conditions in new tab', () => {
+      component.openTerms();
+
+      expect(windowOpenSpy).toHaveBeenCalledWith(
+        'https://concealnetwork.medium.com/conceal-bridge-user-guide-2ad03eee4963',
+        '_blank',
+      );
+    });
   });
 
   describe('form controls', () => {
