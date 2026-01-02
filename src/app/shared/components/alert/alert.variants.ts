@@ -27,6 +27,7 @@ export const alertDescriptionVariants = cva('text-sm leading-relaxed mt-1', {
       default: 'text-muted-foreground',
       destructive: 'text-destructive/90',
       warning: 'text-warning/90',
+      info: 'text-info/90',
     },
   },
   defaultVariants: {
