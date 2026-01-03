@@ -22,6 +22,22 @@ class TestHostComponent {
   title = 'Test Alert';
 }
 
+@Component({
+  standalone: true,
+  imports: [ZardAlertComponent],
+  template: `
+    <ng-template #customIconTemplate>
+      <span class="custom-icon-content">Custom Icon</span>
+    </ng-template>
+    <z-alert [zType]="alertType" [zIcon]="customIconTemplate" [zTitle]="title" />
+  `,
+})
+class TestHostWithTemplateIconComponent {
+  readonly customIconTemplate = viewChild.required<TemplateRef<void>>('customIconTemplate');
+  alertType: 'default' | 'destructive' | 'warning' | 'info' = 'destructive';
+  title = 'Test Alert';
+}
+
 describe('ZardAlertComponent', () => {
   let component: ZardAlertComponent;
   let fixture: ComponentFixture<ZardAlertComponent>;
@@ -307,5 +323,47 @@ describe('ZardAlertComponent with host component', () => {
     const zIconDebug = hostFixture.debugElement.query(By.directive(ZardIconComponent));
     expect(zIconDebug).toBeTruthy();
     expect(zIconDebug.componentInstance.zType()).toBe('circle-alert');
+  });
+});
+
+describe('ZardAlertComponent with TemplateRef icon', () => {
+  let templateHostFixture: ComponentFixture<TestHostWithTemplateIconComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [TestHostWithTemplateIconComponent],
+    }).compileComponents();
+
+    templateHostFixture = TestBed.createComponent(TestHostWithTemplateIconComponent);
+  });
+
+  afterEach(() => {
+    templateHostFixture.destroy();
+    TestBed.resetTestingModule();
+  });
+
+  it('should render TemplateRef content instead of default icon when provided', () => {
+    templateHostFixture.detectChanges();
+
+    // Custom template content should be rendered
+    const customIconContent =
+      templateHostFixture.nativeElement.querySelector('.custom-icon-content');
+    expect(customIconContent).toBeTruthy();
+    expect(customIconContent.textContent).toBe('Custom Icon');
+
+    // z-icon component should NOT be rendered when TemplateRef is provided
+    const zIconDebug = templateHostFixture.debugElement.query(By.directive(ZardIconComponent));
+    expect(zIconDebug).toBeNull();
+  });
+
+  it('should return null from iconName when TemplateRef is provided', () => {
+    templateHostFixture.detectChanges();
+
+    // Get the alert component instance
+    const alertDebug = templateHostFixture.debugElement.query(By.directive(ZardAlertComponent));
+    const alertComponent = alertDebug.componentInstance as ZardAlertComponent;
+
+    // iconName should return null when zIcon is a TemplateRef
+    expect(alertComponent['iconName']()).toBeNull();
   });
 });
