@@ -268,6 +268,121 @@ describe('SwapPage', () => {
     });
   });
 
+  describe('Step Progress Indicator', () => {
+    describe('stepConfigs computed signal', () => {
+      it('should return empty array when direction is null', () => {
+        routeParamMap$.next(convertToParamMap({ direction: 'invalid', network: 'bsc' }));
+        fixture.detectChanges();
+
+        expect(component.stepConfigs()).toEqual([]);
+      });
+
+      it('should return ccx-to-evm step labels at step 0', () => {
+        routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'bsc' }));
+        fixture.detectChanges();
+        component.step.set(0);
+
+        const configs = component.stepConfigs();
+
+        expect(configs).toHaveLength(3);
+        expect(configs[0]).toEqual({ id: 0, label: 'Initialize', state: 'active' });
+        expect(configs[1]).toEqual({ id: 1, label: 'Deposit', state: 'pending' });
+        expect(configs[2]).toEqual({ id: 2, label: 'Complete', state: 'pending' });
+      });
+
+      it('should return ccx-to-evm step labels at step 1', () => {
+        routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'bsc' }));
+        fixture.detectChanges();
+        component.step.set(1);
+
+        const configs = component.stepConfigs();
+
+        expect(configs).toHaveLength(3);
+        expect(configs[0]).toEqual({ id: 0, label: 'Initialize', state: 'completed' });
+        expect(configs[1]).toEqual({ id: 1, label: 'Deposit', state: 'active' });
+        expect(configs[2]).toEqual({ id: 2, label: 'Complete', state: 'pending' });
+      });
+
+      it('should return ccx-to-evm step labels at step 2', () => {
+        routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'bsc' }));
+        fixture.detectChanges();
+        component.step.set(2);
+
+        const configs = component.stepConfigs();
+
+        expect(configs).toHaveLength(3);
+        expect(configs[0]).toEqual({ id: 0, label: 'Initialize', state: 'completed' });
+        expect(configs[1]).toEqual({ id: 1, label: 'Deposit', state: 'completed' });
+        expect(configs[2]).toEqual({ id: 2, label: 'Complete', state: 'active' });
+      });
+
+      it('should return evm-to-ccx step labels at step 0', () => {
+        routeParamMap$.next(convertToParamMap({ direction: 'evm-to-ccx', network: 'bsc' }));
+        fixture.detectChanges();
+        component.step.set(0);
+
+        const configs = component.stepConfigs();
+
+        expect(configs).toHaveLength(3);
+        expect(configs[0]).toEqual({ id: 0, label: 'Send', state: 'active' });
+        expect(configs[1]).toEqual({ id: 1, label: 'Processing', state: 'pending' });
+        expect(configs[2]).toEqual({ id: 2, label: 'Complete', state: 'pending' });
+      });
+
+      it('should return evm-to-ccx step labels at step 1', () => {
+        routeParamMap$.next(convertToParamMap({ direction: 'evm-to-ccx', network: 'bsc' }));
+        fixture.detectChanges();
+        component.step.set(1);
+
+        const configs = component.stepConfigs();
+
+        expect(configs).toHaveLength(3);
+        expect(configs[0]).toEqual({ id: 0, label: 'Send', state: 'completed' });
+        expect(configs[1]).toEqual({ id: 1, label: 'Processing', state: 'active' });
+        expect(configs[2]).toEqual({ id: 2, label: 'Complete', state: 'pending' });
+      });
+
+      it('should return evm-to-ccx step labels at step 2', () => {
+        routeParamMap$.next(convertToParamMap({ direction: 'evm-to-ccx', network: 'bsc' }));
+        fixture.detectChanges();
+        component.step.set(2);
+
+        const configs = component.stepConfigs();
+
+        expect(configs).toHaveLength(3);
+        expect(configs[0]).toEqual({ id: 0, label: 'Send', state: 'completed' });
+        expect(configs[1]).toEqual({ id: 1, label: 'Processing', state: 'completed' });
+        expect(configs[2]).toEqual({ id: 2, label: 'Complete', state: 'active' });
+      });
+
+      it('should update when step changes', () => {
+        routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'bsc' }));
+        fixture.detectChanges();
+
+        component.step.set(0);
+        expect(component.stepConfigs()[0].state).toBe('active');
+        expect(component.stepConfigs()[1].state).toBe('pending');
+
+        component.step.set(1);
+        expect(component.stepConfigs()[0].state).toBe('completed');
+        expect(component.stepConfigs()[1].state).toBe('active');
+      });
+
+      it('should update when direction changes', () => {
+        routeParamMap$.next(convertToParamMap({ direction: 'ccx-to-evm', network: 'bsc' }));
+        fixture.detectChanges();
+        component.step.set(0);
+
+        expect(component.stepConfigs()[0].label).toBe('Initialize');
+
+        routeParamMap$.next(convertToParamMap({ direction: 'evm-to-ccx', network: 'bsc' }));
+        fixture.detectChanges();
+
+        expect(component.stepConfigs()[0].label).toBe('Send');
+      });
+    });
+  });
+
   describe('Form Validation', () => {
     describe('ccxToEvmForm', () => {
       it('should validate CCX address format', () => {
