@@ -7,6 +7,8 @@ export const alertVariants = cva(
       zType: {
         default: 'bg-card text-card-foreground',
         destructive: 'text-destructive bg-card',
+        warning: 'text-warning bg-card',
+        info: 'text-info bg-card',
       },
     },
     defaultVariants: {
@@ -24,6 +26,8 @@ export const alertDescriptionVariants = cva('text-sm leading-relaxed mt-1', {
     zType: {
       default: 'text-muted-foreground',
       destructive: 'text-destructive/90',
+      warning: 'text-warning/90',
+      info: 'text-info/90',
     },
   },
   defaultVariants: {
