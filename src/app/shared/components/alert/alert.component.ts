@@ -83,10 +83,15 @@ export class ZardAlertComponent {
       return customIcon;
     }
 
-    if (this.zType() === 'destructive') return 'circle-alert';
-    if (this.zType() === 'warning') return 'triangle-alert';
-    if (this.zType() === 'info') return 'info';
-
-    return null;
+    switch (this.zType()) {
+      case 'destructive':
+        return 'circle-alert';
+      case 'warning':
+        return 'triangle-alert';
+      case 'info':
+        return 'info';
+      default:
+        return null;
+    }
   });
 }
