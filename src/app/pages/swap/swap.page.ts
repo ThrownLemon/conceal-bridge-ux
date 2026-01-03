@@ -4,6 +4,7 @@ import {
   DestroyRef,
   Injector,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -49,6 +50,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
 import { QrCodeComponent } from '../../shared/qr-code/qr-code.component';
 import { BackoffManager, type BackoffConfig } from '../../core/utils/backoff';
 import { WalletButtonComponent } from '../../shared/wallet/wallet-button.component';
+import { ClipboardService } from '../../core/clipboard.service';
 
 /** Polling configuration with exponential backoff on errors. */
 const POLLING_CONFIG = {
@@ -705,6 +707,7 @@ export class SwapPage {
   readonly api = inject(BridgeApiService);
   readonly wallet = inject(EvmWalletService);
   readonly historyService = inject(TransactionHistoryService);
+  readonly #clipboard = inject(ClipboardService);
 
   readonly #directionParam = toSignal(this.#route.paramMap.pipe(map((pm) => pm.get('direction'))), {
     initialValue: null,
@@ -797,6 +800,16 @@ export class SwapPage {
   constructor() {
     // Best-practice: hydrate wallet state without prompting.
     void this.wallet.hydrate();
+
+    // Sync clipboard status to statusMessage for display in the UI.
+    // This allows the existing statusMessage infrastructure to show copy feedback
+    // while preserving its use for other validation/error messages.
+    effect(() => {
+      const clipStatus = this.#clipboard.status();
+      if (clipStatus !== null) {
+        this.statusMessage.set(clipStatus);
+      }
+    });
 
     // Emit network when route param changes.
     const network$ = this.#route.paramMap.pipe(
@@ -1365,20 +1378,10 @@ export class SwapPage {
   }
 
   async copy(text: string): Promise<void> {
-    const value = text.trim();
-    if (!value) return;
-
-    try {
-      await navigator.clipboard.writeText(value);
-      this.statusMessage.set('Copied to clipboard.');
-      await new Promise((r) => setTimeout(r, 1200));
-      // Only clear if it wasn't replaced by another message.
-      if (this.statusMessage() === 'Copied to clipboard.') this.statusMessage.set(null);
-    } catch (error: unknown) {
-      console.warn('[SwapPage] Clipboard copy failed:', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      this.statusMessage.set('Copy failed (clipboard unavailable).');
-    }
+    await this.#clipboard.copy(text, {
+      successMessage: 'Copied to clipboard.',
+      errorMessage: 'Copy failed (clipboard unavailable).',
+      successTimeout: 1200,
+    });
   }
 }
