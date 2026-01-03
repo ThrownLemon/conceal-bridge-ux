@@ -8,6 +8,7 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
 import { WalletModalService } from '../../core/wallet-modal.service';
+import { ClipboardService } from '../../core/clipboard.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 
 type Variant = 'header' | 'primary';
@@ -138,10 +139,11 @@ export class WalletButtonComponent {
 
   readonly wallet = inject(EvmWalletService);
   readonly #modalService = inject(WalletModalService);
+  readonly #clipboard = inject(ClipboardService);
 
   readonly isSwitchingNetwork = signal(false);
   readonly networkStatus = signal<string | null>(null);
-  readonly copyStatus = signal<string | null>(null);
+  readonly copyStatus = computed(() => this.#clipboard.status());
 
   /** Finds the network info for the currently connected chain ID. */
   readonly #connectedNetworkInfo = computed(() => {
@@ -242,21 +244,8 @@ export class WalletButtonComponent {
   private async handleCopy(): Promise<void> {
     const addr = this.wallet.address();
     if (!addr) return;
-    try {
-      await navigator.clipboard.writeText(addr);
-      this.copyStatus.set('Copied!');
-      setTimeout(() => {
-        if (this.copyStatus() === 'Copied!') {
-          this.copyStatus.set(null);
-        }
-      }, 1000);
-    } catch {
-      this.copyStatus.set('Copy failed - select manually');
-      setTimeout(() => {
-        if (this.copyStatus() === 'Copy failed - select manually') {
-          this.copyStatus.set(null);
-        }
-      }, 3000);
-    }
+    await this.#clipboard.copy(addr, {
+      errorMessage: 'Copy failed - select manually',
+    });
   }
 }

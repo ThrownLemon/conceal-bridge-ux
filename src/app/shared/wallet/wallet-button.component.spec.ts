@@ -5,6 +5,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { WalletButtonComponent } from './wallet-button.component';
 import { EvmWalletService } from '../../core/evm-wallet.service';
 import { WalletModalService } from '../../core/wallet-modal.service';
+import { ClipboardService } from '../../core/clipboard.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 
 // Get actual chain IDs from configured networks (testnets in dev, mainnets in prod)
@@ -17,6 +18,7 @@ describe('WalletButtonComponent', () => {
   let fixture: ComponentFixture<WalletButtonComponent>;
   let mockWalletService: Partial<EvmWalletService>;
   let mockModalService: Partial<WalletModalService>;
+  let mockClipboardService: Partial<ClipboardService>;
 
   // Writable signals for easier test manipulation
   let isConnectedSignal: WritableSignal<boolean>;
@@ -24,6 +26,7 @@ describe('WalletButtonComponent', () => {
   let chainIdSignal: WritableSignal<number | null>;
   let connectorSignal: WritableSignal<'metamask' | 'trust' | 'binance' | null>;
   let shortAddressSignal: WritableSignal<string>;
+  let clipboardStatusSignal: WritableSignal<string | null>;
 
   const mockAddress = '0x1234567890123456789012345678901234567890';
 
@@ -34,6 +37,7 @@ describe('WalletButtonComponent', () => {
     chainIdSignal = signal<number | null>(null);
     connectorSignal = signal<'metamask' | 'trust' | 'binance' | null>(null);
     shortAddressSignal = signal('');
+    clipboardStatusSignal = signal<string | null>(null);
 
     mockWalletService = {
       isConnected: isConnectedSignal,
@@ -49,12 +53,18 @@ describe('WalletButtonComponent', () => {
       open: vi.fn(),
     };
 
+    mockClipboardService = {
+      status: clipboardStatusSignal,
+      copy: vi.fn().mockResolvedValue(true),
+    };
+
     TestBed.configureTestingModule({
       imports: [WalletButtonComponent],
       providers: [
         provideNoopAnimations(),
         { provide: EvmWalletService, useValue: mockWalletService },
         { provide: WalletModalService, useValue: mockModalService },
+        { provide: ClipboardService, useValue: mockClipboardService },
       ],
     });
 
@@ -229,33 +239,30 @@ describe('WalletButtonComponent', () => {
     });
 
     it('should copy address successfully from header', async () => {
-      const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-      Object.assign(navigator, {
-        clipboard: { writeText: writeTextSpy },
-      });
+      clipboardStatusSignal.set('Copied!');
 
       await component.copyAddressFromHeader();
 
-      expect(writeTextSpy).toHaveBeenCalledWith(mockAddress);
+      expect(mockClipboardService.copy).toHaveBeenCalledWith(mockAddress, {
+        errorMessage: 'Copy failed - select manually',
+      });
       expect(component.copyStatus()).toBe('Copied!');
     });
 
     it('should copy address successfully from non-header', async () => {
-      const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-      Object.assign(navigator, {
-        clipboard: { writeText: writeTextSpy },
-      });
+      clipboardStatusSignal.set('Copied!');
 
       await component.copyAddress();
 
-      expect(writeTextSpy).toHaveBeenCalledWith(mockAddress);
+      expect(mockClipboardService.copy).toHaveBeenCalledWith(mockAddress, {
+        errorMessage: 'Copy failed - select manually',
+      });
       expect(component.copyStatus()).toBe('Copied!');
     });
 
     it('should handle copy failure', async () => {
-      Object.assign(navigator, {
-        clipboard: { writeText: vi.fn().mockRejectedValue(new Error('Copy failed')) },
-      });
+      clipboardStatusSignal.set('Copy failed - select manually');
+      (mockClipboardService.copy as ReturnType<typeof vi.fn>).mockResolvedValue(false);
 
       await component.copyAddress();
 
@@ -263,45 +270,27 @@ describe('WalletButtonComponent', () => {
     });
 
     it('should clear copy status after timeout', async () => {
-      vi.useFakeTimers();
-      Object.assign(navigator, {
-        clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
-      });
-
-      await component.copyAddress();
+      clipboardStatusSignal.set('Copied!');
       expect(component.copyStatus()).toBe('Copied!');
 
-      vi.advanceTimersByTime(1000);
+      clipboardStatusSignal.set(null);
       expect(component.copyStatus()).toBeNull();
-
-      vi.useRealTimers();
     });
 
-    it('should not clear copy status if it changed', async () => {
-      vi.useFakeTimers();
-      Object.assign(navigator, {
-        clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
-      });
+    it('should reflect service status changes', async () => {
+      clipboardStatusSignal.set('Copied!');
+      expect(component.copyStatus()).toBe('Copied!');
 
-      await component.copyAddress();
-      component.copyStatus.set('Different status');
-
-      vi.advanceTimersByTime(1000);
+      clipboardStatusSignal.set('Different status');
       expect(component.copyStatus()).toBe('Different status');
-
-      vi.useRealTimers();
     });
 
     it('should not copy when address is null', async () => {
-      const writeTextSpy = vi.fn();
-      Object.assign(navigator, {
-        clipboard: { writeText: writeTextSpy },
-      });
-      (mockWalletService.address as ReturnType<typeof signal<`0x${string}` | null>>).set(null);
+      addressSignal.set(null);
 
       await component.copyAddress();
 
-      expect(writeTextSpy).not.toHaveBeenCalled();
+      expect(mockClipboardService.copy).not.toHaveBeenCalled();
     });
   });
 
