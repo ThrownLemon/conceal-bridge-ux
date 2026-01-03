@@ -3,6 +3,7 @@ import { SwapPage } from './swap.page';
 import { BridgeApiService } from '../../core/bridge-api.service';
 import { EvmWalletService } from '../../core/evm-wallet.service';
 import { TransactionHistoryService } from '../../core/transaction-history.service';
+import { ClipboardService } from '../../core/clipboard.service';
 import { ActivatedRoute, convertToParamMap, type ParamMap } from '@angular/router';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { provideRouter } from '@angular/router';
@@ -51,12 +52,18 @@ interface HistoryServiceMock {
   addTransaction: Mock;
 }
 
+interface ClipboardServiceMock {
+  status: WritableSignal<string | null>;
+  copy: Mock;
+}
+
 describe('SwapPage', () => {
   let component: SwapPage;
   let fixture: ComponentFixture<SwapPage>;
   let apiMock: ApiServiceMock;
   let walletMock: WalletServiceMock;
   let historyMock: HistoryServiceMock;
+  let clipboardMock: ClipboardServiceMock;
   let routeParamMap$: BehaviorSubject<ParamMap>;
 
   const mockConfig: BridgeChainConfig = {
@@ -137,6 +144,11 @@ describe('SwapPage', () => {
       refresh: vi.fn(),
     };
 
+    clipboardMock = {
+      status: signal<string | null>(null),
+      copy: vi.fn(async () => true),
+    };
+
     await TestBed.configureTestingModule({
       imports: [SwapPage],
       providers: [
@@ -144,6 +156,7 @@ describe('SwapPage', () => {
         { provide: BridgeApiService, useValue: apiMock },
         { provide: EvmWalletService, useValue: walletMock },
         { provide: TransactionHistoryService, useValue: historyMock },
+        { provide: ClipboardService, useValue: clipboardMock },
         {
           provide: ActivatedRoute,
           useValue: { paramMap: routeParamMap$.asObservable() },
@@ -413,71 +426,59 @@ describe('SwapPage', () => {
     });
 
     describe('copy()', () => {
-      let originalClipboard: Clipboard;
-
       beforeEach(() => {
-        originalClipboard = navigator.clipboard;
-        vi.useFakeTimers();
+        // Reset clipboard mock status before each test
+        clipboardMock.status.set(null);
+        vi.clearAllMocks();
       });
 
-      afterEach(() => {
-        vi.clearAllTimers();
-        vi.useRealTimers();
-        // Restore original clipboard after each test
-        Object.defineProperty(navigator, 'clipboard', {
-          value: originalClipboard,
-          writable: true,
-          configurable: true,
+      it('should call ClipboardService.copy() with correct parameters', async () => {
+        await component.copy('test text');
+
+        expect(clipboardMock.copy).toHaveBeenCalledWith('test text', {
+          successMessage: 'Copied to clipboard.',
+          errorMessage: 'Copy failed (clipboard unavailable).',
+          successTimeout: 1200,
         });
       });
 
-      it('should copy text to clipboard and show status message', async () => {
-        const writeTextSpy = vi.fn(() => Promise.resolve());
-        Object.defineProperty(navigator, 'clipboard', {
-          value: { writeText: writeTextSpy },
-          writable: true,
-          configurable: true,
+      it('should sync clipboard status to statusMessage on successful copy', async () => {
+        // Simulate successful copy by setting the status
+        clipboardMock.copy.mockImplementation(async () => {
+          clipboardMock.status.set('Copied to clipboard.');
+          return true;
         });
 
-        // Start the copy operation (don't await yet)
-        const copyPromise = component.copy('test text');
+        await component.copy('test text');
+        fixture.detectChanges();
 
-        // Flush pending promises to let clipboard.writeText resolve
-        await vi.runAllTimersAsync();
-
-        expect(writeTextSpy).toHaveBeenCalledWith('test text');
-        await copyPromise;
+        // The effect should sync clipboard status to statusMessage
+        expect(component.statusMessage()).toBe('Copied to clipboard.');
       });
 
-      it('should handle clipboard failure', async () => {
-        Object.defineProperty(navigator, 'clipboard', {
-          value: {
-            writeText: vi.fn(() => Promise.reject(new Error('Clipboard error'))),
-          },
-          writable: true,
-          configurable: true,
+      it('should sync clipboard error status to statusMessage on copy failure', async () => {
+        // Simulate failed copy by setting error status
+        clipboardMock.copy.mockImplementation(async () => {
+          clipboardMock.status.set('Copy failed (clipboard unavailable).');
+          return false;
         });
 
-        const copyPromise = component.copy('test text');
-        await vi.runAllTimersAsync();
-        await copyPromise;
+        await component.copy('test text');
+        fixture.detectChanges();
 
+        // The effect should sync clipboard status to statusMessage
         expect(component.statusMessage()).toBe('Copy failed (clipboard unavailable).');
       });
 
-      it('should do nothing for empty text', async () => {
-        const writeTextSpy = vi.fn();
-        Object.defineProperty(navigator, 'clipboard', {
-          value: { writeText: writeTextSpy },
-          writable: true,
-          configurable: true,
-        });
-
+      it('should handle empty text by delegating to service', async () => {
+        // The service handles empty text validation, but we should still call it
         await component.copy('');
-        expect(writeTextSpy).not.toHaveBeenCalled();
 
-        await component.copy('   ');
-        expect(writeTextSpy).not.toHaveBeenCalled();
+        expect(clipboardMock.copy).toHaveBeenCalledWith('', {
+          successMessage: 'Copied to clipboard.',
+          errorMessage: 'Copy failed (clipboard unavailable).',
+          successTimeout: 1200,
+        });
       });
     });
 
