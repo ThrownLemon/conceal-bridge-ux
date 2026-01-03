@@ -95,6 +95,6 @@ export class ZardAlertComponent {
     }
 
     const variantType = this.zType();
-    return variantType ? (VARIANT_ICONS[variantType] ?? null) : null;
+    return VARIANT_ICONS[variantType] ?? null;
   });
 }
