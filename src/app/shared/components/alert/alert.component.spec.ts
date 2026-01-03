@@ -1,6 +1,26 @@
+import { Component, TemplateRef, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 
 import { ZardAlertComponent } from './alert.component';
+import { ZardIconComponent } from '../icon/icon.component';
+
+@Component({
+  standalone: true,
+  imports: [ZardAlertComponent],
+  template: `
+    <ng-template #customIconTemplate>
+      <span class="custom-icon-content">Custom Icon</span>
+    </ng-template>
+    <z-alert [zType]="alertType" [zIcon]="iconTemplate" [zTitle]="title" />
+  `,
+})
+class TestHostComponent {
+  readonly customIconTemplate = viewChild.required<TemplateRef<void>>('customIconTemplate');
+  alertType: 'default' | 'destructive' | 'warning' | 'info' = 'destructive';
+  iconTemplate: TemplateRef<void> | undefined;
+  title = 'Test Alert';
+}
 
 describe('ZardAlertComponent', () => {
   let component: ZardAlertComponent;
@@ -70,8 +90,9 @@ describe('ZardAlertComponent', () => {
         const icon = fixture.nativeElement.querySelector('[data-slot="alert-icon"]');
         expect(icon).toBeTruthy();
 
-        const zIcon = icon.querySelector('z-icon');
-        expect(zIcon).toBeTruthy();
+        const zIconDebug = fixture.debugElement.query(By.directive(ZardIconComponent));
+        expect(zIconDebug).toBeTruthy();
+        expect(zIconDebug.componentInstance.zType()).toBe('circle-alert');
       });
 
       it('should render description with destructive text color', () => {
@@ -102,8 +123,9 @@ describe('ZardAlertComponent', () => {
         const icon = fixture.nativeElement.querySelector('[data-slot="alert-icon"]');
         expect(icon).toBeTruthy();
 
-        const zIcon = icon.querySelector('z-icon');
-        expect(zIcon).toBeTruthy();
+        const zIconDebug = fixture.debugElement.query(By.directive(ZardIconComponent));
+        expect(zIconDebug).toBeTruthy();
+        expect(zIconDebug.componentInstance.zType()).toBe('triangle-alert');
       });
 
       it('should render description with warning text color', () => {
@@ -134,8 +156,9 @@ describe('ZardAlertComponent', () => {
         const icon = fixture.nativeElement.querySelector('[data-slot="alert-icon"]');
         expect(icon).toBeTruthy();
 
-        const zIcon = icon.querySelector('z-icon');
-        expect(zIcon).toBeTruthy();
+        const zIconDebug = fixture.debugElement.query(By.directive(ZardIconComponent));
+        expect(zIconDebug).toBeTruthy();
+        expect(zIconDebug.componentInstance.zType()).toBe('info');
       });
 
       it('should render description with info text color', () => {
@@ -193,8 +216,37 @@ describe('ZardAlertComponent', () => {
 
   describe('custom icon', () => {
     it('should accept custom icon input', () => {
-      fixture.componentRef.setInput('zIcon', 'check-circle');
-      expect(component.zIcon()).toBe('check-circle');
+      fixture.componentRef.setInput('zIcon', 'circle-check');
+      expect(component.zIcon()).toBe('circle-check');
+    });
+
+    it('should override default variant icon with custom icon', () => {
+      fixture.componentRef.setInput('zType', 'destructive');
+      fixture.componentRef.setInput('zIcon', 'circle-check');
+      fixture.detectChanges();
+
+      // Verify the icon renders in DOM
+      const icon = fixture.nativeElement.querySelector('[data-slot="alert-icon"]');
+      expect(icon).toBeTruthy();
+
+      // Custom icon should override the default 'circle-alert' for destructive
+      const zIconDebug = fixture.debugElement.query(By.directive(ZardIconComponent));
+      expect(zIconDebug).toBeTruthy();
+      expect(zIconDebug.componentInstance.zType()).toBe('circle-check');
+    });
+
+    it('should render icon for default variant when custom icon is provided', () => {
+      fixture.componentRef.setInput('zType', 'default');
+      fixture.componentRef.setInput('zIcon', 'bell');
+      fixture.detectChanges();
+
+      // Default variant normally has no icon, but custom icon should show
+      const icon = fixture.nativeElement.querySelector('[data-slot="alert-icon"]');
+      expect(icon).toBeTruthy();
+
+      const zIconDebug = fixture.debugElement.query(By.directive(ZardIconComponent));
+      expect(zIconDebug).toBeTruthy();
+      expect(zIconDebug.componentInstance.zType()).toBe('bell');
     });
   });
 
@@ -228,5 +280,32 @@ describe('ZardAlertComponent', () => {
       expect(alert.classList.contains('custom-class')).toBe(true);
       expect(alert.classList.contains('text-destructive')).toBe(true);
     });
+  });
+});
+
+describe('ZardAlertComponent with host component', () => {
+  let hostFixture: ComponentFixture<TestHostComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [TestHostComponent],
+    }).compileComponents();
+
+    hostFixture = TestBed.createComponent(TestHostComponent);
+  });
+
+  afterEach(() => {
+    hostFixture.destroy();
+    TestBed.resetTestingModule();
+  });
+
+  it('should use default variant icon when no custom icon is provided', () => {
+    // iconTemplate is undefined by default
+    hostFixture.detectChanges();
+
+    // Should render z-icon with the default destructive icon
+    const zIconDebug = hostFixture.debugElement.query(By.directive(ZardIconComponent));
+    expect(zIconDebug).toBeTruthy();
+    expect(zIconDebug.componentInstance.zType()).toBe('circle-alert');
   });
 });
