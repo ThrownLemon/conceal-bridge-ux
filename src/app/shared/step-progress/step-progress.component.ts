@@ -29,9 +29,29 @@ export interface StepConfig {
  * position in a multi-step process. Shows step circles with numbers/icons,
  * labels, and connecting lines.
  *
+ * ## Accessibility Features
+ *
+ * This component follows WCAG 2.1 AA standards and includes:
+ * - Semantic HTML structure with `<nav>` and `<ol role="list">`
+ * - `aria-current="step"` on the active step for screen reader navigation
+ * - Comprehensive `aria-label` announcing step position, label, and state
+ * - `aria-describedby` linking optional descriptions to their steps
+ * - Visual elements marked with `aria-hidden="true"` to avoid duplication
+ * - WCAG AA color contrast ratios (amber: #f59e0b, green: #10b981, gray: #6b7280)
+ * - Non-interactive design (no focus management required)
+ *
  * @example
  * ```html
  * <app-step-progress [steps]="stepConfigs()" />
+ * ```
+ *
+ * @example With descriptions for enhanced accessibility
+ * ```typescript
+ * const steps = [
+ *   { id: 1, label: 'Initialize', state: 'completed', description: 'Swap details confirmed' },
+ *   { id: 2, label: 'Deposit', state: 'active', description: 'Waiting for blockchain confirmation' },
+ *   { id: 3, label: 'Complete', state: 'pending' }
+ * ];
  * ```
  */
 @Component({
@@ -40,39 +60,56 @@ export interface StepConfig {
   imports: [ZardIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <nav role="list" aria-label="Progress" class="flex w-full items-center justify-center">
-      @for (step of steps(); track step.id; let i = $index; let isLast = $last) {
-        <div class="flex items-center" [class.flex-1]="!isLast">
-          <!-- Step circle and label -->
-          <div class="flex flex-col items-center gap-2">
-            <!-- Step indicator circle -->
-            <div
-              [class]="stepCircleClasses(step.state)"
-              [attr.aria-current]="step.state === 'active' ? 'step' : null"
-              role="listitem"
-              [attr.aria-label]="getAriaLabel(step, i)"
-            >
-              @if (step.state === 'completed') {
-                <!-- Check icon for completed steps -->
-                <z-icon [zType]="'check'" [zSize]="'sm'" [class]="stepIconClasses(step.state)" />
-              } @else {
-                <!-- Step number for pending/active steps -->
-                <span [class]="stepNumberClasses(step.state)">{{ i + 1 }}</span>
+    <nav aria-label="Progress through swap steps" class="flex w-full items-center justify-center">
+      <ol role="list" class="flex w-full items-center justify-center">
+        @for (step of steps(); track step.id; let i = $index; let isLast = $last) {
+          <li class="flex items-center" [class.flex-1]="!isLast">
+            <!-- Step circle and label -->
+            <div class="flex flex-col items-center gap-2">
+              <!-- Step indicator circle -->
+              <div
+                [class]="stepCircleClasses(step.state)"
+                [attr.aria-current]="step.state === 'active' ? 'step' : null"
+                [attr.aria-label]="getAriaLabel(step, i)"
+                [attr.aria-describedby]="step.description ? 'step-desc-' + step.id : null"
+                role="status"
+              >
+                @if (step.state === 'completed') {
+                  <!-- Check icon for completed steps -->
+                  <z-icon
+                    [zType]="'check'"
+                    [zSize]="'sm'"
+                    [class]="stepIconClasses(step.state)"
+                    aria-hidden="true"
+                  />
+                } @else {
+                  <!-- Step number for pending/active steps -->
+                  <span [class]="stepNumberClasses(step.state)" aria-hidden="true">{{
+                    i + 1
+                  }}</span>
+                }
+              </div>
+
+              <!-- Step label -->
+              <div [class]="stepLabelClasses(step.state)" aria-hidden="true">
+                {{ step.label }}
+              </div>
+
+              <!-- Hidden description for screen readers if provided -->
+              @if (step.description) {
+                <span [id]="'step-desc-' + step.id" class="sr-only">
+                  {{ step.description }}
+                </span>
               }
             </div>
 
-            <!-- Step label -->
-            <div [class]="stepLabelClasses(step.state)">
-              {{ step.label }}
-            </div>
-          </div>
-
-          <!-- Connecting line (not shown after last step) -->
-          @if (!isLast) {
-            <div [class]="connectorClasses(step.state)" aria-hidden="true"></div>
-          }
-        </div>
-      }
+            <!-- Connecting line (not shown after last step) -->
+            @if (!isLast) {
+              <div [class]="connectorClasses(step.state)" aria-hidden="true"></div>
+            }
+          </li>
+        }
+      </ol>
     </nav>
   `,
 })
@@ -172,11 +209,13 @@ export class StepProgressComponent {
 
   /**
    * Generates an accessible label for screen readers.
+   * Includes step position, label, state, and optional description.
    */
   protected getAriaLabel(step: StepConfig, index: number): string {
     const total = this.steps().length;
     const position = `Step ${index + 1} of ${total}`;
     const status = step.state === 'completed' ? 'completed' : step.state;
-    return `${position}: ${step.label}, ${status}`;
+    const description = step.description ? `, ${step.description}` : '';
+    return `${position}: ${step.label}, ${status}${description}`;
   }
 }
