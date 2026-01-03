@@ -96,7 +96,7 @@ export class StepProgressComponent {
       case 'active':
         return mergeClasses(
           baseClasses,
-          'border-amber-500 bg-amber-500/10 text-amber-400 shadow-lg shadow-amber-500/20',
+          'border-amber-500 bg-amber-500/10 text-amber-400 shadow-lg shadow-amber-500/20 animate-pulse',
         );
       case 'pending':
       default:
