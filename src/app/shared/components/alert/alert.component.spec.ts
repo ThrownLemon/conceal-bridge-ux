@@ -54,7 +54,6 @@ describe('ZardAlertComponent', () => {
 
   afterEach(() => {
     fixture.destroy();
-    TestBed.resetTestingModule();
   });
 
   describe('initialization', () => {
@@ -312,7 +311,6 @@ describe('ZardAlertComponent with host component', () => {
 
   afterEach(() => {
     hostFixture.destroy();
-    TestBed.resetTestingModule();
   });
 
   it('should use default variant icon when no custom icon is provided', () => {
@@ -339,7 +337,6 @@ describe('ZardAlertComponent with TemplateRef icon', () => {
 
   afterEach(() => {
     templateHostFixture.destroy();
-    TestBed.resetTestingModule();
   });
 
   it('should render TemplateRef content instead of default icon when provided', () => {
