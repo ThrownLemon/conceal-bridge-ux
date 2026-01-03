@@ -196,6 +196,8 @@ const erc20Abi = [
       }
 
       @if (direction(); as d) {
+        <app-step-progress class="mt-6" [steps]="stepConfigs()" />
+
         @if (d === 'ccx-to-evm') {
           <ng-container [formGroup]="ccxToEvmForm">
             @if (step() === 0) {
