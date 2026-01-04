@@ -88,13 +88,9 @@ export class ZardAlertComponent {
     const customIcon = this.zIcon();
     if (customIcon) {
       // If custom icon is a TemplateRef, return null (template will be rendered instead)
-      if (customIcon instanceof TemplateRef) {
-        return null;
-      }
-      return customIcon;
+      return customIcon instanceof TemplateRef ? null : customIcon;
     }
 
-    const variantType = this.zType();
-    return VARIANT_ICONS[variantType] ?? null;
+    return VARIANT_ICONS[this.zType() ?? 'default'] ?? null;
   });
 }
