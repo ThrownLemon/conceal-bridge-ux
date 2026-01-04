@@ -541,7 +541,9 @@ describe('HomePage', () => {
     });
 
     it('should display clickable Terms & Conditions link', () => {
-      const link = fixture.nativeElement.querySelector('a[aria-label="Open Terms and Conditions in new tab"]');
+      const link = fixture.nativeElement.querySelector(
+        'a[aria-label="Open Terms and Conditions in new tab"]',
+      );
       expect(link).toBeTruthy();
       expect(link.textContent).toContain('Terms & Conditions');
       expect(link.getAttribute('role')).toBe('button');

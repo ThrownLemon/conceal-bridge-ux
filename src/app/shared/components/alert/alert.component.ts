@@ -22,6 +22,13 @@ import type { ZardIcon } from '@/shared/components/icon/icons';
 import { ZardStringTemplateOutletDirective } from '@/shared/core/directives/string-template-outlet/string-template-outlet.directive';
 import { mergeClasses } from '@/shared/utils/merge-classes';
 
+/** Maps alert variant types to their default icon names */
+const VARIANT_ICONS: Partial<Record<NonNullable<ZardAlertVariants['zType']>, ZardIcon>> = {
+  destructive: 'circle-alert',
+  warning: 'triangle-alert',
+  info: 'info',
+};
+
 @Component({
   selector: 'z-alert, [z-alert]',
   imports: [ZardIconComponent, ZardStringTemplateOutletDirective],
@@ -79,12 +86,11 @@ export class ZardAlertComponent {
 
   protected readonly iconName = computed((): ZardIcon | null => {
     const customIcon = this.zIcon();
-    if (customIcon && !(customIcon instanceof TemplateRef)) {
-      return customIcon;
+    if (customIcon) {
+      // If custom icon is a TemplateRef, return null (template will be rendered instead)
+      return customIcon instanceof TemplateRef ? null : customIcon;
     }
 
-    if (this.zType() === 'destructive') return 'circle-alert';
-
-    return null;
+    return VARIANT_ICONS[this.zType() ?? 'default'] ?? null;
   });
 }
