@@ -347,6 +347,9 @@ describe('ZardAlertComponent', () => {
       expect(zIconDebug).toBeNull();
     });
 
+    // Internal state verification: confirms that iconName computed signal returns null
+    // when a TemplateRef is provided. The behavioral test above validates DOM output,
+    // while this test directly verifies the signal's computed value for completeness.
     it('should return null from iconName when TemplateRef is provided', () => {
       templateHostFixture.detectChanges();
 
