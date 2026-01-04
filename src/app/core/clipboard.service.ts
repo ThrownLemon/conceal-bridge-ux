@@ -59,7 +59,8 @@ export class ClipboardService {
       }, successTimeout);
 
       return true;
-    } catch {
+    } catch (error) {
+      console.error('[ClipboardService] Failed to copy to clipboard:', error);
       this.status.set(errorMessage);
 
       // Auto-reset after timeout, but only if status hasn't changed

@@ -804,10 +804,17 @@ export class SwapPage {
     // Sync clipboard status to statusMessage for display in the UI.
     // This allows the existing statusMessage infrastructure to show copy feedback
     // while preserving its use for other validation/error messages.
+    // Track the last clipboard message to avoid race conditions with other status updates.
+    let lastClipboardMessage: string | null = null;
     effect(() => {
       const clipStatus = this.#clipboard.status();
       if (clipStatus !== null) {
+        lastClipboardMessage = clipStatus;
         this.statusMessage.set(clipStatus);
+      } else if (this.statusMessage() === lastClipboardMessage) {
+        // Only clear if the current statusMessage was set by clipboard
+        this.statusMessage.set(null);
+        lastClipboardMessage = null;
       }
     });
 

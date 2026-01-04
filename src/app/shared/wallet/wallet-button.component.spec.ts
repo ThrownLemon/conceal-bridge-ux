@@ -269,7 +269,7 @@ describe('WalletButtonComponent', () => {
       expect(component.copyStatus()).toBe('Copy failed - select manually');
     });
 
-    it('should clear copy status after timeout', async () => {
+    it('should reflect null status from service', async () => {
       clipboardStatusSignal.set('Copied!');
       expect(component.copyStatus()).toBe('Copied!');
 
