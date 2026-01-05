@@ -183,8 +183,8 @@ const NETWORK_LOGOS: Record<NetworkKey, string> = {
                 tabindex="0"
                 aria-label="Open Terms and Conditions in new tab"
               >
-                Terms &amp; Conditions
-              </a>.
+                Terms &amp; Conditions </a
+              >.
             </div>
 
             @if (!wallet.isConnected()) {
