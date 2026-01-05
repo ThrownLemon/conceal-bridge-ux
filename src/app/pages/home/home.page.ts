@@ -13,6 +13,7 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 import type { EvmNetworkKey, SwapDirection } from '../../core/bridge-types';
 import { EvmWalletService } from '../../core/evm-wallet.service';
+import { getWalletErrorMessage } from '../../core/utils/wallet-errors';
 import { WalletButtonComponent } from '../../shared/wallet/wallet-button.component';
 
 type NetworkKey = 'ccx' | EvmNetworkKey;
@@ -448,16 +449,7 @@ export class HomePage {
       await this.#wallet.ensureChain(chain);
       this.networkSwitchStatus.set(`Switched wallet to ${label}.`);
     } catch (e: unknown) {
-      const code = (e as { code?: number }).code;
-      if (code === 4001) {
-        this.networkSwitchStatus.set('Network switch was cancelled in your wallet.');
-      } else if (code === -32002) {
-        this.networkSwitchStatus.set(
-          'A wallet request is already pending. Please open your wallet.',
-        );
-      } else {
-        this.networkSwitchStatus.set(e instanceof Error ? e.message : 'Network switch failed.');
-      }
+      this.networkSwitchStatus.set(getWalletErrorMessage(e, 'Network switch failed.'));
     } finally {
       this.isSwitchingNetwork.set(false);
     }

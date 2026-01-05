@@ -335,7 +335,7 @@ describe('HomePage', () => {
 
       await component.switchWalletToSelectedNetwork();
 
-      expect(component.networkSwitchStatus()).toBe('Network switch was cancelled in your wallet.');
+      expect(component.networkSwitchStatus()).toBe('Request was cancelled in your wallet.');
     });
 
     it('should handle pending request (code -32002)', async () => {
