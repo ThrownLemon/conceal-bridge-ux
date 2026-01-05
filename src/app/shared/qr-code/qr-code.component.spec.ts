@@ -39,4 +39,37 @@ describe('QrCodeComponent', () => {
     // Size varies depending on the QR version chosen, but it should be a square.
     expect(qrData?.viewBox).toMatch(/^0 0 \d+ \d+$/);
   });
+
+  it('should apply theme-aware background class', () => {
+    const svg = fixture.nativeElement.querySelector('svg');
+    expect(svg).toBeTruthy();
+    expect(svg.classList.contains('bg-card')).toBe(true);
+  });
+
+  it('should apply theme-aware border classes', () => {
+    const svg = fixture.nativeElement.querySelector('svg');
+    expect(svg).toBeTruthy();
+    expect(svg.classList.contains('border')).toBe(true);
+    expect(svg.classList.contains('border-border')).toBe(true);
+  });
+
+  it('should apply softer shadow styling', () => {
+    const svg = fixture.nativeElement.querySelector('svg');
+    expect(svg).toBeTruthy();
+    expect(svg.classList.contains('shadow-md')).toBe(true);
+  });
+
+  it('should apply theme-aware fill class to path', () => {
+    const path = fixture.nativeElement.querySelector('path');
+    expect(path).toBeTruthy();
+    expect(path.classList.contains('fill-foreground')).toBe(true);
+  });
+
+  it('should preserve existing styling classes', () => {
+    const svg = fixture.nativeElement.querySelector('svg');
+    expect(svg).toBeTruthy();
+    expect(svg.classList.contains('block')).toBe(true);
+    expect(svg.classList.contains('rounded-lg')).toBe(true);
+    expect(svg.classList.contains('p-2')).toBe(true);
+  });
 });
