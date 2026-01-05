@@ -35,6 +35,10 @@ import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 import { ZardInputDirective } from '@/shared/components/input/input.directive';
 
+import {
+  StepProgressComponent,
+  type StepConfig,
+} from '../../shared/step-progress/step-progress.component';
 import { BridgeApiService } from '../../core/bridge-api.service';
 import type {
   BridgeChainConfig,
@@ -128,6 +132,7 @@ const erc20Abi = [
     ReactiveFormsModule,
     RouterLink,
     QrCodeComponent,
+    StepProgressComponent,
     WalletButtonComponent,
     ZardAlertComponent,
     ZardButtonComponent,
@@ -191,6 +196,8 @@ const erc20Abi = [
       }
 
       @if (direction(); as d) {
+        <app-step-progress class="mt-6" [steps]="stepConfigs()" />
+
         @if (d === 'ccx-to-evm') {
           <ng-container [formGroup]="ccxToEvmForm">
             @if (step() === 0) {
@@ -767,6 +774,45 @@ export class SwapPage {
     }
 
     return '';
+  });
+
+  /**
+   * Generates step configurations for the progress indicator based on
+   * current direction and step. Each step can be 'pending', 'active', or 'completed'.
+   */
+  readonly stepConfigs = computed<StepConfig[]>(() => {
+    const dir = this.direction();
+    const currentStep = this.step();
+
+    // Return empty array if direction is not set
+    if (!dir) {
+      return [];
+    }
+
+    // Define labels based on direction
+    const labels =
+      dir === 'ccx-to-evm'
+        ? ['Initialize', 'Deposit', 'Complete']
+        : ['Send', 'Processing', 'Complete'];
+
+    // Generate step configurations with states based on current step
+    return labels.map((label, index) => {
+      let state: 'pending' | 'active' | 'completed';
+
+      if (index < currentStep) {
+        state = 'completed';
+      } else if (index === currentStep) {
+        state = 'active';
+      } else {
+        state = 'pending';
+      }
+
+      return {
+        id: index,
+        label,
+        state,
+      };
+    });
   });
 
   // Track polling subscription to cancel previous ones when starting new polling
