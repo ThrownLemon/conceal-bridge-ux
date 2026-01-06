@@ -15,9 +15,14 @@ import type { ZardIcon } from '@/shared/components/icon/icons';
 import { mergeClasses } from '@/shared/utils/merge-classes';
 
 /**
+ * Supported toast notification types.
+ */
+type ToastType = 'success' | 'error' | 'info';
+
+/**
  * Maps toast types to their corresponding icons.
  */
-const TOAST_ICONS: Record<string, ZardIcon> = {
+const TOAST_ICONS: Record<ToastType, ZardIcon> = {
   success: 'circle-check',
   error: 'circle-x',
   info: 'info',
@@ -26,7 +31,7 @@ const TOAST_ICONS: Record<string, ZardIcon> = {
 /**
  * Maps toast types to their color variants.
  */
-const TOAST_VARIANTS: Record<string, string> = {
+const TOAST_VARIANTS: Record<ToastType, string> = {
   success:
     'border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100 dark:border-green-700',
   error:
@@ -92,7 +97,7 @@ export class ZardToastComponent {
   readonly message = input.required<string>();
 
   /** The type/style of the toast (success, error, info). */
-  readonly type = input<'success' | 'error' | 'info'>('info');
+  readonly type = input<ToastType>('info');
 
   /** Unique identifier for the toast instance. */
   readonly id = input.required<string>();
@@ -118,7 +123,7 @@ export class ZardToastComponent {
       'pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-4 shadow-lg transition-all duration-300 ease-in-out',
       'data-[state=entering]:animate-in data-[state=entering]:slide-in-from-bottom-full data-[state=entering]:slide-in-from-right-4 data-[state=entering]:fade-in-0',
       'data-[state=exiting]:animate-out data-[state=exiting]:fade-out-0 data-[state=exiting]:zoom-out-95',
-      this.type() ? TOAST_VARIANTS[this.type()] : TOAST_VARIANTS['info'],
+      TOAST_VARIANTS[this.type()],
       this.class(),
     ),
   );
@@ -146,7 +151,7 @@ export class ZardToastComponent {
 
   /** The icon name to display based on toast type. */
   protected readonly iconName = computed((): ZardIcon => {
-    return TOAST_ICONS[this.type()] || TOAST_ICONS['info'];
+    return TOAST_ICONS[this.type()];
   });
 
   /** Handles close button click. */

@@ -179,12 +179,20 @@ describe('ZardToastContainerComponent', () => {
     });
 
     describe('toast state', () => {
-      it('should pass visible state to toast component initially', () => {
+      it('should pass entering state to toast component initially', () => {
         toastService.success('Test message');
         fixture.detectChanges();
 
         const toastComponent = fixture.debugElement.query(By.directive(ZardToastComponent));
-        expect(toastComponent.componentInstance.state()).toBe('visible');
+        expect(toastComponent.componentInstance.state()).toBe('entering');
+      });
+
+      it('should have entering state data attribute for CSS animations', () => {
+        toastService.success('Test message');
+        fixture.detectChanges();
+
+        const toastElement = fixture.debugElement.query(By.directive(ZardToastComponent));
+        expect(toastElement.nativeElement.getAttribute('data-state')).toBe('entering');
       });
     });
 
@@ -248,18 +256,31 @@ describe('ZardToastContainerComponent', () => {
         fixture.detectChanges();
 
         const toastComponent = fixture.debugElement.query(By.directive(ZardToastComponent));
-        expect(toastComponent.componentInstance.state()).toBe('visible');
+        const toastElement = toastComponent.nativeElement;
 
-        const closeBtn = toastComponent.nativeElement.querySelector('[data-slot="toast-close"]');
+        // Toast starts in entering state
+        expect(toastComponent.componentInstance.state()).toBe('entering');
+        expect(toastElement.getAttribute('data-state')).toBe('entering');
+
+        const closeBtn = toastElement.querySelector('[data-slot="toast-close"]');
         closeBtn.click();
         fixture.detectChanges();
 
-        // State should change to exiting after click
+        // State should change to exiting after click (entering -> exiting transition is valid)
         expect(toastComponent.componentInstance.state()).toBe('exiting');
+        expect(toastElement.getAttribute('data-state')).toBe('exiting');
       });
     });
 
     describe('toast updates and reactivity', () => {
+      beforeEach(() => {
+        vi.useFakeTimers();
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
       it('should update when new toast is added', () => {
         expect(fixture.debugElement.queryAll(By.directive(ZardToastComponent)).length).toBe(0);
 
@@ -295,19 +316,26 @@ describe('ZardToastContainerComponent', () => {
         expect(fixture.debugElement.queryAll(By.directive(ZardToastComponent)).length).toBe(0);
       });
 
-      it('should reactively update toast state during dismissal', () => {
+      it('should reactively update toast state and data attribute during dismissal', () => {
         toastService.success('Test message');
         fixture.detectChanges();
 
         let toastComponent = fixture.debugElement.query(By.directive(ZardToastComponent));
-        expect(toastComponent.componentInstance.state()).toBe('visible');
+        let toastElement = toastComponent.nativeElement;
 
-        const closeBtn = toastComponent.nativeElement.querySelector('[data-slot="toast-close"]');
+        // Initial state
+        expect(toastComponent.componentInstance.state()).toBe('entering');
+        expect(toastElement.getAttribute('data-state')).toBe('entering');
+
+        const closeBtn = toastElement.querySelector('[data-slot="toast-close"]');
         closeBtn.click();
         fixture.detectChanges();
 
+        // After dismissal
         toastComponent = fixture.debugElement.query(By.directive(ZardToastComponent));
+        toastElement = toastComponent.nativeElement;
         expect(toastComponent.componentInstance.state()).toBe('exiting');
+        expect(toastElement.getAttribute('data-state')).toBe('exiting');
       });
     });
 

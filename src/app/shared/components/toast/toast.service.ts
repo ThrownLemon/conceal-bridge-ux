@@ -84,6 +84,9 @@ export class ZardToastService {
   /** Counter for generating unique toast IDs. */
   #idCounter = 0;
 
+  /** Map of toast IDs to their auto-dismiss timeout handles for proper cleanup. */
+  readonly #timerMap = new Map<string, ReturnType<typeof setTimeout>>();
+
   /**
    * Generates a unique identifier for a toast notification.
    * @returns A unique ID string.
@@ -122,11 +125,12 @@ export class ZardToastService {
     // Add the toast to the list
     this.toasts.update((current) => [...current, toast]);
 
-    // Schedule auto-dismissal
+    // Schedule auto-dismissal and store the timer handle
     const duration = toast.duration;
-    setTimeout(() => {
+    const timerId = setTimeout(() => {
       this.dismiss(id);
     }, duration);
+    this.#timerMap.set(id, timerId);
 
     return id;
   }
@@ -209,7 +213,8 @@ export class ZardToastService {
   /**
    * Dismisses a toast notification by ID.
    *
-   * Removes the specified toast from the toasts signal.
+   * Removes the specified toast from the toasts signal and clears
+   * any pending auto-dismiss timeout for that toast.
    * If the toast doesn't exist, this method does nothing.
    *
    * @param id - The unique ID of the toast to dismiss.
@@ -222,14 +227,23 @@ export class ZardToastService {
    * ```
    */
   dismiss(id: string): void {
+    // Clear the timeout if it exists
+    const timerId = this.#timerMap.get(id);
+    if (timerId) {
+      clearTimeout(timerId);
+      this.#timerMap.delete(id);
+    }
+
+    // Remove the toast from the list
     this.toasts.update((current) => current.filter((toast) => toast.id !== id));
   }
 
   /**
    * Dismisses all active toast notifications.
    *
-   * Clears the entire toasts signal. Useful for cleanup
-   * during component destruction or route changes.
+   * Clears the entire toasts signal and cancels all pending
+   * auto-dismiss timeouts. Useful for cleanup during component
+   * destruction or route changes.
    *
    * @example
    * ```typescript
@@ -240,6 +254,13 @@ export class ZardToastService {
    * ```
    */
   clear(): void {
+    // Clear all pending timeouts
+    this.#timerMap.forEach((timerId) => {
+      clearTimeout(timerId);
+    });
+    this.#timerMap.clear();
+
+    // Clear all toasts
     this.toasts.set([]);
   }
 }

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   ViewEncapsulation,
 } from '@angular/core';
@@ -83,22 +84,65 @@ export class ZardToastContainerComponent {
   /** Set of toast IDs that are in the process of being dismissed (for exit animation). */
   readonly #dismissingToasts = new Set<string>();
 
+  /** Set of toast IDs that are in the process of entering (for entrance animation). */
+  readonly #enteringToasts = new Set<string>();
+
   /**
    * Current active toasts from the toast service.
    * This signal is automatically updated when toasts are added/removed.
    */
   readonly toasts = this.#toastService.toasts;
 
+  constructor() {
+    /**
+     * Effect to track newly added toasts and manage their entrance animation state.
+     *
+     * When a toast is added:
+     * 1. Add it to the entering set (triggers entrance animation)
+     * 2. Wait for entrance animation duration
+     * 3. Remove it from the entering set (transitions to 'visible' state)
+     */
+    effect(() => {
+      const currentToasts = this.toasts();
+      const currentIds = new Set(currentToasts.map((t) => t.id));
+
+      // Find newly added toasts by comparing current IDs with entering and visible toasts
+      currentIds.forEach((id) => {
+        if (!this.#enteringToasts.has(id) && !this.#dismissingToasts.has(id)) {
+          // This is a new toast, add it to entering set
+          this.#enteringToasts.add(id);
+
+          // Remove from entering set after entrance animation completes (300ms matches toast component CSS)
+          setTimeout(() => {
+            this.#enteringToasts.delete(id);
+          }, 300);
+        }
+      });
+
+      // Clean up entering toasts that are no longer in the list
+      this.#enteringToasts.forEach((id) => {
+        if (!currentIds.has(id)) {
+          this.#enteringToasts.delete(id);
+        }
+      });
+    });
+  }
+
   /**
    * Gets the animation state for a specific toast.
    *
-   * Toasts are in 'visible' state by default, and move to 'exiting' state
-   * when the dismiss handler is called (before being removed from the array).
+   * Toasts transition through three states:
+   * - 'entering': When first added (triggers entrance animation)
+   * - 'visible': After entrance animation completes (stable state)
+   * - 'exiting': When being dismissed (triggers exit animation)
    *
    * @param id - The toast ID to check.
    * @returns The animation state ('entering', 'visible', or 'exiting').
    */
   protected getToastState(id: string): 'entering' | 'visible' | 'exiting' {
+    if (this.#enteringToasts.has(id)) {
+      return 'entering';
+    }
     return this.#dismissingToasts.has(id) ? 'exiting' : 'visible';
   }
 
@@ -118,6 +162,9 @@ export class ZardToastContainerComponent {
     if (this.#dismissingToasts.has(id)) {
       return;
     }
+
+    // Remove from entering set if present (toast may be dismissed during entrance animation)
+    this.#enteringToasts.delete(id);
 
     // Add to dismissing set to trigger exit animation
     this.#dismissingToasts.add(id);
