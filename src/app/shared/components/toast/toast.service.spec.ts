@@ -100,7 +100,7 @@ describe('ZardToastService', () => {
 
   describe('success()', () => {
     it('should create a success toast', () => {
-      const id = service.success('Operation successful');
+      service.success('Operation successful');
 
       expect(service.toasts()).toHaveLength(1);
       expect(service.toasts()[0].type).toBe('success');
@@ -125,7 +125,7 @@ describe('ZardToastService', () => {
 
   describe('error()', () => {
     it('should create an error toast', () => {
-      const id = service.error('Operation failed');
+      service.error('Operation failed');
 
       expect(service.toasts()).toHaveLength(1);
       expect(service.toasts()[0].type).toBe('error');
@@ -150,7 +150,7 @@ describe('ZardToastService', () => {
 
   describe('info()', () => {
     it('should create an info toast', () => {
-      const id = service.info('Information message');
+      service.info('Information message');
 
       expect(service.toasts()).toHaveLength(1);
       expect(service.toasts()[0].type).toBe('info');
@@ -262,7 +262,7 @@ describe('ZardToastService', () => {
 
   describe('edge cases', () => {
     it('should handle empty message gracefully', () => {
-      const id = service.show({ message: '' });
+      service.show({ message: '' });
 
       expect(service.toasts()).toHaveLength(1);
       expect(service.toasts()[0].message).toBe('');
