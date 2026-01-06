@@ -198,7 +198,7 @@ describe('ZardToastContainerComponent', () => {
       });
 
       it('should remove toast after close button click and animation', () => {
-        const id = toastService.success('Test message');
+        toastService.success('Test message');
         fixture.detectChanges();
 
         const toastComponent = fixture.debugElement.query(By.directive(ZardToastComponent));
@@ -244,7 +244,7 @@ describe('ZardToastContainerComponent', () => {
       });
 
       it('should update toast state to exiting during dismissal', () => {
-        const id = toastService.success('Test message');
+        toastService.success('Test message');
         fixture.detectChanges();
 
         const toastComponent = fixture.debugElement.query(By.directive(ZardToastComponent));
@@ -296,7 +296,7 @@ describe('ZardToastContainerComponent', () => {
       });
 
       it('should reactively update toast state during dismissal', () => {
-        const id = toastService.success('Test message');
+        toastService.success('Test message');
         fixture.detectChanges();
 
         let toastComponent = fixture.debugElement.query(By.directive(ZardToastComponent));
@@ -399,9 +399,9 @@ describe('ZardToastContainerComponent', () => {
       });
 
       it('should maintain order after removing middle toast', () => {
-        const id1 = toastService.success('First');
+        toastService.success('First');
         const id2 = toastService.error('Second');
-        const id3 = toastService.info('Third');
+        toastService.info('Third');
 
         toastService.dismiss(id2);
         fixture.detectChanges();
