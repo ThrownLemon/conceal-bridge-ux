@@ -77,5 +77,3 @@ gha-creds-*.json
 .auto-claude/
 .claude_settings.json
 .auto-claude-status
-# Git worktrees (for parallel branch development)
-.worktrees/
