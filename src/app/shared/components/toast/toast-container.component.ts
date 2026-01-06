@@ -85,7 +85,7 @@ export class ZardToastContainerComponent {
   readonly #dismissingToasts = signal<Set<string>>(new Set());
 
   /** Set of toast IDs that are in the process of entering (for entrance animation). */
-  readonly #enteringToasts = new Set<string>();
+  readonly #enteringToasts = signal<Set<string>>(new Set());
 
   /** Map of toast IDs to their pending timeout handles for cleanup. */
   readonly #pendingTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
@@ -111,21 +111,36 @@ export class ZardToastContainerComponent {
 
       // Find newly added toasts by comparing current IDs with entering and visible toasts
       currentIds.forEach((id) => {
-        if (!this.#enteringToasts.has(id) && !this.#dismissingToasts().has(id)) {
+        if (!this.#enteringToasts().has(id) && !this.#dismissingToasts().has(id)) {
           // This is a new toast, add it to entering set
-          this.#enteringToasts.add(id);
+          this.#enteringToasts.update((prev) => {
+            const s = new Set(prev);
+            s.add(id);
+            return s;
+          });
 
           // Remove from entering set after entrance animation completes (matches TOAST_ANIMATION_DURATION)
-          setTimeout(() => {
-            this.#enteringToasts.delete(id);
+          const timeoutId = setTimeout(() => {
+            this.#enteringToasts.update((prev) => {
+              const s = new Set(prev);
+              s.delete(id);
+              return s;
+            });
+            this.#pendingTimeouts.delete(id);
           }, TOAST_ANIMATION_DURATION);
+
+          this.#pendingTimeouts.set(id, timeoutId);
         }
       });
 
       // Clean up entering toasts that are no longer in the list
-      this.#enteringToasts.forEach((id) => {
+      this.#enteringToasts().forEach((id) => {
         if (!currentIds.has(id)) {
-          this.#enteringToasts.delete(id);
+          this.#enteringToasts.update((prev) => {
+            const s = new Set(prev);
+            s.delete(id);
+            return s;
+          });
         }
       });
     });
@@ -152,13 +167,13 @@ export class ZardToastContainerComponent {
     if (this.#dismissingToasts().has(id)) {
       return 'exiting';
     }
-    if (this.#enteringToasts.has(id)) {
+    if (this.#enteringToasts().has(id)) {
       return 'entering';
     }
-    // If not in either set, check if it's a known toast (should be entering)
+    // If not in either set, check if it's a known toast (should be visible)
     const currentToasts = this.toasts();
     const isKnownToast = currentToasts.some((toast) => toast.id === id);
-    return isKnownToast ? 'entering' : 'visible';
+    return isKnownToast ? 'visible' : 'entering';
   }
 
   /**
@@ -179,7 +194,11 @@ export class ZardToastContainerComponent {
     }
 
     // Remove from entering set if present (toast may be dismissed during entrance animation)
-    this.#enteringToasts.delete(id);
+    this.#enteringToasts.update((prev) => {
+      const s = new Set(prev);
+      s.delete(id);
+      return s;
+    });
 
     // Add to dismissing set to trigger exit animation
     this.#dismissingToasts.update((set) => new Set(set).add(id));
