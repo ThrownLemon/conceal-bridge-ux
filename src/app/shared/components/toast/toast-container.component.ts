@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
   inject,
   ViewEncapsulation,
@@ -81,11 +82,17 @@ export class ZardToastContainerComponent {
   /** Toast service for managing toast state. */
   readonly #toastService = inject(ZardToastService);
 
+  /** DestroyRef for cleanup on component destruction. */
+  readonly #destroyRef = inject(DestroyRef);
+
   /** Set of toast IDs that are in the process of being dismissed (for exit animation). */
   readonly #dismissingToasts = new Set<string>();
 
   /** Set of toast IDs that are in the process of entering (for entrance animation). */
   readonly #enteringToasts = new Set<string>();
+
+  /** Map of toast IDs to their pending timeout handles for cleanup. */
+  readonly #pendingTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
   /**
    * Current active toasts from the toast service.
@@ -125,6 +132,12 @@ export class ZardToastContainerComponent {
           this.#enteringToasts.delete(id);
         }
       });
+    });
+
+    // Clean up pending timeouts on component destruction to prevent memory leaks
+    this.#destroyRef.onDestroy(() => {
+      this.#pendingTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+      this.#pendingTimeouts.clear();
     });
   }
 
@@ -170,10 +183,13 @@ export class ZardToastContainerComponent {
     this.#dismissingToasts.add(id);
 
     // Wait for exit animation (300ms matches toast component CSS)
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       this.#toastService.dismiss(id);
       this.#dismissingToasts.delete(id);
+      this.#pendingTimeouts.delete(id);
     }, 300);
+
+    this.#pendingTimeouts.set(id, timeoutId);
   }
 
   /**
