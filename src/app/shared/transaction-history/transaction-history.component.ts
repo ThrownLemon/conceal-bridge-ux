@@ -171,10 +171,16 @@ export class TransactionHistoryComponent {
   }
 
   async copy(text: string) {
+    const value = text?.trim();
+    if (!value) return;
+
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(value);
       this.#toast.success('Hash copied');
-    } catch {
+    } catch (error: unknown) {
+      console.warn('[TransactionHistoryComponent] Clipboard copy failed:', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       this.#toast.error('Failed to copy hash');
     }
   }

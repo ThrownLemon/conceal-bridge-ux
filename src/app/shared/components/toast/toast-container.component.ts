@@ -11,6 +11,7 @@ import {
 
 import { ZardToastComponent } from '@/shared/components/toast/toast.component';
 import { ZardToastService } from '@/shared/components/toast/toast.service';
+import { TOAST_ANIMATION_DURATION } from '@/shared/components/toast/toast.constants';
 
 import { mergeClasses } from '@/shared/utils/merge-classes';
 
@@ -120,10 +121,10 @@ export class ZardToastContainerComponent {
           // This is a new toast, add it to entering set
           this.#enteringToasts.add(id);
 
-          // Remove from entering set after entrance animation completes (300ms matches toast component CSS)
+          // Remove from entering set after entrance animation completes (matches TOAST_ANIMATION_DURATION)
           setTimeout(() => {
             this.#enteringToasts.delete(id);
-          }, 300);
+          }, TOAST_ANIMATION_DURATION);
         }
       });
 
@@ -189,7 +190,7 @@ export class ZardToastContainerComponent {
     // Add to dismissing set to trigger exit animation
     this.#dismissingToasts.update((set) => new Set(set).add(id));
 
-    // Wait for exit animation (300ms matches toast component CSS)
+    // Wait for exit animation (matches TOAST_ANIMATION_DURATION)
     const timeoutId = setTimeout(() => {
       this.#toastService.dismiss(id);
       this.#dismissingToasts.update((set) => {
@@ -198,7 +199,7 @@ export class ZardToastContainerComponent {
         return newSet;
       });
       this.#pendingTimeouts.delete(id);
-    }, 300);
+    }, TOAST_ANIMATION_DURATION);
 
     this.#pendingTimeouts.set(id, timeoutId);
   }

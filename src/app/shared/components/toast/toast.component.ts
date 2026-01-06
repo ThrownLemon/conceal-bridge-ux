@@ -46,6 +46,9 @@ const TOAST_VARIANTS: Record<ToastType, string> = {
  * Supports success, error, and info variants with distinct styling.
  * Animates in from the bottom-right and fades out on removal.
  *
+ * Note: The 'duration-300' Tailwind class should match TOAST_ANIMATION_DURATION
+ * from toast.constants.ts to keep animation timing consistent.
+ *
  * @example
  * ```typescript
  * @for (toast of toasts(); track toast.id) {
