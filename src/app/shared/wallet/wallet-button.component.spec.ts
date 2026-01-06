@@ -6,6 +6,7 @@ import { WalletButtonComponent } from './wallet-button.component';
 import { EvmWalletService } from '../../core/evm-wallet.service';
 import { WalletModalService } from '../../core/wallet-modal.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
+import { ZardToastService } from '../components/toast/toast.service';
 
 // Get actual chain IDs from configured networks (testnets in dev, mainnets in prod)
 const ETH_CHAIN_ID = EVM_NETWORKS.eth.chain.id;
@@ -17,6 +18,7 @@ describe('WalletButtonComponent', () => {
   let fixture: ComponentFixture<WalletButtonComponent>;
   let mockWalletService: Partial<EvmWalletService>;
   let mockModalService: Partial<WalletModalService>;
+  let mockToastService: Partial<ZardToastService>;
 
   // Writable signals for easier test manipulation
   let isConnectedSignal: WritableSignal<boolean>;
@@ -49,12 +51,19 @@ describe('WalletButtonComponent', () => {
       open: vi.fn(),
     };
 
+    mockToastService = {
+      success: vi.fn(),
+      error: vi.fn(),
+      info: vi.fn(),
+    };
+
     TestBed.configureTestingModule({
       imports: [WalletButtonComponent],
       providers: [
         provideNoopAnimations(),
         { provide: EvmWalletService, useValue: mockWalletService },
         { provide: WalletModalService, useValue: mockModalService },
+        { provide: ZardToastService, useValue: mockToastService },
       ],
     });
 
@@ -80,7 +89,6 @@ describe('WalletButtonComponent', () => {
     it('should initialize signals', () => {
       expect(component.isSwitchingNetwork()).toBe(false);
       expect(component.networkStatus()).toBeNull();
-      expect(component.copyStatus()).toBeNull();
     });
   });
 
@@ -237,7 +245,7 @@ describe('WalletButtonComponent', () => {
       await component.copyAddressFromHeader();
 
       expect(writeTextSpy).toHaveBeenCalledWith(mockAddress);
-      expect(component.copyStatus()).toBe('Copied!');
+      expect(mockToastService.success).toHaveBeenCalledWith('Copied!');
     });
 
     it('should copy address successfully from non-header', async () => {
@@ -249,7 +257,7 @@ describe('WalletButtonComponent', () => {
       await component.copyAddress();
 
       expect(writeTextSpy).toHaveBeenCalledWith(mockAddress);
-      expect(component.copyStatus()).toBe('Copied!');
+      expect(mockToastService.success).toHaveBeenCalledWith('Copied!');
     });
 
     it('should handle copy failure', async () => {
@@ -259,37 +267,7 @@ describe('WalletButtonComponent', () => {
 
       await component.copyAddress();
 
-      expect(component.copyStatus()).toBe('Copy failed - select manually');
-    });
-
-    it('should clear copy status after timeout', async () => {
-      vi.useFakeTimers();
-      Object.assign(navigator, {
-        clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
-      });
-
-      await component.copyAddress();
-      expect(component.copyStatus()).toBe('Copied!');
-
-      vi.advanceTimersByTime(1000);
-      expect(component.copyStatus()).toBeNull();
-
-      vi.useRealTimers();
-    });
-
-    it('should not clear copy status if it changed', async () => {
-      vi.useFakeTimers();
-      Object.assign(navigator, {
-        clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
-      });
-
-      await component.copyAddress();
-      component.copyStatus.set('Different status');
-
-      vi.advanceTimersByTime(1000);
-      expect(component.copyStatus()).toBe('Different status');
-
-      vi.useRealTimers();
+      expect(mockToastService.error).toHaveBeenCalledWith('Copy failed - select manually');
     });
 
     it('should not copy when address is null', async () => {
@@ -302,6 +280,8 @@ describe('WalletButtonComponent', () => {
       await component.copyAddress();
 
       expect(writeTextSpy).not.toHaveBeenCalled();
+      expect(mockToastService.success).not.toHaveBeenCalled();
+      expect(mockToastService.error).not.toHaveBeenCalled();
     });
   });
 
