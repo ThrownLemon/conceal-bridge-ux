@@ -9,6 +9,7 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
 import { WalletModalService } from '../../core/wallet-modal.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
+import { ZardToastService } from '../components/toast/toast.service';
 
 type Variant = 'header' | 'primary';
 
@@ -94,7 +95,7 @@ type Variant = 'header' | 'primary';
 
           <z-dropdown-menu-content #walletMenu="zDropdownMenuContent" class="w-56">
             <z-dropdown-menu-item (click)="copyAddressFromHeader()">
-              {{ copyStatus() ?? 'Copy address' }}
+              Copy address
             </z-dropdown-menu-item>
             <z-divider zSpacing="sm" class="-mx-1" />
             <z-dropdown-menu-item (click)="disconnectFromHeader()">
@@ -123,9 +124,7 @@ type Variant = 'header' | 'primary';
         </button>
 
         <z-dropdown-menu-content #simpleMenu="zDropdownMenuContent" class="w-52">
-          <z-dropdown-menu-item (click)="copyAddress()">
-            {{ copyStatus() ?? 'Copy address' }}
-          </z-dropdown-menu-item>
+          <z-dropdown-menu-item (click)="copyAddress()"> Copy address </z-dropdown-menu-item>
           <z-divider zSpacing="sm" class="-mx-1" />
           <z-dropdown-menu-item (click)="disconnect()"> Disconnect </z-dropdown-menu-item>
         </z-dropdown-menu-content>
@@ -138,10 +137,10 @@ export class WalletButtonComponent {
 
   readonly wallet = inject(EvmWalletService);
   readonly #modalService = inject(WalletModalService);
+  readonly #toast = inject(ZardToastService);
 
   readonly isSwitchingNetwork = signal(false);
   readonly networkStatus = signal<string | null>(null);
-  readonly copyStatus = signal<string | null>(null);
 
   /** Finds the network info for the currently connected chain ID. */
   readonly #connectedNetworkInfo = computed(() => {
@@ -244,19 +243,12 @@ export class WalletButtonComponent {
     if (!addr) return;
     try {
       await navigator.clipboard.writeText(addr);
-      this.copyStatus.set('Copied!');
-      setTimeout(() => {
-        if (this.copyStatus() === 'Copied!') {
-          this.copyStatus.set(null);
-        }
-      }, 1000);
-    } catch {
-      this.copyStatus.set('Copy failed - select manually');
-      setTimeout(() => {
-        if (this.copyStatus() === 'Copy failed - select manually') {
-          this.copyStatus.set(null);
-        }
-      }, 3000);
+      this.#toast.success('Copied!');
+    } catch (error: unknown) {
+      console.warn('[WalletButtonComponent] Clipboard copy failed:', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      this.#toast.error('Copy failed - select manually');
     }
   }
 }

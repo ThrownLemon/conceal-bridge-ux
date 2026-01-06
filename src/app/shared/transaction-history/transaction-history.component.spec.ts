@@ -4,6 +4,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { TransactionHistoryComponent } from './transaction-history.component';
 import { TransactionHistoryService } from '../../core/transaction-history.service';
+import { ZardToastService } from '../components/toast/toast.service';
 import type { StoredTransaction } from '../../core/bridge-types';
 
 describe('TransactionHistoryComponent', () => {
@@ -16,6 +17,7 @@ describe('TransactionHistoryComponent', () => {
     open: ReturnType<typeof vi.fn>;
     toggle: ReturnType<typeof vi.fn>;
   };
+  let mockToastService: Partial<ZardToastService>;
 
   const mockTransaction: StoredTransaction = {
     id: 'tx-123',
@@ -55,11 +57,18 @@ describe('TransactionHistoryComponent', () => {
       toggle: vi.fn(),
     };
 
+    mockToastService = {
+      success: vi.fn(),
+      error: vi.fn(),
+      info: vi.fn(),
+    };
+
     TestBed.configureTestingModule({
       imports: [TransactionHistoryComponent],
       providers: [
         provideNoopAnimations(),
         { provide: TransactionHistoryService, useValue: mockService },
+        { provide: ZardToastService, useValue: mockToastService },
       ],
     });
 
@@ -80,10 +89,6 @@ describe('TransactionHistoryComponent', () => {
 
     it('should inject TransactionHistoryService', () => {
       expect(component.service).toBeDefined();
-    });
-
-    it('should initialize copyStatus as null', () => {
-      expect(component.copyStatus()).toBeNull();
     });
   });
 
@@ -240,20 +245,15 @@ describe('TransactionHistoryComponent', () => {
       });
     });
 
-    it('should copy text to clipboard', async () => {
+    it('should copy text to clipboard and show success toast', async () => {
       const text = '0xtest123';
       await component.copy(text);
 
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(text);
+      expect(mockToastService.success).toHaveBeenCalledWith('Hash copied');
     });
 
-    it('should set copyStatus to copied on success', async () => {
-      await component.copy('0xtest123');
-
-      expect(component.copyStatus()).toEqual({ hash: '0xtest123', status: 'copied' });
-    });
-
-    it('should set copyStatus to failed on error', async () => {
+    it('should show error toast on copy failure', async () => {
       Object.assign(navigator, {
         clipboard: {
           writeText: vi.fn().mockRejectedValue(new Error('Copy failed')),
@@ -262,50 +262,7 @@ describe('TransactionHistoryComponent', () => {
 
       await component.copy('0xtest123');
 
-      expect(component.copyStatus()).toEqual({ hash: '0xtest123', status: 'failed' });
-    });
-
-    it('should clear copyStatus after 2 seconds', async () => {
-      vi.useFakeTimers();
-      await component.copy('0xtest123');
-      expect(component.copyStatus()).not.toBeNull();
-
-      vi.advanceTimersByTime(2000);
-
-      expect(component.copyStatus()).toBeNull();
-      vi.useRealTimers();
-    });
-
-    it('should not clear copyStatus if hash changed', async () => {
-      vi.useFakeTimers();
-      await component.copy('0xtest123');
-      component.copyStatus.set({ hash: '0xdifferent', status: 'copied' });
-
-      vi.advanceTimersByTime(2000);
-
-      expect(component.copyStatus()).toEqual({ hash: '0xdifferent', status: 'copied' });
-      vi.useRealTimers();
-    });
-  });
-
-  describe('getCopyLabel', () => {
-    it('should return "Copy Hash" when no status', () => {
-      expect(component.getCopyLabel('0xtest')).toBe('Copy Hash');
-    });
-
-    it('should return "Copied!" when status is copied for matching hash', () => {
-      component.copyStatus.set({ hash: '0xtest', status: 'copied' });
-      expect(component.getCopyLabel('0xtest')).toBe('Copied!');
-    });
-
-    it('should return "Copy failed" when status is failed for matching hash', () => {
-      component.copyStatus.set({ hash: '0xtest', status: 'failed' });
-      expect(component.getCopyLabel('0xtest')).toBe('Copy failed');
-    });
-
-    it('should return "Copy Hash" for non-matching hash', () => {
-      component.copyStatus.set({ hash: '0xtest', status: 'copied' });
-      expect(component.getCopyLabel('0xother')).toBe('Copy Hash');
+      expect(mockToastService.error).toHaveBeenCalledWith('Failed to copy hash');
     });
   });
 
@@ -358,11 +315,6 @@ describe('TransactionHistoryComponent', () => {
       );
       const srOnly = closeBtn?.querySelector('.sr-only');
       expect(srOnly?.textContent.trim()).toBe('Close');
-    });
-
-    it('should have aria-live region for copy status', () => {
-      const liveRegion = fixture.nativeElement.querySelector('[aria-live="polite"]');
-      expect(liveRegion).toBeTruthy();
     });
   });
 

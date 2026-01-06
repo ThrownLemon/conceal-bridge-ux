@@ -1,6 +1,6 @@
 import { A11yModule } from '@angular/cdk/a11y';
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { formatDistanceToNow } from 'date-fns';
 
 import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
@@ -9,6 +9,7 @@ import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
 import { TransactionHistoryService } from '../../core/transaction-history.service';
+import { ZardToastService } from '../components/toast/toast.service';
 
 @Component({
   selector: 'app-transaction-history',
@@ -45,13 +46,6 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
       [cdkTrapFocus]="service.isOpen()"
       [cdkTrapFocusAutoCapture]="service.isOpen()"
     >
-      <!-- ARIA live region for copy status -->
-      <div class="sr-only" aria-live="polite" aria-atomic="true">
-        @if (copyStatus(); as status) {
-          {{ status.status === 'copied' ? 'Hash copied to clipboard' : 'Failed to copy hash' }}
-        }
-      </div>
-
       <div class="flex items-center justify-between mb-6">
         <h2 id="transaction-history-title" class="text-xl font-bold">Recent Activity</h2>
         <button
@@ -132,7 +126,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
                         zSize="sm"
                         class="opacity-0 group-hover:opacity-100 transition-opacity !p-1 !h-auto"
                         (click)="copy(tx.depositHash)"
-                        [title]="getCopyLabel(tx.depositHash)"
+                        title="Copy hash"
                       >
                         <z-icon zType="copy" zSize="sm" />
                       </button>
@@ -153,7 +147,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
                         zSize="sm"
                         class="opacity-0 group-hover:opacity-100 transition-opacity !p-1 !h-auto"
                         (click)="copy(tx.swapHash)"
-                        [title]="getCopyLabel(tx.swapHash)"
+                        title="Copy hash"
                       >
                         <z-icon zType="copy" zSize="sm" />
                       </button>
@@ -170,31 +164,24 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
 })
 export class TransactionHistoryComponent {
   readonly service = inject(TransactionHistoryService);
-  readonly copyStatus = signal<{ hash: string; status: 'copied' | 'failed' } | null>(null);
+  readonly #toast = inject(ZardToastService);
 
   getRelativeTime(timestamp: number): string {
     return formatDistanceToNow(timestamp, { addSuffix: true });
   }
 
   async copy(text: string) {
-    try {
-      await navigator.clipboard.writeText(text);
-      this.copyStatus.set({ hash: text, status: 'copied' });
-    } catch {
-      this.copyStatus.set({ hash: text, status: 'failed' });
-    }
-    setTimeout(() => {
-      if (this.copyStatus()?.hash === text) {
-        this.copyStatus.set(null);
-      }
-    }, 2000);
-  }
+    const value = text?.trim();
+    if (!value) return;
 
-  getCopyLabel(hash: string): string {
-    const status = this.copyStatus();
-    if (status?.hash === hash) {
-      return status.status === 'copied' ? 'Copied!' : 'Copy failed';
+    try {
+      await navigator.clipboard.writeText(value);
+      this.#toast.success('Hash copied');
+    } catch (error: unknown) {
+      console.warn('[TransactionHistoryComponent] Clipboard copy failed:', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      this.#toast.error('Failed to copy hash');
     }
-    return 'Copy Hash';
   }
 }

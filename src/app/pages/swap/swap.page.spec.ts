@@ -3,6 +3,7 @@ import { SwapPage } from './swap.page';
 import { BridgeApiService } from '../../core/bridge-api.service';
 import { EvmWalletService } from '../../core/evm-wallet.service';
 import { TransactionHistoryService } from '../../core/transaction-history.service';
+import { ZardToastService } from '../../shared/components/toast/toast.service';
 import { ActivatedRoute, convertToParamMap, type ParamMap } from '@angular/router';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { provideRouter } from '@angular/router';
@@ -51,12 +52,19 @@ interface HistoryServiceMock {
   addTransaction: Mock;
 }
 
+interface ToastServiceMock {
+  success: Mock;
+  error: Mock;
+  info: Mock;
+}
+
 describe('SwapPage', () => {
   let component: SwapPage;
   let fixture: ComponentFixture<SwapPage>;
   let apiMock: ApiServiceMock;
   let walletMock: WalletServiceMock;
   let historyMock: HistoryServiceMock;
+  let toastMock: ToastServiceMock;
   let routeParamMap$: BehaviorSubject<ParamMap>;
 
   const mockConfig: BridgeChainConfig = {
@@ -137,6 +145,12 @@ describe('SwapPage', () => {
       refresh: vi.fn(),
     };
 
+    toastMock = {
+      success: vi.fn(),
+      error: vi.fn(),
+      info: vi.fn(),
+    };
+
     await TestBed.configureTestingModule({
       imports: [SwapPage],
       providers: [
@@ -144,6 +158,7 @@ describe('SwapPage', () => {
         { provide: BridgeApiService, useValue: apiMock },
         { provide: EvmWalletService, useValue: walletMock },
         { provide: TransactionHistoryService, useValue: historyMock },
+        { provide: ZardToastService, useValue: toastMock },
         {
           provide: ActivatedRoute,
           useValue: { paramMap: routeParamMap$.asObservable() },
@@ -546,7 +561,7 @@ describe('SwapPage', () => {
         });
       });
 
-      it('should copy text to clipboard and show status message', async () => {
+      it('should copy text to clipboard and show success toast', async () => {
         const writeTextSpy = vi.fn(() => Promise.resolve());
         Object.defineProperty(navigator, 'clipboard', {
           value: { writeText: writeTextSpy },
@@ -561,6 +576,7 @@ describe('SwapPage', () => {
         await vi.runAllTimersAsync();
 
         expect(writeTextSpy).toHaveBeenCalledWith('test text');
+        expect(toastMock.success).toHaveBeenCalledWith('Copied to clipboard.');
         await copyPromise;
       });
 
@@ -577,7 +593,7 @@ describe('SwapPage', () => {
         await vi.runAllTimersAsync();
         await copyPromise;
 
-        expect(component.statusMessage()).toBe('Copy failed (clipboard unavailable).');
+        expect(toastMock.error).toHaveBeenCalledWith('Copy failed (clipboard unavailable).');
       });
 
       it('should do nothing for empty text', async () => {
@@ -590,9 +606,13 @@ describe('SwapPage', () => {
 
         await component.copy('');
         expect(writeTextSpy).not.toHaveBeenCalled();
+        expect(toastMock.success).not.toHaveBeenCalled();
+        expect(toastMock.error).not.toHaveBeenCalled();
 
         await component.copy('   ');
         expect(writeTextSpy).not.toHaveBeenCalled();
+        expect(toastMock.success).not.toHaveBeenCalled();
+        expect(toastMock.error).not.toHaveBeenCalled();
       });
     });
 

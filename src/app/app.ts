@@ -4,6 +4,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ErrorBoundaryComponent } from '@/shared/components/error-boundary/error-boundary.component';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
+import { ZardToastContainerComponent } from '@/shared/components/toast/toast-container.component';
 
 import { environment } from '../environments/environment';
 import { TransactionHistoryService } from './core/transaction-history.service';
@@ -25,6 +26,7 @@ const TESTNET_BANNER_DISMISSED_KEY = 'testnet_banner_dismissed';
     WalletModalComponent,
     ZardButtonComponent,
     ZardIconComponent,
+    ZardToastContainerComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
