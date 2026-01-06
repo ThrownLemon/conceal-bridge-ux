@@ -244,7 +244,10 @@ export class WalletButtonComponent {
     try {
       await navigator.clipboard.writeText(addr);
       this.#toast.success('Copied!');
-    } catch {
+    } catch (error: unknown) {
+      console.warn('[WalletButtonComponent] Clipboard copy failed:', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       this.#toast.error('Copy failed - select manually');
     }
   }
