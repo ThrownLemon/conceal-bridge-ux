@@ -170,10 +170,10 @@ export class ZardToastContainerComponent {
     if (this.#enteringToasts().has(id)) {
       return 'entering';
     }
-    // If not in either set, check if it's a known toast (should be visible)
+    // If not in either set, check if it's a known toast (should be entering for animation)
     const currentToasts = this.toasts();
     const isKnownToast = currentToasts.some((toast) => toast.id === id);
-    return isKnownToast ? 'visible' : 'entering';
+    return isKnownToast ? 'entering' : 'visible';
   }
 
   /**
