@@ -9,6 +9,7 @@ import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
 import { TransactionHistoryService } from '../../core/transaction-history.service';
+import { ZardToastService } from '../components/toast/toast.service';
 
 @Component({
   selector: 'app-transaction-history',
@@ -170,6 +171,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
 })
 export class TransactionHistoryComponent {
   readonly service = inject(TransactionHistoryService);
+  readonly #toast = inject(ZardToastService);
   readonly copyStatus = signal<{ hash: string; status: 'copied' | 'failed' } | null>(null);
 
   getRelativeTime(timestamp: number): string {
@@ -179,15 +181,10 @@ export class TransactionHistoryComponent {
   async copy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      this.copyStatus.set({ hash: text, status: 'copied' });
+      this.#toast.success('Hash copied');
     } catch {
-      this.copyStatus.set({ hash: text, status: 'failed' });
+      this.#toast.error('Failed to copy hash');
     }
-    setTimeout(() => {
-      if (this.copyStatus()?.hash === text) {
-        this.copyStatus.set(null);
-      }
-    }, 2000);
   }
 
   getCopyLabel(hash: string): string {
