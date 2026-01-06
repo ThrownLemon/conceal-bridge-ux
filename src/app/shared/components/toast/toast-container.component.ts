@@ -22,7 +22,6 @@ import { mergeClasses } from '@/shared/utils/merge-classes';
  * - Subscribing to the toast service's toasts signal
  * - Rendering multiple toast components in a fixed position
  * - Managing toast dismissal (both manual and auto-dismiss)
- * - Providing ARIA live region for screen reader accessibility
  *
  * Should be placed once in the application root (typically app.html).
  *
@@ -56,12 +55,7 @@ import { mergeClasses } from '@/shared/utils/merge-classes';
   imports: [ZardToastComponent],
   standalone: true,
   template: `
-    <div
-      [attr.role]="'status'"
-      [attr.aria-live]="'polite'"
-      [attr.aria-atomic]="'true'"
-      [class]="containerClasses()"
-    >
+    <div [class]="containerClasses()">
       @for (toast of toasts(); track toast.id) {
         <z-toast
           [id]="toast.id"

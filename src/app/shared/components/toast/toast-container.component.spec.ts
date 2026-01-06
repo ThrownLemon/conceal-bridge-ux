@@ -78,34 +78,14 @@ describe('ZardToastContainerComponent', () => {
       });
 
       it('should enable pointer events on container', () => {
-        const container = fixture.nativeElement.querySelector('[role="status"]');
+        const container = fixture.nativeElement.querySelector('.flex-col-reverse');
         expect(container).toBeTruthy();
         expect(container.classList.contains('pointer-events-auto')).toBe(true);
       });
 
       it('should use flex-col-reverse for stacking', () => {
-        const container = fixture.nativeElement.querySelector('[role="status"]');
+        const container = fixture.nativeElement.querySelector('.flex-col-reverse');
         expect(container.classList.contains('flex-col-reverse')).toBe(true);
-      });
-    });
-
-    describe('accessibility', () => {
-      it('should have role="status"', () => {
-        const container = fixture.nativeElement.querySelector('[role="status"]');
-        expect(container).toBeTruthy();
-        expect(container.getAttribute('role')).toBe('status');
-      });
-
-      it('should have aria-live="polite"', () => {
-        const container = fixture.nativeElement.querySelector('[aria-live="polite"]');
-        expect(container).toBeTruthy();
-        expect(container.getAttribute('aria-live')).toBe('polite');
-      });
-
-      it('should have aria-atomic="true"', () => {
-        const container = fixture.nativeElement.querySelector('[aria-atomic="true"]');
-        expect(container).toBeTruthy();
-        expect(container.getAttribute('aria-atomic')).toBe('true');
       });
     });
 
