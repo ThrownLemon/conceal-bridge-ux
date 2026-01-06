@@ -5,6 +5,7 @@ import {
   DestroyRef,
   effect,
   inject,
+  signal,
   ViewEncapsulation,
 } from '@angular/core';
 
@@ -86,7 +87,7 @@ export class ZardToastContainerComponent {
   readonly #destroyRef = inject(DestroyRef);
 
   /** Set of toast IDs that are in the process of being dismissed (for exit animation). */
-  readonly #dismissingToasts = new Set<string>();
+  readonly #dismissingToasts = signal<Set<string>>(new Set());
 
   /** Set of toast IDs that are in the process of entering (for entrance animation). */
   readonly #enteringToasts = new Set<string>();
@@ -115,7 +116,7 @@ export class ZardToastContainerComponent {
 
       // Find newly added toasts by comparing current IDs with entering and visible toasts
       currentIds.forEach((id) => {
-        if (!this.#enteringToasts.has(id) && !this.#dismissingToasts.has(id)) {
+        if (!this.#enteringToasts.has(id) && !this.#dismissingToasts().has(id)) {
           // This is a new toast, add it to entering set
           this.#enteringToasts.add(id);
 
@@ -156,7 +157,7 @@ export class ZardToastContainerComponent {
     if (this.#enteringToasts.has(id)) {
       return 'entering';
     }
-    return this.#dismissingToasts.has(id) ? 'exiting' : 'visible';
+    return this.#dismissingToasts().has(id) ? 'exiting' : 'visible';
   }
 
   /**
@@ -172,7 +173,7 @@ export class ZardToastContainerComponent {
    */
   protected handleDismiss(id: string): void {
     // Don't process if already being dismissed
-    if (this.#dismissingToasts.has(id)) {
+    if (this.#dismissingToasts().has(id)) {
       return;
     }
 
@@ -180,12 +181,16 @@ export class ZardToastContainerComponent {
     this.#enteringToasts.delete(id);
 
     // Add to dismissing set to trigger exit animation
-    this.#dismissingToasts.add(id);
+    this.#dismissingToasts.update((set) => new Set(set).add(id));
 
     // Wait for exit animation (300ms matches toast component CSS)
     const timeoutId = setTimeout(() => {
       this.#toastService.dismiss(id);
-      this.#dismissingToasts.delete(id);
+      this.#dismissingToasts.update((set) => {
+        const newSet = new Set(set);
+        newSet.delete(id);
+        return newSet;
+      });
       this.#pendingTimeouts.delete(id);
     }, 300);
 
