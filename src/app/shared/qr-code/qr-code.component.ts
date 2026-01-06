@@ -9,7 +9,7 @@ import { QrCode } from './qr-code.utils';
     <div class="grid place-items-center gap-2">
       @if (qrData(); as qr) {
         <svg
-          class="block rounded-lg bg-white p-2 shadow-sm"
+          class="block rounded-lg bg-card p-2 shadow-md border border-border"
           [attr.width]="size()"
           [attr.height]="size()"
           [attr.viewBox]="qr.viewBox"
@@ -17,7 +17,7 @@ import { QrCode } from './qr-code.utils';
           role="img"
           [attr.aria-label]="alt()"
         >
-          <path [attr.d]="qr.path" fill="#0f172a" />
+          <path [attr.d]="qr.path" class="fill-foreground" />
         </svg>
       } @else {
         <div class="text-sm text-muted-foreground">No QR data.</div>
