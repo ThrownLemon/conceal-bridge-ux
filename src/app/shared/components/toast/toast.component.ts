@@ -12,12 +12,9 @@ import type { ClassValue } from 'clsx';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 import type { ZardIcon } from '@/shared/components/icon/icons';
 
-import { mergeClasses } from '@/shared/utils/merge-classes';
+import type { ToastType } from '@/shared/components/toast/toast.service';
 
-/**
- * Supported toast notification types.
- */
-type ToastType = 'success' | 'error' | 'info';
+import { mergeClasses } from '@/shared/utils/merge-classes';
 
 /**
  * Maps toast types to their corresponding icons.
