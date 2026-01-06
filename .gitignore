@@ -79,3 +79,4 @@ gha-creds-*.json
 .auto-claude-status
 # Git worktrees (for parallel branch development)
 .worktrees/
+.auto-claude-security.json
