@@ -154,10 +154,16 @@ export class ZardToastContainerComponent {
    * @returns The animation state ('entering', 'visible', or 'exiting').
    */
   protected getToastState(id: string): 'entering' | 'visible' | 'exiting' {
+    if (this.#dismissingToasts().has(id)) {
+      return 'exiting';
+    }
     if (this.#enteringToasts.has(id)) {
       return 'entering';
     }
-    return this.#dismissingToasts().has(id) ? 'exiting' : 'visible';
+    // If not in either set, check if it's a known toast (should be entering)
+    const currentToasts = this.toasts();
+    const isKnownToast = currentToasts.some((toast) => toast.id === id);
+    return isKnownToast ? 'entering' : 'visible';
   }
 
   /**
