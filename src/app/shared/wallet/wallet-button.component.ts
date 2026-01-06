@@ -95,7 +95,7 @@ type Variant = 'header' | 'primary';
 
           <z-dropdown-menu-content #walletMenu="zDropdownMenuContent" class="w-56">
             <z-dropdown-menu-item (click)="copyAddressFromHeader()">
-              {{ copyStatus() ?? 'Copy address' }}
+              Copy address
             </z-dropdown-menu-item>
             <z-divider zSpacing="sm" class="-mx-1" />
             <z-dropdown-menu-item (click)="disconnectFromHeader()">
@@ -124,9 +124,7 @@ type Variant = 'header' | 'primary';
         </button>
 
         <z-dropdown-menu-content #simpleMenu="zDropdownMenuContent" class="w-52">
-          <z-dropdown-menu-item (click)="copyAddress()">
-            {{ copyStatus() ?? 'Copy address' }}
-          </z-dropdown-menu-item>
+          <z-dropdown-menu-item (click)="copyAddress()"> Copy address </z-dropdown-menu-item>
           <z-divider zSpacing="sm" class="-mx-1" />
           <z-dropdown-menu-item (click)="disconnect()"> Disconnect </z-dropdown-menu-item>
         </z-dropdown-menu-content>
@@ -143,7 +141,6 @@ export class WalletButtonComponent {
 
   readonly isSwitchingNetwork = signal(false);
   readonly networkStatus = signal<string | null>(null);
-  readonly copyStatus = signal<string | null>(null);
 
   /** Finds the network info for the currently connected chain ID. */
   readonly #connectedNetworkInfo = computed(() => {

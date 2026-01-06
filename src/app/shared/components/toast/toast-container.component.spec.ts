@@ -171,7 +171,9 @@ describe('ZardToastContainerComponent', () => {
         toastService.success('Test message');
         fixture.detectChanges();
 
-        const toastElement = fixture.debugElement.query(By.directive(ZardToastComponent)).nativeElement;
+        const toastElement = fixture.debugElement.query(
+          By.directive(ZardToastComponent),
+        ).nativeElement;
         expect(toastElement.classList.contains('pointer-events-auto')).toBe(true);
       });
     });
@@ -227,7 +229,9 @@ describe('ZardToastContainerComponent', () => {
 
         // Click close button on middle toast
         const toastComponents = fixture.debugElement.queryAll(By.directive(ZardToastComponent));
-        const closeBtn2 = toastComponents[1].nativeElement.querySelector('[data-slot="toast-close"]');
+        const closeBtn2 = toastComponents[1].nativeElement.querySelector(
+          '[data-slot="toast-close"]',
+        );
         closeBtn2.click();
 
         vi.advanceTimersByTime(300);
