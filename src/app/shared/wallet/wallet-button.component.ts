@@ -9,6 +9,7 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.service';
 import { WalletModalService } from '../../core/wallet-modal.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
+import { ZardToastService } from '../components/toast/toast.service';
 
 type Variant = 'header' | 'primary';
 
@@ -138,6 +139,7 @@ export class WalletButtonComponent {
 
   readonly wallet = inject(EvmWalletService);
   readonly #modalService = inject(WalletModalService);
+  readonly #toast = inject(ZardToastService);
 
   readonly isSwitchingNetwork = signal(false);
   readonly networkStatus = signal<string | null>(null);
@@ -244,19 +246,9 @@ export class WalletButtonComponent {
     if (!addr) return;
     try {
       await navigator.clipboard.writeText(addr);
-      this.copyStatus.set('Copied!');
-      setTimeout(() => {
-        if (this.copyStatus() === 'Copied!') {
-          this.copyStatus.set(null);
-        }
-      }, 1000);
+      this.#toast.success('Copied!');
     } catch {
-      this.copyStatus.set('Copy failed - select manually');
-      setTimeout(() => {
-        if (this.copyStatus() === 'Copy failed - select manually') {
-          this.copyStatus.set(null);
-        }
-      }, 3000);
+      this.#toast.error('Copy failed - select manually');
     }
   }
 }
