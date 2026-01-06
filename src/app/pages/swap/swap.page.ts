@@ -34,6 +34,7 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 import { ZardInputDirective } from '@/shared/components/input/input.directive';
+import { ZardToastService } from '@/shared/components/toast/toast.service';
 
 import {
   StepProgressComponent,
@@ -712,6 +713,7 @@ export class SwapPage {
   readonly api = inject(BridgeApiService);
   readonly wallet = inject(EvmWalletService);
   readonly historyService = inject(TransactionHistoryService);
+  readonly #toast = inject(ZardToastService);
 
   readonly #directionParam = toSignal(this.#route.paramMap.pipe(map((pm) => pm.get('direction'))), {
     initialValue: null,
@@ -1416,15 +1418,12 @@ export class SwapPage {
 
     try {
       await navigator.clipboard.writeText(value);
-      this.statusMessage.set('Copied to clipboard.');
-      await new Promise((r) => setTimeout(r, 1200));
-      // Only clear if it wasn't replaced by another message.
-      if (this.statusMessage() === 'Copied to clipboard.') this.statusMessage.set(null);
+      this.#toast.success('Copied to clipboard.');
     } catch (error: unknown) {
       console.warn('[SwapPage] Clipboard copy failed:', {
         error: error instanceof Error ? error.message : String(error),
       });
-      this.statusMessage.set('Copy failed (clipboard unavailable).');
+      this.#toast.error('Copy failed (clipboard unavailable).');
     }
   }
 }
