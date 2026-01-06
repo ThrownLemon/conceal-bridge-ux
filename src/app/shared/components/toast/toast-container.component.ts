@@ -81,7 +81,7 @@ export class ZardToastContainerComponent {
   readonly #toastService = inject(ZardToastService);
 
   /** Set of toast IDs that are in the process of being dismissed (for exit animation). */
-  readonly #dismissingToasts = inject(() => new Set<string>());
+  readonly #dismissingToasts = new Set<string>();
 
   /**
    * Current active toasts from the toast service.
@@ -99,7 +99,7 @@ export class ZardToastContainerComponent {
    * @returns The animation state ('entering', 'visible', or 'exiting').
    */
   protected getToastState(id: string): 'entering' | 'visible' | 'exiting' {
-    return this.#dismissingToasts().has(id) ? 'exiting' : 'visible';
+    return this.#dismissingToasts.has(id) ? 'exiting' : 'visible';
   }
 
   /**
@@ -115,17 +115,17 @@ export class ZardToastContainerComponent {
    */
   protected handleDismiss(id: string): void {
     // Don't process if already being dismissed
-    if (this.#dismissingToasts().has(id)) {
+    if (this.#dismissingToasts.has(id)) {
       return;
     }
 
     // Add to dismissing set to trigger exit animation
-    this.#dismissingToasts().add(id);
+    this.#dismissingToasts.add(id);
 
     // Wait for exit animation (300ms matches toast component CSS)
     setTimeout(() => {
       this.#toastService.dismiss(id);
-      this.#dismissingToasts().delete(id);
+      this.#dismissingToasts.delete(id);
     }, 300);
   }
 
