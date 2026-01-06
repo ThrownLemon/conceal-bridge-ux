@@ -25,24 +25,11 @@ describe('TransactionHistoryService', () => {
 
   function setupLocalStorage(data: Record<string, string> = {}): void {
     mockLocalStorage = { ...data };
-    const mockGetItem = vi.fn((key: string) => mockLocalStorage[key] ?? null);
-    const mockSetItem = vi.fn((key: string, value: string) => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key: string) => {
+      return mockLocalStorage[key] ?? null;
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
       mockLocalStorage[key] = value;
-    });
-    const mockRemoveItem = vi.fn((key: string) => {
-      delete mockLocalStorage[key];
-    });
-    const mockClear = vi.fn(() => {
-      mockLocalStorage = {};
-    });
-    Object.defineProperty(window, 'localStorage', {
-      value: {
-        getItem: mockGetItem,
-        setItem: mockSetItem,
-        removeItem: mockRemoveItem,
-        clear: mockClear,
-      },
-      writable: true,
     });
   }
 
@@ -129,7 +116,7 @@ describe('TransactionHistoryService', () => {
     it('should handle localStorage.setItem throwing', () => {
       service = TestBed.inject(TransactionHistoryService);
 
-      vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
         throw new Error('QuotaExceededError');
       });
 
@@ -144,8 +131,7 @@ describe('TransactionHistoryService', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockReturnValue(undefined);
 
       TestBed.resetTestingModule();
-      setupLocalStorage();
-      vi.spyOn(window.localStorage, 'getItem').mockImplementation(() => {
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
         throw new Error('SecurityError: localStorage is not available');
       });
       TestBed.configureTestingModule({ providers: [TransactionHistoryService] });
