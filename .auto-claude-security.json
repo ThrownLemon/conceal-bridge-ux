@@ -140,28 +140,12 @@
     "tsx",
     "vitest"
   ],
-  "script_commands": [
-    "bun",
-    "npm",
-    "pnpm",
-    "yarn"
-  ],
+  "script_commands": ["bun", "npm", "pnpm", "yarn"],
   "custom_commands": [],
   "detected_stack": {
-    "languages": [
-      "javascript",
-      "typescript"
-    ],
-    "package_managers": [
-      "npm"
-    ],
-    "frameworks": [
-      "angular",
-      "vitest",
-      "playwright",
-      "eslint",
-      "prettier"
-    ],
+    "languages": ["javascript", "typescript"],
+    "package_managers": ["npm"],
+    "frameworks": ["angular", "vitest", "playwright", "eslint", "prettier"],
     "databases": [],
     "infrastructure": [],
     "cloud_providers": [],

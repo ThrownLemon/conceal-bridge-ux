@@ -29,7 +29,8 @@ const TOAST_ICONS: Record<string, ZardIcon> = {
 const TOAST_VARIANTS: Record<string, string> = {
   success:
     'border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-100 dark:border-green-700',
-  error: 'border-red-500 bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100 dark:border-red-700',
+  error:
+    'border-red-500 bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-100 dark:border-red-700',
   info: 'border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-100 dark:border-blue-700',
 };
 
@@ -133,9 +134,7 @@ export class ZardToastComponent {
   );
 
   /** Message text classes. */
-  protected readonly messageClasses = computed(() =>
-    mergeClasses('text-sm font-medium flex-1'),
-  );
+  protected readonly messageClasses = computed(() => mergeClasses('text-sm font-medium flex-1'));
 
   /** Close button classes. */
   protected readonly closeButtonClasses = computed(() =>
