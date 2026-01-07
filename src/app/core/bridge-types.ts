@@ -25,6 +25,38 @@ export const EVM_NETWORK_KEYS = ['eth', 'bsc', 'plg'] as const;
  */
 export type EvmNetworkKey = (typeof EVM_NETWORK_KEYS)[number];
 
+/**
+ * Direction of a bridge swap operation between Conceal Network and EVM chains.
+ *
+ * The Conceal Bridge facilitates bidirectional swaps between the native ₡CCX token
+ * (on Conceal Network) and its wrapped equivalent $wCCX (on EVM-compatible chains).
+ * This type specifies the direction of value transfer.
+ *
+ * **Supported Directions:**
+ * - `'ccx-to-evm'` - Swap from ₡CCX (Conceal Network) to $wCCX (EVM chain)
+ *   - User sends CCX to a Conceal address
+ *   - Backend mints/transfers equivalent wCCX on selected EVM chain
+ * - `'evm-to-ccx'` - Swap from $wCCX (EVM chain) to ₡CCX (Conceal Network)
+ *   - User locks wCCX in smart contract on EVM chain
+ *   - Backend releases equivalent CCX to Conceal address
+ *
+ * @see {@link StoredTransaction} interface which uses this type to track swap history
+ * @see {@link BridgeInitSwapResponse} returned when initiating a swap
+ * @see {@link BridgeSwapStateResponse} for monitoring swap progress
+ *
+ * @example
+ * ```typescript
+ * // Set up a CCX to wCCX swap
+ * const direction: SwapDirection = 'ccx-to-evm';
+ *
+ * // Check direction in routing
+ * if (direction === 'ccx-to-evm') {
+ *   // Handle CCX -> wCCX flow
+ * } else {
+ *   // Handle wCCX -> CCX flow
+ * }
+ * ```
+ */
 export type SwapDirection = 'ccx-to-evm' | 'evm-to-ccx';
 
 export interface BridgeChainConfig {
