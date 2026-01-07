@@ -391,11 +391,28 @@ const erc20Abi = [
                 </div>
               </z-card>
             } @else if (step() === 1) {
-              <z-card
-                class="mt-6"
-                zTitle="Step 2 — Send CCX with payment ID"
-                zDescription="Send your CCX to the bridge address and include the payment ID shown below. We'll keep checking until it's received."
-              >
+              <z-card class="mt-6">
+                <div
+                  class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6"
+                >
+                  <div
+                    class="leading-none font-semibold flex items-center gap-2"
+                    data-slot="card-title"
+                  >
+                    @if (step() === 1) {
+                      <z-icon
+                        zType="loader-circle"
+                        class="animate-spin duration-2000 text-amber-400"
+                        aria-hidden="true"
+                      />
+                    }
+                    Step 2 — Send CCX with payment ID
+                  </div>
+                  <div class="text-muted-foreground text-sm" data-slot="card-description">
+                    Send your CCX to the bridge address and include the payment ID shown below.
+                    We'll keep checking until it's received.
+                  </div>
+                </div>
                 <div class="grid gap-6 sm:grid-cols-2">
                   <div class="grid gap-3">
                     <div class="text-sm font-medium">CCX deposit address</div>
