@@ -54,6 +54,7 @@ import { TransactionHistoryService } from '../../core/transaction-history.servic
 import { QrCodeComponent } from '../../shared/qr-code/qr-code.component';
 import { BackoffManager, type BackoffConfig } from '../../core/utils/backoff';
 import { WalletButtonComponent } from '../../shared/wallet/wallet-button.component';
+import { SwapStepHeader } from '../../shared/swap-step-header/swap-step-header';
 
 /** Polling configuration with exponential backoff on errors. */
 const POLLING_CONFIG = {
@@ -134,6 +135,7 @@ const erc20Abi = [
     RouterLink,
     QrCodeComponent,
     StepProgressComponent,
+    SwapStepHeader,
     WalletButtonComponent,
     ZardAlertComponent,
     ZardButtonComponent,
@@ -391,11 +393,12 @@ const erc20Abi = [
                 </div>
               </z-card>
             } @else if (step() === 1) {
-              <z-card
-                class="mt-6"
-                zTitle="Step 2 — Send CCX with payment ID"
-                zDescription="Send your CCX to the bridge address and include the payment ID shown below. We'll keep checking until it's received."
-              >
+              <z-card class="mt-6">
+                <app-swap-step-header
+                  title="Step 2 — Send CCX with payment ID"
+                  description="Send your CCX to the bridge address and include the payment ID shown below. We'll keep checking until it's received."
+                  [showSpinner]="true"
+                />
                 <div class="grid gap-6 sm:grid-cols-2">
                   <div class="grid gap-3">
                     <div class="text-sm font-medium">CCX deposit address</div>
@@ -633,11 +636,12 @@ const erc20Abi = [
                 </div>
               </z-card>
             } @else if (step() === 1) {
-              <z-card
-                class="mt-6"
-                zTitle="Processing"
-                zDescription="Deposit accepted. We're processing your swap."
-              >
+              <z-card class="mt-6">
+                <app-swap-step-header
+                  title="Processing"
+                  description="Deposit accepted. We're processing your swap."
+                  [showSpinner]="true"
+                />
                 <div class="grid gap-3 text-sm">
                   <div>
                     Payment ID:
