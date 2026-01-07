@@ -1,5 +1,5 @@
 <div class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6">
-  <div class="leading-none font-semibold flex items-center gap-2" data-slot="card-title">
+  <h2 class="leading-none font-semibold flex items-center gap-2" data-slot="card-title">
     @if (showSpinner()) {
       <z-icon
         zType="loader-circle"
@@ -8,8 +8,8 @@
       />
     }
     {{ title() }}
-  </div>
-  <div class="text-muted-foreground text-sm" data-slot="card-description">
+  </h2>
+  <p class="text-muted-foreground text-sm" data-slot="card-description">
     {{ description() }}
-  </div>
+  </p>
 </div>
