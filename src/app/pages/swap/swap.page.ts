@@ -744,6 +744,7 @@ export class SwapPage {
 
   readonly step = signal<0 | 1 | 2>(0);
   readonly isBusy = signal(false);
+  readonly isPolling = computed(() => this.step() === 1);
 
   readonly paymentId = signal('');
   readonly evmTxHash = signal<Hash | ''>('');
