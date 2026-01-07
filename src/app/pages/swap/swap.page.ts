@@ -650,11 +650,27 @@ const erc20Abi = [
                 </div>
               </z-card>
             } @else if (step() === 1) {
-              <z-card
-                class="mt-6"
-                zTitle="Processing"
-                zDescription="Deposit accepted. We're processing your swap."
-              >
+              <z-card class="mt-6">
+                <div
+                  class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6"
+                >
+                  <div
+                    class="leading-none font-semibold flex items-center gap-2"
+                    data-slot="card-title"
+                  >
+                    @if (step() === 1) {
+                      <z-icon
+                        zType="loader-circle"
+                        class="animate-spin duration-2000 text-amber-400"
+                        aria-hidden="true"
+                      />
+                    }
+                    Processing
+                  </div>
+                  <div class="text-muted-foreground text-sm" data-slot="card-description">
+                    Deposit accepted. We're processing your swap.
+                  </div>
+                </div>
                 <div class="grid gap-3 text-sm">
                   <div>
                     Payment ID:
