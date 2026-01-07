@@ -393,12 +393,12 @@ const erc20Abi = [
                 </div>
               </z-card>
             } @else if (step() === 1) {
-               <z-card class="mt-6">
-                 <app-swap-step-header
-                   title="Step 2 — Send CCX with payment ID"
-                   description="Send your CCX to the bridge address and include the payment ID shown below. We'll keep checking until it's received."
-                   [showSpinner]="true"
-                 />
+              <z-card class="mt-6">
+                <app-swap-step-header
+                  title="Step 2 — Send CCX with payment ID"
+                  description="Send your CCX to the bridge address and include the payment ID shown below. We'll keep checking until it's received."
+                  [showSpinner]="true"
+                />
                 <div class="grid gap-6 sm:grid-cols-2">
                   <div class="grid gap-3">
                     <div class="text-sm font-medium">CCX deposit address</div>
@@ -635,13 +635,13 @@ const erc20Abi = [
                   </button>
                 </div>
               </z-card>
-             } @else if (step() === 1) {
-               <z-card class="mt-6">
-                 <app-swap-step-header
-                   title="Processing"
-                   description="Deposit accepted. We're processing your swap."
-                   [showSpinner]="true"
-                 />
+            } @else if (step() === 1) {
+              <z-card class="mt-6">
+                <app-swap-step-header
+                  title="Processing"
+                  description="Deposit accepted. We're processing your swap."
+                  [showSpinner]="true"
+                />
                 <div class="grid gap-3 text-sm">
                   <div>
                     Payment ID:
@@ -748,7 +748,6 @@ export class SwapPage {
 
   readonly step = signal<0 | 1 | 2>(0);
   readonly isBusy = signal(false);
-
 
   readonly paymentId = signal('');
   readonly evmTxHash = signal<Hash | ''>('');

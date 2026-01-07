@@ -29,7 +29,7 @@ import { mergeClasses } from '@/shared/utils/merge-classes';
   imports: [ZardIconComponent],
   template: `
     @if (zLoading()) {
-      <z-icon zType="loader-circle" class="animate-spin duration-2000" />
+      <z-icon zType="loader-circle" class="animate-spin duration-[2000ms]" />
     }
     <ng-content />
   `,
