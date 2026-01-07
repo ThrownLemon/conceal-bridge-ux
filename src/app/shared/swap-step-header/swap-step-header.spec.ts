@@ -14,6 +14,11 @@ describe('SwapStepHeader', () => {
 
     fixture = TestBed.createComponent(SwapStepHeader);
     component = fixture.componentInstance;
+
+    // Set required signal inputs before change detection
+    component.title.set('Test Title');
+    component.description.set('Test Description');
+
     await fixture.whenStable();
   });
 
