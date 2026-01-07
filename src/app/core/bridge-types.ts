@@ -1,6 +1,28 @@
 import type { Abi, Address } from 'viem';
 
 export const EVM_NETWORK_KEYS = ['eth', 'bsc', 'plg'] as const;
+
+/**
+ * Network identifier for supported EVM-compatible chains in the Conceal Bridge.
+ *
+ * The bridge supports swapping ₡CCX (Conceal Network) to/from $wCCX (Wrapped CCX)
+ * on three EVM chains. Each key maps to a specific chain configuration in the
+ * {@link EVM_NETWORKS} registry (see evm-networks.ts).
+ *
+ * **Supported Networks:**
+ * - `'eth'` - Ethereum (Mainnet or Sepolia Testnet depending on environment)
+ * - `'bsc'` - BNB Smart Chain (Mainnet or Testnet depending on environment)
+ * - `'plg'` - Polygon (Mainnet or Amoy Testnet depending on environment)
+ *
+ * @see {@link EVM_NETWORK_KEYS} for the canonical array of valid keys
+ * @see {@link EVM_NETWORKS} in evm-networks.ts for full chain configurations
+ *
+ * @example
+ * ```typescript
+ * const network: EvmNetworkKey = 'eth';
+ * const config = getChainConfig(network);
+ * ```
+ */
 export type EvmNetworkKey = (typeof EVM_NETWORK_KEYS)[number];
 
 export type SwapDirection = 'ccx-to-evm' | 'evm-to-ccx';
