@@ -16,7 +16,8 @@
     "format:check": "prettier --check .",
     "e2e": "ng e2e",
     "test:a11y": "npx playwright test e2e/accessibility.spec.ts --project=chromium",
-    "prepare": "husky"
+    "prepare": "husky",
+    "create:example": "node scripts/create-example.mjs"
   },
   "prettier": {
     "printWidth": 100,
