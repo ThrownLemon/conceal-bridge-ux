@@ -10,6 +10,7 @@ import { EvmWalletService, type WalletConnectorId } from '../../core/evm-wallet.
 import { WalletModalService } from '../../core/wallet-modal.service';
 import { EVM_NETWORKS } from '../../core/evm-networks';
 import { ZardToastService } from '../components/toast/toast.service';
+import { copyToClipboard } from '@/shared/utils/clipboard';
 
 type Variant = 'header' | 'primary';
 
@@ -241,14 +242,8 @@ export class WalletButtonComponent {
   private async handleCopy(): Promise<void> {
     const addr = this.wallet.address();
     if (!addr) return;
-    try {
-      await navigator.clipboard.writeText(addr);
-      this.#toast.success('Copied!');
-    } catch (error: unknown) {
-      console.warn('[WalletButtonComponent] Clipboard copy failed:', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      this.#toast.error('Copy failed - select manually');
-    }
+    await copyToClipboard(addr, this.#toast, {
+      context: 'WalletButtonComponent',
+    });
   }
 }
