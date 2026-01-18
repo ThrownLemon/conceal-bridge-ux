@@ -31,7 +31,7 @@ describe('copyToClipboard', () => {
       configurable: true,
     });
 
-    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockReturnValue(undefined);
   });
 
   afterEach(() => {
@@ -41,20 +41,14 @@ describe('copyToClipboard', () => {
   describe('successful copy', () => {
     it('should copy text to clipboard', async () => {
       const text = 'CCX7abc123';
-      const result = await copyToClipboard(
-        text,
-        mockToastService as unknown as ZardToastService
-      );
+      const result = await copyToClipboard(text, mockToastService as unknown as ZardToastService);
 
       expect(mockClipboard.writeText).toHaveBeenCalledWith(text);
       expect(result).toBe(true);
     });
 
     it('should show default success toast', async () => {
-      await copyToClipboard(
-        'test text',
-        mockToastService as unknown as ZardToastService
-      );
+      await copyToClipboard('test text', mockToastService as unknown as ZardToastService);
 
       expect(mockToastService.success).toHaveBeenCalledWith('Copied!');
     });
@@ -64,11 +58,7 @@ describe('copyToClipboard', () => {
         successMessage: 'Address copied!',
       };
 
-      await copyToClipboard(
-        'test text',
-        mockToastService as unknown as ZardToastService,
-        options
-      );
+      await copyToClipboard('test text', mockToastService as unknown as ZardToastService, options);
 
       expect(mockToastService.success).toHaveBeenCalledWith('Address copied!');
     });
@@ -76,7 +66,7 @@ describe('copyToClipboard', () => {
     it('should return true on successful copy', async () => {
       const result = await copyToClipboard(
         'test text',
-        mockToastService as unknown as ZardToastService
+        mockToastService as unknown as ZardToastService,
       );
 
       expect(result).toBe(true);
@@ -84,10 +74,7 @@ describe('copyToClipboard', () => {
 
     it('should trim whitespace from text', async () => {
       const text = '  test text  ';
-      await copyToClipboard(
-        text,
-        mockToastService as unknown as ZardToastService
-      );
+      await copyToClipboard(text, mockToastService as unknown as ZardToastService);
 
       expect(mockClipboard.writeText).toHaveBeenCalledWith('test text');
     });
@@ -95,20 +82,13 @@ describe('copyToClipboard', () => {
 
   describe('failed copy', () => {
     beforeEach(() => {
-      mockClipboard.writeText.mockRejectedValue(
-        new Error('Clipboard not available')
-      );
+      mockClipboard.writeText.mockRejectedValue(new Error('Clipboard not available'));
     });
 
     it('should show default error toast', async () => {
-      await copyToClipboard(
-        'test text',
-        mockToastService as unknown as ZardToastService
-      );
+      await copyToClipboard('test text', mockToastService as unknown as ZardToastService);
 
-      expect(mockToastService.error).toHaveBeenCalledWith(
-        'Copy failed (clipboard unavailable).'
-      );
+      expect(mockToastService.error).toHaveBeenCalledWith('Copy failed (clipboard unavailable).');
     });
 
     it('should show custom error toast', async () => {
@@ -116,37 +96,28 @@ describe('copyToClipboard', () => {
         errorMessage: 'Failed to copy address',
       };
 
-      await copyToClipboard(
-        'test text',
-        mockToastService as unknown as ZardToastService,
-        options
-      );
+      await copyToClipboard('test text', mockToastService as unknown as ZardToastService, options);
 
-      expect(mockToastService.error).toHaveBeenCalledWith(
-        'Failed to copy address'
-      );
+      expect(mockToastService.error).toHaveBeenCalledWith('Failed to copy address');
     });
 
     it('should return false on failed copy', async () => {
       const result = await copyToClipboard(
         'test text',
-        mockToastService as unknown as ZardToastService
+        mockToastService as unknown as ZardToastService,
       );
 
       expect(result).toBe(false);
     });
 
     it('should log warning with default context', async () => {
-      await copyToClipboard(
-        'test text',
-        mockToastService as unknown as ZardToastService
-      );
+      await copyToClipboard('test text', mockToastService as unknown as ZardToastService);
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         '[copyToClipboard] Clipboard copy failed:',
         expect.objectContaining({
           err: expect.any(Error),
-        })
+        }),
       );
     });
 
@@ -155,25 +126,18 @@ describe('copyToClipboard', () => {
         context: 'SwapPage',
       };
 
-      await copyToClipboard(
-        'test text',
-        mockToastService as unknown as ZardToastService,
-        options
-      );
+      await copyToClipboard('test text', mockToastService as unknown as ZardToastService, options);
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         '[SwapPage] Clipboard copy failed:',
         expect.objectContaining({
           err: expect.any(Error),
-        })
+        }),
       );
     });
 
     it('should not call success toast on error', async () => {
-      await copyToClipboard(
-        'test text',
-        mockToastService as unknown as ZardToastService
-      );
+      await copyToClipboard('test text', mockToastService as unknown as ZardToastService);
 
       expect(mockToastService.success).not.toHaveBeenCalled();
     });
@@ -181,37 +145,25 @@ describe('copyToClipboard', () => {
 
   describe('empty text handling', () => {
     it('should return false for empty string', async () => {
-      const result = await copyToClipboard(
-        '',
-        mockToastService as unknown as ZardToastService
-      );
+      const result = await copyToClipboard('', mockToastService as unknown as ZardToastService);
 
       expect(result).toBe(false);
     });
 
     it('should return false for whitespace-only string', async () => {
-      const result = await copyToClipboard(
-        '   ',
-        mockToastService as unknown as ZardToastService
-      );
+      const result = await copyToClipboard('   ', mockToastService as unknown as ZardToastService);
 
       expect(result).toBe(false);
     });
 
     it('should not copy empty text to clipboard', async () => {
-      await copyToClipboard(
-        '',
-        mockToastService as unknown as ZardToastService
-      );
+      await copyToClipboard('', mockToastService as unknown as ZardToastService);
 
       expect(mockClipboard.writeText).not.toHaveBeenCalled();
     });
 
     it('should not show toast for empty text', async () => {
-      await copyToClipboard(
-        '',
-        mockToastService as unknown as ZardToastService
-      );
+      await copyToClipboard('', mockToastService as unknown as ZardToastService);
 
       expect(mockToastService.success).not.toHaveBeenCalled();
       expect(mockToastService.error).not.toHaveBeenCalled();
@@ -222,7 +174,7 @@ describe('copyToClipboard', () => {
     it('should work with no options provided', async () => {
       const result = await copyToClipboard(
         'test text',
-        mockToastService as unknown as ZardToastService
+        mockToastService as unknown as ZardToastService,
       );
 
       expect(result).toBe(true);
@@ -233,7 +185,7 @@ describe('copyToClipboard', () => {
       const result = await copyToClipboard(
         'test text',
         mockToastService as unknown as ZardToastService,
-        {}
+        {},
       );
 
       expect(result).toBe(true);
@@ -250,7 +202,7 @@ describe('copyToClipboard', () => {
       const result = await copyToClipboard(
         'test text',
         mockToastService as unknown as ZardToastService,
-        options
+        options,
       );
 
       expect(result).toBe(true);
@@ -262,11 +214,7 @@ describe('copyToClipboard', () => {
         successMessage: 'Custom success',
       };
 
-      await copyToClipboard(
-        'test text',
-        mockToastService as unknown as ZardToastService,
-        options
-      );
+      await copyToClipboard('test text', mockToastService as unknown as ZardToastService, options);
 
       expect(mockToastService.success).toHaveBeenCalledWith('Custom success');
     });
@@ -278,7 +226,7 @@ describe('copyToClipboard', () => {
       const result = await copyToClipboard(
         address,
         mockToastService as unknown as ZardToastService,
-        { successMessage: 'Address copied!', context: 'SwapPage' }
+        { successMessage: 'Address copied!', context: 'SwapPage' },
       );
 
       expect(mockClipboard.writeText).toHaveBeenCalledWith(address);
@@ -294,13 +242,11 @@ describe('copyToClipboard', () => {
         {
           successMessage: 'Transaction hash copied!',
           context: 'TransactionHistoryComponent',
-        }
+        },
       );
 
       expect(mockClipboard.writeText).toHaveBeenCalledWith(txHash);
-      expect(mockToastService.success).toHaveBeenCalledWith(
-        'Transaction hash copied!'
-      );
+      expect(mockToastService.success).toHaveBeenCalledWith('Transaction hash copied!');
       expect(result).toBe(true);
     });
 
@@ -312,13 +258,11 @@ describe('copyToClipboard', () => {
         {
           successMessage: 'Wallet address copied!',
           context: 'WalletButtonComponent',
-        }
+        },
       );
 
       expect(mockClipboard.writeText).toHaveBeenCalledWith(walletAddress);
-      expect(mockToastService.success).toHaveBeenCalledWith(
-        'Wallet address copied!'
-      );
+      expect(mockToastService.success).toHaveBeenCalledWith('Wallet address copied!');
       expect(result).toBe(true);
     });
   });

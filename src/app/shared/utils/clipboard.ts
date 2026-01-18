@@ -34,7 +34,7 @@ export interface CopyToClipboardOptions {
 export async function copyToClipboard(
   text: string,
   toast: ZardToastService,
-  options: CopyToClipboardOptions = {}
+  options: CopyToClipboardOptions = {},
 ): Promise<boolean> {
   const value = text.trim();
 
