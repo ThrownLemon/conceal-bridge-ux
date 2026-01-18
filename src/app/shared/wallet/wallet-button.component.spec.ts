@@ -267,7 +267,7 @@ describe('WalletButtonComponent', () => {
 
       await component.copyAddress();
 
-      expect(mockToastService.error).toHaveBeenCalledWith('Copy failed - select manually');
+      expect(mockToastService.error).toHaveBeenCalledWith('Copy failed (clipboard unavailable).');
     });
 
     it('should not copy when address is null', async () => {
