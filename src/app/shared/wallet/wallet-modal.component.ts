@@ -228,12 +228,18 @@ export class WalletModalComponent {
       logo: 'images/wallets/binance.svg',
       installUrl: 'https://www.binance.com/en/web3wallet',
     },
+    walletconnect: {
+      name: 'WalletConnect',
+      logo: 'images/wallets/walletconnect.svg',
+      installUrl: 'https://walletconnect.com/',
+    },
   };
 
   private static readonly SUPPORTED_CONNECTORS: WalletConnectorId[] = [
     'metamask',
     'trust',
     'binance',
+    'walletconnect',
   ];
 
   readonly modalService = inject(WalletModalService);
@@ -313,6 +319,9 @@ export class WalletModalComponent {
   }
 
   connectorConnectingHint(connector: WalletConnectorId): string {
+    if (connector === 'walletconnect') {
+      return 'Scan the QR code with your mobile wallet or use the WalletConnect modal to connect.';
+    }
     return `Open the ${this.connectorName(connector)} browser extension to connect your wallet.`;
   }
 }

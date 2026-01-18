@@ -2,7 +2,6 @@
 
 # Compiled output
 /dist
-dist/
 /tmp
 /out-tsc
 /bazel-out
@@ -32,6 +31,7 @@ yarn-error.log
 
 # Miscellaneous
 /.angular/cache
+/.angular/
 .sass-cache/
 /connect.lock
 /coverage
@@ -43,12 +43,29 @@ __screenshots__/
 
 # Environment variables
 .env
-.env.local
-.env*.local
+.env.*
+!.env.example
+*.local
+
+# Secrets and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+.secrets
+secrets/
+credentials.json
+service-account*.json
+gha-creds-*.json
 
 # System files
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+*~
 
 # AI Tools
 .claude/
@@ -58,23 +75,31 @@ Thumbs.db
 .letta/
 .claude-flow/
 .swarm/
+.aider*
+.continue/
+.codeium/
+.tabnine/
+.kite/
+.sourcery/
+.mcp.json
 
 # Playwright
 /test-results/
-test-results/
 /playwright-report/
-playwright-report/
 /playwright/.cache/
-.claude-flow/metrics/system-metrics.json
-.swarm/memory.db-shm
-.claude-flow/metrics/system-metrics.json
-
-.mcp.json
-
-gha-creds-*.json
+/blob-report/
 
 # Auto Claude data directory
 .auto-claude/
 .claude_settings.json
 .auto-claude-status
 .auto-claude-security.json
+
+# Debug
+.debug/
+*.debug
+
+# Local development
+.local/
+*.local.ts
+*.local.json

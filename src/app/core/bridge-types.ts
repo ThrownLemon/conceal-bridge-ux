@@ -63,3 +63,24 @@ export interface StoredTransaction {
   swapHash?: string;
   recipientAddress?: string;
 }
+
+/**
+ * Fee breakdown for displaying transaction cost summary to users.
+ * All amounts are in their smallest units (wei for gas, atomic units for tokens).
+ */
+export interface FeeBreakdown {
+  /** Amount user is sending (in atomic units) */
+  inputAmount: bigint;
+  /** Gas fee in native token's smallest unit (wei) */
+  gasFee: bigint;
+  /** Bridge fee deducted from transfer (in atomic units), 0n if none */
+  bridgeFee: bigint;
+  /** Amount user will receive after fees (in atomic units) */
+  outputAmount: bigint;
+  /** Decimals for input amount display */
+  inputDecimals: number;
+  /** Decimals for output amount display */
+  outputDecimals: number;
+  /** Native token symbol (ETH, BNB, MATIC) for gas fee display */
+  nativeSymbol: string;
+}
