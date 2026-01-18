@@ -42,8 +42,8 @@ describe('WalletModalComponent', () => {
     it('should return options for all supported connectors', () => {
       const options = component.connectorOptions();
 
-      expect(options).toHaveLength(3);
-      expect(options.map((o) => o.id)).toEqual(['metamask', 'trust', 'binance']);
+      expect(options).toHaveLength(4);
+      expect(options.map((o) => o.id)).toEqual(['metamask', 'trust', 'binance', 'walletconnect']);
     });
 
     it('should mark available connectors', () => {

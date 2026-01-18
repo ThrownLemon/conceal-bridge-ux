@@ -10,7 +10,9 @@ import {
   type Hash,
 } from 'viem';
 import { mainnet } from 'viem/chains';
-// import { APP_CONFIG } from './app-config';
+
+import { APP_CONFIG } from './app-config';
+import { EVM_NETWORKS } from './evm-networks';
 
 interface Eip1193Provider {
   request: (args: {
@@ -28,8 +30,9 @@ interface Eip1193Provider {
  * - 'metamask': MetaMask browser extension
  * - 'trust': Trust Wallet browser extension
  * - 'binance': Binance Wallet browser extension
+ * - 'walletconnect': WalletConnect v2 (mobile wallets, hardware wallets)
  */
-export type WalletConnectorId = 'metamask' | 'trust' | 'binance';
+export type WalletConnectorId = 'metamask' | 'trust' | 'binance' | 'walletconnect';
 
 type ProviderWithFlags = Eip1193Provider & {
   isMetaMask?: boolean;
@@ -64,6 +67,7 @@ type ProviderWithFlags = Eip1193Provider & {
 @Injectable({ providedIn: 'root' })
 export class EvmWalletService {
   readonly #destroyRef = inject(DestroyRef);
+  readonly #appConfig = inject(APP_CONFIG);
 
   /** LocalStorage key used to persist the user's explicit disconnect action. */
   static readonly DISCONNECTED_STORAGE_KEY = 'conceal_bridge_wallet_disconnected';
@@ -106,6 +110,9 @@ export class EvmWalletService {
    * @returns The provider object or null if not available.
    */
   readonly provider = this.#provider.asReadonly();
+
+  /** WalletConnect provider instance (lazily initialized). Uses Eip1193Provider interface. */
+  #wcProvider: (Eip1193Provider & { disconnect: () => Promise<void> }) | null = null;
 
   /**
    * Whether an injected EVM provider (window.ethereum) is available.
@@ -162,6 +169,12 @@ export class EvmWalletService {
    * ```
    */
   isConnectorAvailable(connector: WalletConnectorId): boolean {
+    // WalletConnect is always available (no browser extension required)
+    // But only if a project ID is configured
+    if (connector === 'walletconnect') {
+      return !!this.#appConfig.walletConnectProjectId;
+    }
+
     if (connector === 'binance') return this.hasBinanceProvider();
 
     const injected = this.#injectedProvider();
@@ -301,6 +314,9 @@ export class EvmWalletService {
     this.#setProvider(provider, connector);
 
     // WalletConnect's provider requires connect() before request() calls.
+    if (connector === 'walletconnect' && provider.connect) {
+      await provider.connect();
+    }
 
     const { walletClient } = this.getClients(mainnet, provider);
     const accounts = await walletClient.requestAddresses();
@@ -330,6 +346,8 @@ export class EvmWalletService {
    */
   async disconnect(): Promise<void> {
     const provider = this.#provider();
+    const connector = this.#connector();
+
     try {
       // Prefer a real disconnect if the provider supports ERC-7846.
       // This prompts the wallet to revoke connection, when supported.
@@ -347,18 +365,24 @@ export class EvmWalletService {
     } catch {
       // Ignore: not all providers implement disconnect.
     }
+
+    // For WalletConnect, fully clear provider/session (real disconnect).
+    if (connector === 'walletconnect' && this.#wcProvider) {
+      try {
+        await this.#wcProvider.disconnect();
+      } catch {
+        // Ignore disconnect errors
+      }
+      this.#detachListeners?.();
+      this.#detachListeners = null;
+      this.#wcProvider = null;
+      this.#provider.set(null);
+    }
+
     this.#setDisconnectedFlag(true);
     this.#address.set(null);
     this.#chainId.set(null);
     this.#setConnector(null);
-    /*
-    // For WalletConnect, fully clear provider/session (real disconnect).
-    if (connector === 'walletconnect') {
-      this.#detachListeners?.();
-      this.#detachListeners = null;
-      this.#provider.set(null);
-    }
-    */
   }
 
   /**
@@ -587,6 +611,10 @@ export class EvmWalletService {
   }
 
   async #resolveProvider(connector: WalletConnectorId): Promise<Eip1193Provider> {
+    if (connector === 'walletconnect') {
+      return await this.#initWalletConnectProvider();
+    }
+
     if (connector === 'binance') {
       const binance = this.#binanceProvider();
       if (!binance) throw new Error('Binance Wallet not detected in this browser.');
@@ -612,6 +640,55 @@ export class EvmWalletService {
     }
 
     return injected;
+  }
+
+  /**
+   * Lazily initializes and returns the WalletConnect provider.
+   * Reuses existing provider if already initialized.
+   */
+  async #initWalletConnectProvider(): Promise<Eip1193Provider> {
+    // Reuse existing provider if available and connected
+    if (this.#wcProvider) {
+      return this.#wcProvider as unknown as Eip1193Provider;
+    }
+
+    const projectId = this.#appConfig.walletConnectProjectId;
+    if (!projectId) {
+      throw new Error('WalletConnect is not configured. Missing project ID.');
+    }
+
+    // Dynamic import to avoid loading WalletConnect if not used
+    const { EthereumProvider } = await import('@walletconnect/ethereum-provider');
+
+    // Get chain IDs from supported networks
+    const chainIds = Object.values(EVM_NETWORKS).map((n) => n.chain.id);
+    const [mainChain, ...optionalChains] = chainIds;
+
+    const provider = await EthereumProvider.init({
+      projectId,
+      chains: [mainChain],
+      optionalChains: optionalChains.length > 0 ? optionalChains : undefined,
+      showQrModal: true,
+      qrModalOptions: {
+        themeMode: 'dark',
+      },
+    });
+
+    // Cast to our interface type for storage
+    this.#wcProvider = provider as unknown as Eip1193Provider & {
+      disconnect: () => Promise<void>;
+    };
+
+    // Listen for WalletConnect-specific events
+    provider.on('disconnect', () => {
+      // Clean up when WalletConnect session ends
+      this.#address.set(null);
+      this.#chainId.set(null);
+      this.#setConnector(null);
+      this.#wcProvider = null;
+    });
+
+    return provider as unknown as Eip1193Provider;
   }
 
   #setProvider(
@@ -678,7 +755,12 @@ export class EvmWalletService {
     if (typeof window === 'undefined') return null;
     try {
       const stored = window.localStorage.getItem(EvmWalletService.CONNECTOR_STORAGE_KEY);
-      const validConnectors: readonly WalletConnectorId[] = ['metamask', 'trust', 'binance'];
+      const validConnectors: readonly WalletConnectorId[] = [
+        'metamask',
+        'trust',
+        'binance',
+        'walletconnect',
+      ];
       if (stored && validConnectors.includes(stored as WalletConnectorId)) {
         return stored as WalletConnectorId;
       }

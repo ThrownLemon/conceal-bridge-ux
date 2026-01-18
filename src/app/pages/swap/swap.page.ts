@@ -12,6 +12,7 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   catchError,
+  debounceTime,
   distinctUntilChanged,
   filter,
   from,
@@ -45,6 +46,7 @@ import type {
   BridgeChainConfig,
   BridgeSwapStateResponse,
   EvmNetworkKey,
+  FeeBreakdown,
   SwapDirection,
 } from '../../core/bridge-types';
 import { EVM_NETWORK_KEYS } from '../../core/bridge-types';
@@ -52,22 +54,12 @@ import { EVM_NETWORKS } from '../../core/evm-networks';
 import { EvmWalletService } from '../../core/evm-wallet.service';
 import { TransactionHistoryService } from '../../core/transaction-history.service';
 import { QrCodeComponent } from '../../shared/qr-code/qr-code.component';
-import { BackoffManager, type BackoffConfig } from '../../core/utils/backoff';
+import { ERC20_ABI } from '../../core/contracts/erc20.abi';
+import { POLLING_CONFIG } from '../../core/config/polling.config';
+import { BackoffManager } from '../../core/utils/backoff';
+import { getErrorMessage, isWalletError, WALLET_ERROR_CODES } from '../../core/utils/error.utils';
+import { FeeBreakdownComponent } from '../../shared/fee-breakdown/fee-breakdown.component';
 import { WalletButtonComponent } from '../../shared/wallet/wallet-button.component';
-
-/** Polling configuration with exponential backoff on errors. */
-const POLLING_CONFIG = {
-  /** Interval between successful polls in milliseconds. */
-  successInterval: 10_000,
-  /** Backoff configuration for retry after errors. */
-  backoff: {
-    baseDelay: 2_000,
-    maxDelay: 30_000,
-    maxRetries: 5,
-    jitter: true,
-    jitterFactor: 0.2,
-  } satisfies Partial<BackoffConfig>,
-};
 
 const CCX_ADDRESS_RE = /^[Cc][Cc][Xx][a-zA-Z0-9]{95}$/;
 const EVM_ADDRESS_RE = /^0x[a-fA-F0-9]{40}$/;
@@ -106,32 +98,13 @@ function inferDecimalsFromUnits(units: number): number | null {
   return decimals;
 }
 
-const erc20Abi = [
-  {
-    type: 'function',
-    name: 'balanceOf',
-    stateMutability: 'view',
-    inputs: [{ name: 'owner', type: 'address' }],
-    outputs: [{ name: 'balance', type: 'uint256' }],
-  },
-  {
-    type: 'function',
-    name: 'transfer',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'to', type: 'address' },
-      { name: 'amount', type: 'uint256' },
-    ],
-    outputs: [{ name: 'success', type: 'bool' }],
-  },
-] as const;
-
 @Component({
   selector: 'app-swap-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     RouterLink,
+    FeeBreakdownComponent,
     QrCodeComponent,
     StepProgressComponent,
     WalletButtonComponent,
@@ -377,6 +350,18 @@ const erc20Abi = [
                     </div>
                   </div>
 
+                  <!-- Fee breakdown -->
+                  @if (feeBreakdown(); as fees) {
+                    <app-fee-breakdown [breakdown]="fees" tokenSymbol="wCCX" />
+                  } @else if (isFetchingFees()) {
+                    <div class="rounded-lg border border-border bg-muted/50 p-4">
+                      <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                        <z-icon zType="loader-circle" class="animate-spin" zSize="sm" />
+                        Calculating fees...
+                      </div>
+                    </div>
+                  }
+
                   <button
                     z-button
                     type="button"
@@ -619,6 +604,18 @@ const erc20Abi = [
                     </button>
                   </div>
 
+                  <!-- Fee breakdown -->
+                  @if (feeBreakdown(); as fees) {
+                    <app-fee-breakdown [breakdown]="fees" tokenSymbol="CCX" />
+                  } @else if (isFetchingFees()) {
+                    <div class="rounded-lg border border-border bg-muted/50 p-4">
+                      <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                        <z-icon zType="loader-circle" class="animate-spin" zSize="sm" />
+                        Calculating fees...
+                      </div>
+                    </div>
+                  }
+
                   <button
                     z-button
                     type="button"
@@ -753,6 +750,11 @@ export class SwapPage {
   readonly statusMessage = signal<string | null>(null);
   readonly balanceFetchError = signal<string | null>(null);
   readonly pollingError = signal<string | null>(null);
+
+  /** Fee breakdown for the current swap amount */
+  readonly feeBreakdown = signal<FeeBreakdown | null>(null);
+  /** Whether fees are currently being calculated */
+  readonly isFetchingFees = signal(false);
 
   /** Screen reader announcement for loading states */
   readonly loadingAnnouncement = computed(() => {
@@ -982,6 +984,32 @@ export class SwapPage {
     if (!dir) {
       this.pageError.set('Unknown swap direction.');
     }
+
+    // Debounced fee calculation for CCX → wCCX form
+    this.ccxToEvmForm.controls.amount.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged(), takeUntilDestroyed(this.#destroyRef))
+      .subscribe((val) => {
+        const amount = parseFloat(val);
+        const network = this.networkKey();
+        if (amount > 0 && network) {
+          void this.#calculateFees(network, amount);
+        } else {
+          this.feeBreakdown.set(null);
+        }
+      });
+
+    // Debounced fee calculation for wCCX → CCX form
+    this.evmToCcxForm.controls.amount.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged(), takeUntilDestroyed(this.#destroyRef))
+      .subscribe((val) => {
+        const amount = parseFloat(val);
+        const network = this.networkKey();
+        if (amount > 0 && network) {
+          void this.#calculateFees(network, amount);
+        } else {
+          this.feeBreakdown.set(null);
+        }
+      });
   }
 
   // Wallet connection is handled via the shared wallet button/modal in the header/UI.
@@ -1006,18 +1034,18 @@ export class SwapPage {
       });
       this.statusMessage.set('Token request sent to wallet.');
     } catch (e: unknown) {
-      const code = (e as { code?: number }).code;
-      const msg = e instanceof Error ? e.message : 'Failed to add token.';
+      const code = isWalletError(e) ? e.code : undefined;
+      const msg = getErrorMessage(e, 'Failed to add token.');
 
-      if (code === 4001) {
+      if (code === WALLET_ERROR_CODES.USER_REJECTED) {
         this.statusMessage.set('Token request was cancelled in your wallet.');
         return;
       }
 
       // Some WalletConnect wallets throw a generic -32603 for unsupported token/watchAsset.
-      if (code === -32603 || /not supported/i.test(msg)) {
+      if (code === WALLET_ERROR_CODES.UNSUPPORTED || /not supported/i.test(msg)) {
         this.statusMessage.set(
-          `Your wallet doesn’t support adding tokens automatically on this network. Add wCCX manually:\n` +
+          `Your wallet doesn't support adding tokens automatically on this network. Add wCCX manually:\n` +
             `Contract: ${cfg.wccx.contractAddress}\n` +
             `Symbol: wCCX\n` +
             `Decimals: ${decimals}`,
@@ -1045,6 +1073,49 @@ export class SwapPage {
     this.evmTxHash.set('');
     this.swapState.set(null);
     this.statusMessage.set(null);
+    this.feeBreakdown.set(null);
+  }
+
+  /**
+   * Calculates and displays fee breakdown for the given amount.
+   * Called with debouncing when the user changes the amount input.
+   */
+  async #calculateFees(network: EvmNetworkKey, amount: number): Promise<void> {
+    const cfg = this.config();
+    if (!cfg) {
+      this.feeBreakdown.set(null);
+      return;
+    }
+
+    this.isFetchingFees.set(true);
+    try {
+      const estimate = await firstValueFrom(this.api.estimateGasPrice(network, amount));
+
+      if (!estimate?.result || estimate.gas === undefined) {
+        this.feeBreakdown.set(null);
+        return;
+      }
+
+      const networkInfo = EVM_NETWORKS[network];
+      const decimals = inferDecimalsFromUnits(cfg.wccx.units) ?? 6;
+      const inputAmount = parseUnits(amount.toString(), decimals);
+      // API returns gas cost in native token units (e.g., ETH)
+      const gasFee = parseEther(estimate.gas.toString());
+
+      this.feeBreakdown.set({
+        inputAmount,
+        gasFee,
+        bridgeFee: 0n, // Bridge fee not currently charged
+        outputAmount: inputAmount, // 1:1 swap ratio
+        inputDecimals: decimals,
+        outputDecimals: decimals,
+        nativeSymbol: networkInfo.chain.nativeCurrency.symbol,
+      });
+    } catch {
+      this.feeBreakdown.set(null);
+    } finally {
+      this.isFetchingFees.set(false);
+    }
   }
 
   async startCcxToEvm(): Promise<void> {
@@ -1167,7 +1238,7 @@ export class SwapPage {
       this.startPolling(network, 'wccx', init.paymentId);
     } catch (e: unknown) {
       this.isBusy.set(false);
-      this.statusMessage.set(e instanceof Error ? e.message : 'Swap failed.');
+      this.statusMessage.set(getErrorMessage(e, 'Swap failed.'));
     }
   }
 
@@ -1237,7 +1308,7 @@ export class SwapPage {
       this.statusMessage.set('Checking wCCX balance…');
       const tokenBalance = await publicClient.readContract({
         address: cfg.wccx.contractAddress,
-        abi: erc20Abi,
+        abi: ERC20_ABI,
         functionName: 'balanceOf',
         args: [account],
       });
@@ -1251,7 +1322,7 @@ export class SwapPage {
         account,
         chain: info.chain,
         address: cfg.wccx.contractAddress,
-        abi: erc20Abi,
+        abi: ERC20_ABI,
         functionName: 'transfer',
         args: [cfg.wccx.accountAddress, transferAmount],
       });
@@ -1296,7 +1367,7 @@ export class SwapPage {
       this.startPolling(network, 'ccx', init.paymentId);
     } catch (e: unknown) {
       this.isBusy.set(false);
-      this.statusMessage.set(e instanceof Error ? e.message : 'Swap failed.');
+      this.statusMessage.set(getErrorMessage(e, 'Swap failed.'));
     }
   }
 
