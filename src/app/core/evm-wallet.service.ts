@@ -169,9 +169,7 @@ export class EvmWalletService {
 
     if (connector === 'metamask') return !!injected.isMetaMask;
 
-    // Trust Wallet desktop extension may not always set flags; treat "not MetaMask" as acceptable.
-    if (connector === 'trust')
-      return !!(injected.isTrust || injected.isTrustWallet) || !injected.isMetaMask;
+    if (connector === 'trust') return !!(injected.isTrust || injected.isTrustWallet);
 
     return false;
   }

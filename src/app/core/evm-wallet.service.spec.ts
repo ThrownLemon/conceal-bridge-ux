@@ -218,9 +218,9 @@ describe('EvmWalletService', () => {
       expect(service.isConnectorAvailable('trust')).toBe(true);
     });
 
-    it('should return true for trust when not MetaMask (fallback)', () => {
+    it('should return false for trust when provider has no Trust flags', () => {
       service = reconfigureAndInjectService(createMockProvider({ isMetaMask: false }));
-      expect(service.isConnectorAvailable('trust')).toBe(true);
+      expect(service.isConnectorAvailable('trust')).toBe(false);
     });
 
     it('should return false for binance when no BinanceChain', () => {
