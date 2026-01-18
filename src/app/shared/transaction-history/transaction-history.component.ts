@@ -10,6 +10,7 @@ import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 
 import { TransactionHistoryService } from '../../core/transaction-history.service';
 import { ZardToastService } from '../components/toast/toast.service';
+import { copyToClipboard } from '../utils/clipboard';
 
 @Component({
   selector: 'app-transaction-history',
@@ -171,17 +172,10 @@ export class TransactionHistoryComponent {
   }
 
   async copy(text: string) {
-    const value = text?.trim();
-    if (!value) return;
-
-    try {
-      await navigator.clipboard.writeText(value);
-      this.#toast.success('Hash copied');
-    } catch (error: unknown) {
-      console.warn('[TransactionHistoryComponent] Clipboard copy failed:', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      this.#toast.error('Failed to copy hash');
-    }
+    await copyToClipboard(text, this.#toast, {
+      successMessage: 'Hash copied',
+      errorMessage: 'Failed to copy hash',
+      context: 'TransactionHistoryComponent',
+    });
   }
 }

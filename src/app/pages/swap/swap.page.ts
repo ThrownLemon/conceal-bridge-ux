@@ -35,6 +35,7 @@ import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardIconComponent } from '@/shared/components/icon/icon.component';
 import { ZardInputDirective } from '@/shared/components/input/input.directive';
 import { ZardToastService } from '@/shared/components/toast/toast.service';
+import { copyToClipboard } from '@/shared/utils/clipboard';
 
 import {
   StepProgressComponent,
@@ -1413,17 +1414,9 @@ export class SwapPage {
   }
 
   async copy(text: string): Promise<void> {
-    const value = text.trim();
-    if (!value) return;
-
-    try {
-      await navigator.clipboard.writeText(value);
-      this.#toast.success('Copied to clipboard.');
-    } catch (error: unknown) {
-      console.warn('[SwapPage] Clipboard copy failed:', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      this.#toast.error('Copy failed (clipboard unavailable).');
-    }
+    await copyToClipboard(text, this.#toast, {
+      successMessage: 'Copied to clipboard.',
+      context: 'SwapPage',
+    });
   }
 }
