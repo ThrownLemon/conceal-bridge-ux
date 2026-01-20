@@ -8,3 +8,44 @@
 .worktrees/
 .security-key
 logs/security/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log*
+
+# Angular
+.angular/
+dist/
+out-tsc/
+bazel-out/
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Editor directories and files
+.idea/
+.vscode/*.log
+*.swp
+*.swo
+
+# Misc
+*.log
+tmp/
