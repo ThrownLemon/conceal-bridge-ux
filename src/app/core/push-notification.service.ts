@@ -225,7 +225,7 @@ export class PushNotificationService {
         // Using application server key (VAPID) - should be configured via environment
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: this.#getApplicationServerKey(),
+          applicationServerKey: this.#getApplicationServerKey() as BufferSource | undefined,
         });
       }
 
