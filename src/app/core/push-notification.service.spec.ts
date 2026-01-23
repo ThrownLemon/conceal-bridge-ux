@@ -85,22 +85,6 @@ describe('PushNotificationService', () => {
     });
   }
 
-  function removeNotificationSupport(): void {
-    Object.defineProperty(window, 'Notification', {
-      value: undefined,
-      writable: true,
-      configurable: true,
-    });
-  }
-
-  function removePushManagerSupport(): void {
-    Object.defineProperty(window, 'PushManager', {
-      value: undefined,
-      writable: true,
-      configurable: true,
-    });
-  }
-
   function setNotificationPermission(permission: NotificationPermission): void {
     Object.defineProperty(mockNotification, 'permission', {
       get: () => permission,

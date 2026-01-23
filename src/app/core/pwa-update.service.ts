@@ -1,4 +1,4 @@
-import { Injectable, signal, inject, isDevMode } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter, interval } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -140,7 +140,7 @@ export class PwaUpdateService {
         filter((event): event is VersionReadyEvent => event.type === 'VERSION_READY'),
         takeUntilDestroyed()
       )
-      .subscribe((event) => {
+      .subscribe(() => {
         this.updateAvailable.set(true);
         this.#showUpdateNotification();
       });
