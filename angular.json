@@ -45,7 +45,8 @@
                 }
               ],
               "outputHashing": "all",
-              "baseHref": "/conceal-bridge-ux/"
+              "baseHref": "/conceal-bridge-ux/",
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "fileReplacements": [
