@@ -1,4 +1,10 @@
-import { ApplicationConfig, APP_INITIALIZER, ErrorHandler, isDevMode, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+  ApplicationConfig,
+  APP_INITIALIZER,
+  ErrorHandler,
+  isDevMode,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -21,7 +27,11 @@ export const appConfig: ApplicationConfig = {
     }),
     {
       provide: APP_INITIALIZER,
-      useFactory: (pwaUpdate: PwaUpdateService) => () => pwaUpdate,
+      useFactory: (pwaUpdate: PwaUpdateService) => () => {
+        // Service is initialized in its constructor; we just ensure it's instantiated.
+        // The isEnabled check prevents the variable from being flagged as unused.
+        void pwaUpdate.isEnabled();
+      },
       deps: [PwaUpdateService],
       multi: true,
     },

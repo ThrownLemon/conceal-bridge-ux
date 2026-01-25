@@ -137,11 +137,7 @@ export class PushNotificationService {
    * ```
    */
   isSupported(): boolean {
-    return (
-      'serviceWorker' in navigator &&
-      'Notification' in window &&
-      'PushManager' in window
-    );
+    return 'serviceWorker' in navigator && 'Notification' in window && 'PushManager' in window;
   }
 
   /**
@@ -222,10 +218,16 @@ export class PushNotificationService {
 
       if (!subscription) {
         // Create new subscription
-        // Using application server key (VAPID) - should be configured via environment
+        const applicationServerKey = this.#getApplicationServerKey();
+        if (!applicationServerKey) {
+          console.info(
+            '[PushNotificationService] No VAPID key configured. Push subscriptions may not work in production. ' +
+              'Configure vapidPublicKey in environment to enable push notifications.',
+          );
+        }
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: this.#getApplicationServerKey() as BufferSource | undefined,
+          applicationServerKey: applicationServerKey as BufferSource | undefined,
         });
       }
 

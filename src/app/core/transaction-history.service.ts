@@ -196,8 +196,7 @@ export class TransactionHistoryService {
       return;
     }
 
-    const directionLabel =
-      tx.direction === 'ccx-to-evm' ? 'CCX to wCCX' : 'wCCX to CCX';
+    const directionLabel = tx.direction === 'ccx-to-evm' ? 'CCX to wCCX' : 'wCCX to CCX';
     const amountFormatted = (tx.amount / 1_000_000).toFixed(2);
 
     let title: string;
@@ -215,7 +214,7 @@ export class TransactionHistoryService {
     void this.#pushNotificationService.showNotification({
       title,
       body,
-      icon: '/assets/icons/icon-192x192.png',
+      icon: '/android-chrome-192x192.png',
       tag: 'bridge-transaction',
       data: { transactionId: tx.id },
     });

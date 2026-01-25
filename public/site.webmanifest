@@ -51,21 +51,5 @@
         }
       ]
     }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/swap-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Swap interface on desktop"
-    },
-    {
-      "src": "/screenshots/swap-mobile.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Swap interface on mobile"
-    }
   ]
 }
