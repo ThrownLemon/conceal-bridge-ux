@@ -38,6 +38,14 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
 
+      - name: Replace WalletConnect Project ID
+        run: |
+          if [ -n "${{ secrets.WALLETCONNECT_PROJECT_ID }}" ]; then
+            find src -name "*.ts" -exec sed -i "s/__WALLETCONNECT_PROJECT_ID__/${{ secrets.WALLETCONNECT_PROJECT_ID }}/g" {} +
+          else
+            echo "Warning: WALLETCONNECT_PROJECT_ID secret not set - WalletConnect features will not work"
+          fi
+
       - name: Build production bundle
         run: npm run build
 
