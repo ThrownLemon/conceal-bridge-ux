@@ -182,9 +182,7 @@ export class EvmWalletService {
 
     if (connector === 'metamask') return !!injected.isMetaMask;
 
-    // Trust Wallet desktop extension may not always set flags; treat "not MetaMask" as acceptable.
-    if (connector === 'trust')
-      return !!(injected.isTrust || injected.isTrustWallet) || !injected.isMetaMask;
+    if (connector === 'trust') return !!(injected.isTrust || injected.isTrustWallet);
 
     return false;
   }
@@ -630,13 +628,9 @@ export class EvmWalletService {
     }
 
     if (connector === 'trust' && !(injected.isTrust || injected.isTrustWallet)) {
-      // Trust on desktop is often injected without flags; prefer letting it work.
-      // Only hard-fail if it's clearly MetaMask-only.
-      if (injected.isMetaMask) {
-        throw new Error(
-          'Trust Wallet not detected. Please install Trust Wallet or choose another wallet.',
-        );
-      }
+      throw new Error(
+        'Trust Wallet not detected. Please install Trust Wallet or choose another wallet.',
+      );
     }
 
     return injected;

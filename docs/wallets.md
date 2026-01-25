@@ -17,7 +17,7 @@ The app supports these connectors (see [`WalletConnectorId`](conceal-bridge-ux/s
 
 - **Injected wallets**
   - MetaMask (detected via `window.ethereum.isMetaMask`, see [`isConnectorAvailable()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:77))
-  - Trust Wallet (detected via Trust flags OR “not MetaMask”, see [`isConnectorAvailable()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:86))
+  - Trust Wallet (detected via `isTrust` or `isTrustWallet` flags, see [`isConnectorAvailable()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:86))
 - **Binance Wallet**
   - detected via `window.BinanceChain` (see [`hasBinanceProvider`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:58) and [`#binanceProvider()`](conceal-bridge-ux/src/app/core/evm-wallet.service.ts:292))
 
