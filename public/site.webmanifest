@@ -2,9 +2,9 @@
   "name": "Conceal Bridge",
   "short_name": "CCX Bridge",
   "description": "Swap between Conceal (CCX) and wrapped CCX (wCCX) on EVM networks",
-  "start_url": "/",
-  "id": "/",
-  "scope": "/",
+  "start_url": "/conceal-bridge-ux/",
+  "id": "/conceal-bridge-ux/",
+  "scope": "/conceal-bridge-ux/",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -29,7 +29,7 @@
       "name": "Swap Tokens",
       "short_name": "Swap",
       "description": "Swap CCX and wCCX tokens",
-      "url": "/swap",
+      "url": "/conceal-bridge-ux/swap",
       "icons": [
         {
           "src": "/android-chrome-192x192.png",
@@ -42,7 +42,7 @@
       "name": "Transaction History",
       "short_name": "History",
       "description": "View your swap transaction history",
-      "url": "/swap?view=history",
+      "url": "/conceal-bridge-ux/swap?view=history",
       "icons": [
         {
           "src": "/android-chrome-192x192.png",

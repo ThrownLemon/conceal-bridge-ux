@@ -128,15 +128,22 @@ describe('PushNotificationService', () => {
       expect(service.subscription()).toBeNull();
     });
 
-    it('should load subscription state from localStorage on init', () => {
+    it('should load subscription state from localStorage on init', async () => {
       TestBed.resetTestingModule();
       setupLocalStorage({
         [SUBSCRIPTION_KEY]: JSON.stringify({ isSubscribed: true }),
       });
+      // Set up service worker with existing subscription for verification
+      setupServiceWorkerSupport();
+      mockPushManager.getSubscription = vi.fn().mockResolvedValue({
+        endpoint: 'https://push.example.com/existing',
+        toJSON: () => ({ endpoint: 'https://push.example.com/existing' }),
+      } as PushSubscription);
       TestBed.configureTestingModule({ providers: [PushNotificationService] });
       service = TestBed.inject(PushNotificationService);
 
-      expect(service.isSubscribed()).toBe(true);
+      // Wait for async initialization to complete
+      await vi.waitFor(() => expect(service.isSubscribed()).toBe(true));
     });
 
     it('should load granted permission from Notification API', () => {
@@ -832,10 +839,13 @@ describe('PushNotificationService', () => {
       TestBed.resetTestingModule();
       setupLocalStorage(savedData);
       setupServiceWorkerSupport();
+      // Mock subscription still exists for verification
+      mockPushManager.getSubscription = vi.fn().mockResolvedValue(existingSubscription);
       TestBed.configureTestingModule({ providers: [PushNotificationService] });
       const newService = TestBed.inject(PushNotificationService);
 
-      expect(newService.isSubscribed()).toBe(true);
+      // Wait for async initialization to complete
+      await vi.waitFor(() => expect(newService.isSubscribed()).toBe(true));
     });
 
     it('should not persist subscription state after unsubscribe', async () => {

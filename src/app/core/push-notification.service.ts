@@ -113,10 +113,11 @@ export class PushNotificationService {
    * subscription status from localStorage.
    * Automatically called in constructor.
    */
-  #initialize() {
+  #initialize(): void {
     if (this.isSupported()) {
       this.permission.set(Notification.permission);
-      this.#loadSubscriptionState();
+      // Fire-and-forget async initialization - state will update when ready
+      void this.#loadSubscriptionState();
     }
   }
 
@@ -228,7 +229,10 @@ export class PushNotificationService {
         }
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: applicationServerKey as BufferSource,
+          // Type assertion required: Uint8Array.buffer returns ArrayBufferLike which
+          // includes SharedArrayBuffer, but PushManager only accepts ArrayBuffer.
+          // At runtime, Uint8Array always uses ArrayBuffer, not SharedArrayBuffer.
+          applicationServerKey: applicationServerKey.buffer as ArrayBuffer,
         });
       }
 
@@ -285,6 +289,10 @@ export class PushNotificationService {
         return success;
       }
 
+      // No subscription exists - clear any stale local state
+      this.#subscription.set(null);
+      this.isSubscribed.set(false);
+      this.#clearSubscriptionState();
       return true;
     } catch (error) {
       console.warn('Failed to unsubscribe from push notifications', error);
@@ -387,14 +395,27 @@ export class PushNotificationService {
 
   /**
    * Loads subscription state from localStorage on service initialization.
+   * Verifies the subscription still exists in the browser to prevent stale state.
    * Silently handles parse errors or missing data.
    */
-  #loadSubscriptionState() {
+  async #loadSubscriptionState(): Promise<void> {
     try {
       const raw = localStorage.getItem(SUBSCRIPTION_KEY);
       if (raw) {
         const state = JSON.parse(raw) as { isSubscribed: boolean };
-        this.isSubscribed.set(state.isSubscribed);
+        if (state.isSubscribed) {
+          // Verify subscription still exists in browser
+          const registration = await navigator.serviceWorker.ready;
+          const subscription = await registration.pushManager.getSubscription();
+          if (subscription) {
+            this.isSubscribed.set(true);
+            this.#subscription.set(subscription);
+          } else {
+            // Subscription was revoked/expired - clear stale state
+            this.isSubscribed.set(false);
+            this.#clearSubscriptionState();
+          }
+        }
       }
     } catch (error) {
       console.warn('Failed to load push subscription state', error);
