@@ -1,5 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { StoredTransaction } from './bridge-types';
+import { PushNotificationService } from './push-notification.service';
+import { formatCcxAmount } from './utils/format.utils';
 
 /** LocalStorage key for persisting transaction history. */
 const STORAGE_KEY = 'conceal_bridge_tx_history';
@@ -36,6 +38,7 @@ const STORAGE_KEY = 'conceal_bridge_tx_history';
   providedIn: 'root',
 })
 export class TransactionHistoryService {
+  readonly #pushNotificationService = inject(PushNotificationService);
   readonly #transactions = signal<StoredTransaction[]>([]);
 
   /**
@@ -102,6 +105,9 @@ export class TransactionHistoryService {
    * than 5 transactions, the oldest ones are removed. Changes are
    * automatically persisted to localStorage.
    *
+   * If push notifications are enabled, a notification is shown with
+   * the transaction status update.
+   *
    * @param tx - The transaction to add.
    *
    * @example
@@ -124,6 +130,7 @@ export class TransactionHistoryService {
       return updated.slice(0, 5);
     });
     this.#saveToStorage();
+    this.#showNotificationForTransaction(tx);
   }
 
   /**
@@ -171,5 +178,46 @@ export class TransactionHistoryService {
     } catch (e) {
       console.warn('Failed to save transaction history', e);
     }
+  }
+
+  /**
+   * Shows a push notification for the transaction based on its status.
+   *
+   * Displays different notification messages depending on whether the
+   * transaction is pending or completed, and its direction (CCX to EVM
+   * or EVM to CCX).
+   *
+   * Only shows notifications if the user has granted permission.
+   *
+   * @param tx - The transaction to show a notification for.
+   */
+  #showNotificationForTransaction(tx: StoredTransaction) {
+    // Only show notifications if permission is granted
+    if (this.#pushNotificationService.permission() !== 'granted') {
+      return;
+    }
+
+    const directionLabel = tx.direction === 'ccx-to-evm' ? 'CCX to wCCX' : 'wCCX to CCX';
+    const amountFormatted = formatCcxAmount(BigInt(tx.amount));
+
+    let title: string;
+    let body: string;
+
+    if (tx.status === 'completed') {
+      title = 'Bridge Transaction Complete';
+      body = `Successfully bridged ${amountFormatted} CCX (${directionLabel}) on ${tx.network.toUpperCase()}`;
+    } else {
+      title = 'Bridge Transaction Started';
+      body = `Bridging ${amountFormatted} CCX (${directionLabel}) on ${tx.network.toUpperCase()}`;
+    }
+
+    // Show the notification (async, but we don't need to await)
+    void this.#pushNotificationService.showNotification({
+      title,
+      body,
+      icon: '/android-chrome-192x192.png',
+      tag: 'bridge-transaction',
+      data: { transactionId: tx.id },
+    });
   }
 }

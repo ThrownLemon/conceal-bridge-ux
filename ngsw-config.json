@@ -1,0 +1,83 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/conceal-bridge-ux/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/conceal-bridge-ux/favicon.svg",
+          "/conceal-bridge-ux/index.html",
+          "/conceal-bridge-ux/*.css",
+          "/conceal-bridge-ux/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/conceal-bridge-ux/android-chrome-192x192.png",
+          "/conceal-bridge-ux/android-chrome-512x512.png",
+          "/conceal-bridge-ux/apple-touch-icon.png",
+          "/conceal-bridge-ux/favicon-16x16.png",
+          "/conceal-bridge-ux/favicon-32x32.png",
+          "/conceal-bridge-ux/site.webmanifest",
+          "/conceal-bridge-ux/fonts/**",
+          "/conceal-bridge-ux/images/**"
+        ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "api-config",
+      "urls": [
+        "https://bridge.conceal.network/backend/*/config/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 10,
+        "maxAge": "1h",
+        "timeout": "10s"
+      }
+    },
+    {
+      "name": "api-balance",
+      "urls": [
+        "https://bridge.conceal.network/backend/*/api/balance/**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 20,
+        "maxAge": "5m",
+        "timeout": "5s"
+      }
+    },
+    {
+      "name": "api-swap",
+      "urls": [
+        "https://bridge.conceal.network/backend/*/api/**/swap/**",
+        "https://bridge.conceal.network/backend/*/api/**/tx",
+        "https://bridge.conceal.network/backend/*/api/**/estimateGas",
+        "https://bridge.conceal.network/backend/*/api/**/getGasPrice"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 50,
+        "maxAge": "1m",
+        "timeout": "10s"
+      }
+    }
+  ],
+  "navigationUrls": [
+    "/**",
+    "!/**/*.*",
+    "!/**/*__*",
+    "!/**/*__*/**"
+  ]
+}

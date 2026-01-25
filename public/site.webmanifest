@@ -2,19 +2,54 @@
   "name": "Conceal Bridge",
   "short_name": "CCX Bridge",
   "description": "Swap between Conceal (CCX) and wrapped CCX (wCCX) on EVM networks",
+  "start_url": "/conceal-bridge-ux/",
+  "id": "/conceal-bridge-ux/",
+  "scope": "/conceal-bridge-ux/",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "/conceal-bridge-ux/android-chrome-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/android-chrome-512x512.png",
+      "src": "/conceal-bridge-ux/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "theme_color": "#ffa500",
   "background_color": "#0a0a0a",
-  "display": "standalone"
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Swap Tokens",
+      "short_name": "Swap",
+      "description": "Swap CCX and wCCX tokens",
+      "url": "/conceal-bridge-ux/swap",
+      "icons": [
+        {
+          "src": "/conceal-bridge-ux/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Transaction History",
+      "short_name": "History",
+      "description": "View your swap transaction history",
+      "url": "/conceal-bridge-ux/swap?view=history",
+      "icons": [
+        {
+          "src": "/conceal-bridge-ux/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }
