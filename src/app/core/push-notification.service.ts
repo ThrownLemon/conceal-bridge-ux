@@ -221,13 +221,14 @@ export class PushNotificationService {
         const applicationServerKey = this.#getApplicationServerKey();
         if (!applicationServerKey) {
           console.info(
-            '[PushNotificationService] No VAPID key configured. Push subscriptions may not work in production. ' +
+            '[PushNotificationService] No VAPID key configured. Push subscriptions require a VAPID key. ' +
               'Configure vapidPublicKey in environment to enable push notifications.',
           );
+          return null;
         }
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: applicationServerKey as BufferSource | undefined,
+          applicationServerKey: applicationServerKey as BufferSource,
         });
       }
 

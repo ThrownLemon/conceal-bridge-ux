@@ -296,6 +296,14 @@ describe('PushNotificationService', () => {
       setNotificationPermission('granted');
       service.permission.set('granted');
 
+      // Use existing subscription to test localStorage error handling
+      const existingSubscription = {
+        endpoint: 'https://push.example.com/existing',
+        toJSON: () => ({ endpoint: 'https://push.example.com/existing' }),
+      } as PushSubscription;
+
+      mockPushManager.getSubscription = vi.fn().mockResolvedValue(existingSubscription);
+
       vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
         throw new Error('QuotaExceededError');
       });
@@ -403,16 +411,30 @@ describe('PushNotificationService', () => {
     });
 
     it('should successfully subscribe to push notifications', async () => {
+      // When no VAPID key is configured, subscribe should return null for new subscriptions
+      const infoSpy = vi.spyOn(console, 'info').mockReturnValue(undefined);
+      const subscription = await service.subscribe();
+
+      expect(subscription).toBeNull();
+      expect(service.isSubscribed()).toBe(false);
+      expect(infoSpy).toHaveBeenCalledWith(expect.stringContaining('No VAPID key configured'));
+    });
+
+    it('should successfully subscribe with existing subscription', async () => {
+      // When there's already a subscription, we don't need VAPID key
+      const existingSubscription = {
+        endpoint: 'https://push.example.com/existing',
+        toJSON: () => ({ endpoint: 'https://push.example.com/existing' }),
+      } as PushSubscription;
+
+      mockPushManager.getSubscription = vi.fn().mockResolvedValue(existingSubscription);
+
       const subscription = await service.subscribe();
 
       expect(subscription).toBeTruthy();
-      expect(subscription?.endpoint).toBe('https://push.example.com/subscription');
+      expect(subscription?.endpoint).toBe('https://push.example.com/existing');
       expect(service.isSubscribed()).toBe(true);
       expect(service.subscription()).toBe(subscription);
-      expect(mockPushManager.subscribe).toHaveBeenCalledWith({
-        userVisibleOnly: true,
-        applicationServerKey: undefined,
-      });
     });
 
     it('should return existing subscription if already subscribed', async () => {
@@ -431,6 +453,14 @@ describe('PushNotificationService', () => {
     });
 
     it('should persist subscription state to localStorage', async () => {
+      // Use existing subscription to test localStorage persistence
+      const existingSubscription = {
+        endpoint: 'https://push.example.com/existing',
+        toJSON: () => ({ endpoint: 'https://push.example.com/existing' }),
+      } as PushSubscription;
+
+      mockPushManager.getSubscription = vi.fn().mockResolvedValue(existingSubscription);
+
       await service.subscribe();
 
       expect(localStorage.setItem).toHaveBeenCalledWith(
@@ -476,7 +506,8 @@ describe('PushNotificationService', () => {
     });
 
     it('should handle subscribe errors gracefully', async () => {
-      mockPushManager.subscribe = vi.fn().mockRejectedValue(new Error('Subscribe failed'));
+      // Test error handling during getSubscription
+      mockPushManager.getSubscription = vi.fn().mockRejectedValue(new Error('Failed to get subscription'));
       const warnSpy = vi.spyOn(console, 'warn').mockReturnValue(undefined);
 
       const subscription = await service.subscribe();
@@ -749,6 +780,14 @@ describe('PushNotificationService', () => {
       setNotificationPermission('granted');
       service.permission.set('granted');
 
+      // Use existing subscription to test signal updates
+      const existingSubscription = {
+        endpoint: 'https://push.example.com/existing',
+        toJSON: () => ({ endpoint: 'https://push.example.com/existing' }),
+      } as PushSubscription;
+
+      mockPushManager.getSubscription = vi.fn().mockResolvedValue(existingSubscription);
+
       await service.subscribe();
 
       expect(service.isSubscribed()).toBe(true);
@@ -777,6 +816,14 @@ describe('PushNotificationService', () => {
       service = TestBed.inject(PushNotificationService);
       setNotificationPermission('granted');
       service.permission.set('granted');
+
+      // Use existing subscription to test persistence
+      const existingSubscription = {
+        endpoint: 'https://push.example.com/existing',
+        toJSON: () => ({ endpoint: 'https://push.example.com/existing' }),
+      } as PushSubscription;
+
+      mockPushManager.getSubscription = vi.fn().mockResolvedValue(existingSubscription);
 
       await service.subscribe();
 

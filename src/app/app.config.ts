@@ -27,11 +27,7 @@ export const appConfig: ApplicationConfig = {
     }),
     {
       provide: APP_INITIALIZER,
-      useFactory: (pwaUpdate: PwaUpdateService) => () => {
-        // Service is initialized in its constructor; we just ensure it's instantiated.
-        // The isEnabled check prevents the variable from being flagged as unused.
-        void pwaUpdate.isEnabled();
-      },
+      useFactory: (pwaUpdate: PwaUpdateService) => () => pwaUpdate.checkForUpdate(),
       deps: [PwaUpdateService],
       multi: true,
     },

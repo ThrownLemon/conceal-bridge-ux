@@ -1,6 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { StoredTransaction } from './bridge-types';
 import { PushNotificationService } from './push-notification.service';
+import { formatCcxAmount } from './utils/format.utils';
 
 /** LocalStorage key for persisting transaction history. */
 const STORAGE_KEY = 'conceal_bridge_tx_history';
@@ -197,7 +198,7 @@ export class TransactionHistoryService {
     }
 
     const directionLabel = tx.direction === 'ccx-to-evm' ? 'CCX to wCCX' : 'wCCX to CCX';
-    const amountFormatted = (tx.amount / 1_000_000).toFixed(2);
+    const amountFormatted = formatCcxAmount(BigInt(tx.amount));
 
     let title: string;
     let body: string;
